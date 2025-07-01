@@ -130,71 +130,57 @@ function getDotId(item) {
 
 // Function to dynamically generate content based on the JSON data
 function generateContent() {
-  const questionContainer = document.getElementById("question-container");
-  const mainHeading = document.getElementById("mainHeading");
+  const questionContainer = document.getElementById('question-container');
+  const mainHeading = document.getElementById('mainHeading');
   mainHeading.textContent = gameData[0].question;
 
-  const matchingArea = document.getElementById("matching-area");
-  matchingArea.innerHTML = ""; // Clear any previous content
+  const matchingArea = document.getElementById('matching-area');
+  matchingArea.innerHTML = ''; // Clear any previous content
 
-  const leftItems = gameData.slice(1).map((item) => item.is_equal_one);
-  const rightItems = derangedShuffle(
-    gameData.slice(1).map((item) => item.is_equal_two)
-  );
+  const leftItems = gameData.slice(1).map(item => item.is_equal_one);
+  const rightItems = derangedShuffle(gameData.slice(1).map(item => item.is_equal_two));
 
   for (let i = 0; i < leftItems.length; i++) {
-    const row = document.createElement("div");
-    row.classList.add("row", "mb-3");
+    const row = document.createElement('div');
+    row.classList.add('row', 'mb-3');
 
     const left = leftItems[i];
     const right = rightItems[i];
-    const instruction = gameData[i + 1].instruction; // Access the instruction for each match
+    const instruction = gameData[i + 1].instruction;  // Access the instruction for each match
 
-    const originalIndex = leftItems.findIndex(
-      (item) => JSON.stringify(item) === JSON.stringify(right)
+    const originalIndex = leftItems.findIndex(item =>
+      JSON.stringify(item) === JSON.stringify(right)
     );
 
     // Left Column
-    const leftColumn = document.createElement("div");
-    leftColumn.classList.add("col-6");
+    const leftColumn = document.createElement('div');
+    leftColumn.classList.add('col-6');
     leftColumn.innerHTML = `
-      <div class="item left" data-id="${getDotId(
-        left
-      )}">  <!-- Use getDotId() here -->
+      <div class="item left" data-id="${getDotId(left)}">  <!-- Use getDotId() here -->
         <p class="item_left_">${left.text}<p>
-        <div class="dot left" data-id="${getDotId(
-          left
-        )}"></div>  <!-- Use getDotId() here -->
+        <div class="dot left" data-id="${getDotId(left)}"></div>  <!-- Use getDotId() here -->
         <input type="hidden" value="${i}"/>
-        ${
-          left.thumbnail
-            ? `<img src="/${left.thumbnail}" alt="${left.text}" />`
-            : ""
-        } <!-- Display image if thumbnail exists -->
+        ${left.thumbnail ? `<img src="${left.thumbnail}" alt="${left.text}" />` : ''} <!-- Display image if thumbnail exists -->
       </div>
     `;
     row.appendChild(leftColumn);
 
     // Right Column
-    const rightColumn = document.createElement("div");
-    rightColumn.classList.add("col-6", "text-end");
+    const rightColumn = document.createElement('div');
+    rightColumn.classList.add('col-6', 'text-end');
     rightColumn.innerHTML = `
   <div class="item right d-inline-block" data-id="${getDotId(right)}">
     <!-- Display text inside <p> tag with class item_right_text if text exists -->
-    ${right.text ? `<p class="item_right_text">${right.text}</p>` : ""}
+    ${right.text ? `<p class="item_right_text">${right.text}</p>` : ''}
 
-    ${
-      right.thumbnail
-        ? `<img src="/${right.thumbnail}" alt="${right.text}" />`
-        : ""
-    }  <!-- Display image if thumbnail exists -->
-    <div class="dot right" data-id="${getDotId(
-      right
-    )}"></div>  <!-- Use getDotId() here -->
+    ${right.thumbnail ? `<img src="${right.thumbnail}" alt="${right.text}" />` : ''}  <!-- Display image if thumbnail exists -->
+    <div class="dot right" data-id="${getDotId(right)}"></div>  <!-- Use getDotId() here -->
     <input type="hidden" value="${originalIndex}"/>
   </div>
 `;
     row.appendChild(rightColumn);
+
+
 
     matchingArea.appendChild(row);
   }
@@ -202,23 +188,24 @@ function generateContent() {
   enableDragAndDrop();
 }
 
+
+
 // Call the function to generate content
 window.onload = () => {
   fetchQuestions(() => {
-    generateContent();
-    createGuidanceSteps();
+  generateContent();
   });
 };
 
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
 
 const dragAudio = document.getElementById("dragAudio");
 const dropAudio = document.getElementById("dropAudio");
 const correctAudio = document.getElementById("correctAudio");
 const wrongAudio = document.getElementById("wrongAudio");
 const resultAudio = document.getElementById("resultAudio");
-const backgroundAudio = document.getElementById("backgorundAudio");
+const backgroundAudio = document.getElementById('backgorundAudio');
 backgroundAudio.loop = true;
 backgroundAudio.volume = 0.5;
 
@@ -236,9 +223,9 @@ let checkingAnswers = false;
 let guidanceSteps = [];
 
 function createGuidanceSteps() {
-  guidanceSteps = gameData.slice(1).map((item) => ({
+  guidanceSteps = gameData.slice(1).map(item => ({
     id: item.is_equal_one.text,
-    label: item.instruction,
+    label: item.instruction
   }));
 
   // Shuffle the guidance steps
@@ -267,7 +254,7 @@ function speakTextWithBackgroundControl(text) {
   if (!window.speechSynthesis) return;
   speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "en-US";
+  utterance.lang = 'en-US';
   controlBackgroundMusicVolume(0.2);
   speechSynthesis.speak(utterance);
   utterance.onend = () => controlBackgroundMusicVolume(1.0);
@@ -277,7 +264,7 @@ function speakText(text) {
   if (!window.speechSynthesis) return;
   speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "en-US";
+  utterance.lang = 'en-US';
   speechSynthesis.speak(utterance);
 }
 
@@ -288,12 +275,12 @@ function typeHeadingText(text, elementId, speed = 50, onComplete = null) {
   if (!el) return;
 
   // Ensure that the element is visible when starting the animation
-  el.style.visibility = "visible"; // Make sure it is visible
+  el.style.visibility = 'visible';  // Make sure it is visible
 
   clearInterval(typeHeadingInterval);
   typingInProgress = true;
   el.dataset.fulltext = text;
-  el.textContent = ""; // Start fresh with no text
+  el.textContent = '';  // Start fresh with no text
   let i = 0;
 
   // Start typing animation
@@ -302,7 +289,7 @@ function typeHeadingText(text, elementId, speed = 50, onComplete = null) {
       el.textContent += text.charAt(i++);
     } else {
       clearInterval(typeHeadingInterval);
-      el.style.borderRight = "none";
+      el.style.borderRight = 'none';
       typingInProgress = false;
       // Trigger onComplete callback after typing finishes
       if (onComplete) setTimeout(onComplete, 300);
@@ -311,15 +298,15 @@ function typeHeadingText(text, elementId, speed = 50, onComplete = null) {
 }
 
 // Mouse hover effect to increase font size
-document.getElementById("mainHeading").addEventListener("mouseenter", () => {
+document.getElementById("mainHeading").addEventListener('mouseenter', () => {
   const el = document.getElementById("mainHeading");
   el.style.transition = "font-size 0.3s ease-in-out";
-  el.style.fontSize = "35px"; // Increased font size on hover
+  el.style.fontSize = "35px";  // Increased font size on hover
 });
 
-document.getElementById("mainHeading").addEventListener("mouseleave", () => {
+document.getElementById("mainHeading").addEventListener('mouseleave', () => {
   const el = document.getElementById("mainHeading");
-  el.style.fontSize = ""; // Reset font size on mouse leave
+  el.style.fontSize = "";  // Reset font size on mouse leave
 });
 
 function stopTypingAndShowFullText(elementId) {
@@ -329,25 +316,25 @@ function stopTypingAndShowFullText(elementId) {
   clearInterval(typeHeadingInterval);
   typingInProgress = false;
 
-  const fullText = el.dataset.fulltext || "";
+  const fullText = el.dataset.fulltext || '';
   el.textContent = fullText;
-  el.style.borderRight = "none";
+  el.style.borderRight = 'none';
 }
 
-window.addEventListener("load", () => {
+window.addEventListener('load', () => {
   const intro = document.getElementById("introAudio");
   intro.muted = false;
-  document.getElementById("mainHeading").style.visibility = "hidden";
+  document.getElementById("mainHeading").style.visibility = 'hidden';
   document.getElementById("timer-section").classList.remove("d-none");
 
   // Create guidance steps from gameData
-  // createGuidanceSteps();
+  createGuidanceSteps();
 
   intro.play().catch(() => {
-    document.body.addEventListener("click", () => intro.play(), { once: true });
+    document.body.addEventListener('click', () => intro.play(), { once: true });
   });
 
-  intro.addEventListener("ended", () => {
+  intro.addEventListener('ended', () => {
     speakText("Are you ready?");
     setTimeout(() => {
       document.getElementById("timer-section").classList.add("fade-in");
@@ -365,32 +352,32 @@ window.addEventListener("load", () => {
     }, 2000);
   });
 
-  document.getElementById("checkBtn").addEventListener("click", checkAnswers);
+  document.getElementById('checkBtn').addEventListener('click', checkAnswers);
 });
 
 function enableHoverSpeak() {
-  document.querySelectorAll(".item[data-id]").forEach((item) => {
-    item.addEventListener("mouseenter", () => {
-      const label = item.textContent.trim().split("\n")[0];
-      item.style.backgroundColor = "#d6eaff";
+  document.querySelectorAll('.item[data-id]').forEach(item => {
+    item.addEventListener('mouseenter', () => {
+      const label = item.textContent.trim().split('\n')[0];
+      item.style.backgroundColor = '#d6eaff';
       stopTypingAndShowFullText("instruction-text");
       speakText(label);
     });
-    item.addEventListener("mouseleave", () => {
-      const isRight = item.classList.contains("right");
-      item.style.backgroundColor = isRight ? "#e0fff5" : "#fffbe0";
+    item.addEventListener('mouseleave', () => {
+      const isRight = item.classList.contains('right');
+      item.style.backgroundColor = isRight ? '#e0fff5' : '#fffbe0';
     });
   });
 
   const mainHeading = document.getElementById("mainHeading");
-  mainHeading.addEventListener("mouseenter", () => {
+  mainHeading.addEventListener('mouseenter', () => {
     const text = mainHeading.dataset.fulltext || mainHeading.textContent.trim();
+
   });
 
   const instructionBox = document.getElementById("instruction-text");
-  instructionBox.addEventListener("mouseenter", () => {
-    const text =
-      instructionBox.dataset.fulltext || instructionBox.textContent.trim();
+  instructionBox.addEventListener('mouseenter', () => {
+    const text = instructionBox.dataset.fulltext || instructionBox.textContent.trim();
     if (typingInProgress) {
       stopTypingAndShowFullText("instruction-text");
     } else if (text) {
@@ -403,8 +390,8 @@ function enableHoverSpeak() {
 function setDefaultImages() {
   const boyImg = document.querySelector('img[alt="Left Side Image"]');
   const girlImg = document.querySelector('img[alt="Right Side Image"]');
-  if (boyImg) boyImg.src = "/activity/matchup/images/boy-2.png";
-  if (girlImg) girlImg.src = "/activity/matchup/images/girl-2.png";
+  if (boyImg) boyImg.src = '/activity/matchup/images/boy-2.png';
+  if (girlImg) girlImg.src = '/activity/matchup/images/girl-2.png';
 }
 
 function changeImages(isCorrect = false) {
@@ -412,12 +399,8 @@ function changeImages(isCorrect = false) {
   const girlImage = document.querySelector('img[alt="Right Side Image"]');
   if (!boyImage || !girlImage) return;
 
-  const newBoyImage = isCorrect
-    ? "/activity/matchup/images/boy-4.png"
-    : "/activity/matchup/images/boy-3.png";
-  const newGirlImage = isCorrect
-    ? "/activity/matchup/images/girl-4.png"
-    : "/activity/matchup/images/girl-3.png";
+  const newBoyImage = isCorrect ? '/activity/matchup/images/boy-4.png' : '/activity/matchup/images/boy-3.png';
+  const newGirlImage = isCorrect ? '/activity/matchup/images/girl-4.png' : '/activity/matchup/images/girl-3.png';
   const boyImg = new Image();
   const girlImg = new Image();
 
@@ -449,16 +432,16 @@ function nextAnswer() {
       box.style.opacity = 1;
     }, 100);
 
-    document.getElementById("checkBtn").disabled = false;
+    document.getElementById('checkBtn').disabled = false;
   }
 }
 
 function startTimer() {
   timerInterval = setInterval(() => {
     secondsElapsed++;
-    const min = String(Math.floor(secondsElapsed / 60)).padStart(2, "0");
-    const sec = String(secondsElapsed % 60).padStart(2, "0");
-    document.getElementById("timer-count").textContent = ` ${min}:${sec}`;
+    const min = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+    const sec = String(secondsElapsed % 60).padStart(2, '0');
+    document.getElementById('timer-count').textContent = ` ${min}:${sec}`;
   }, 1000);
 }
 
@@ -476,75 +459,72 @@ function startGuidance() {
 }
 
 function resizeCanvas() {
-  const canvas = document.getElementById("canvas");
+  const canvas = document.getElementById('canvas');
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  drawLines(); // Redraw lines when resizing
+  drawLines();  // Redraw lines when resizing
 }
 
-window.addEventListener("resize", resizeCanvas);
-window.addEventListener("scroll", drawLines); // Redraw lines on scroll
-resizeCanvas(); // Initial call to set canvas size
+window.addEventListener('resize', resizeCanvas);
+window.addEventListener('scroll', drawLines);  // Redraw lines on scroll
+resizeCanvas();  // Initial call to set canvas size
+
 
 function getAbsolutePosition(dot) {
   const rect = dot.getBoundingClientRect();
   return {
-    x: rect.left + window.scrollX, // Account for horizontal scrolling
-    y: rect.top + window.scrollY, // Account for vertical scrolling
+    x: rect.left + window.scrollX,  // Account for horizontal scrolling
+    y: rect.top + window.scrollY    // Account for vertical scrolling
   };
 }
+
 
 function enableDragAndDrop() {
   let isDragging = false;
 
-  document.querySelectorAll(".dot.left").forEach((dot) => {
-    dot.addEventListener("mousedown", (e) => {
+  document.querySelectorAll('.dot.left').forEach(dot => {
+    dot.addEventListener('mousedown', (e) => {
       e.preventDefault();
       if (!dragEnabled || isDragging) return;
 
       isDragging = true;
       dropAudio.currentTime = 0;
-      dropAudio.play().catch(() => {});
+      dropAudio.play().catch(() => { });
 
-      dot.classList.remove("active-match");
+      dot.classList.remove('active-match');
       startDot = {
         el: dot,
         id: dot.dataset.id,
-        pos: getAbsolutePosition(dot),
+        pos: getAbsolutePosition(dot)
       };
-      dot.classList.add("active-drag");
-      dot.classList.add("active");
+      dot.classList.add('active-drag');
+      dot.classList.add('active');
     });
   });
 
-  document.addEventListener("mousemove", (e) => {
+  document.addEventListener('mousemove', (e) => {
     if (startDot && isDragging) {
       tempLine = {
         start: startDot.pos,
-        end: { x: e.pageX, y: e.pageY },
+        end: { x: e.pageX, y: e.pageY }
       };
       drawLines();
     }
   });
 
-  document.addEventListener("mouseup", (e) => {
+  document.addEventListener('mouseup', (e) => {
     if (!startDot || !isDragging) return;
 
     isDragging = false;
     let matchedRightDot = null;
 
-    document.querySelectorAll(".dot.right").forEach((dot) => {
+    document.querySelectorAll('.dot.right').forEach(dot => {
       const rect = dot.getBoundingClientRect();
-      if (
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom
-      ) {
+      if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
         matchedRightDot = {
           el: dot,
           id: dot.dataset.id,
-          pos: getAbsolutePosition(dot),
+          pos: getAbsolutePosition(dot)
         };
       }
     });
@@ -552,14 +532,13 @@ function enableDragAndDrop() {
     tempLine = null;
 
     if (matchedRightDot) {
-      lines = lines.filter(
-        (line) =>
-          line.leftId !== startDot.id && line.rightId !== matchedRightDot.id
+      lines = lines.filter(line =>
+        line.leftId !== startDot.id && line.rightId !== matchedRightDot.id
       );
 
       // Store which instruction this match was made for
-      const currentInstruction =
-        currentStep < guidanceSteps.length ? guidanceSteps[currentStep] : null;
+      const currentInstruction = currentStep < guidanceSteps.length ?
+        guidanceSteps[currentStep] : null;
 
       lines.push({
         start: startDot.pos,
@@ -567,72 +546,64 @@ function enableDragAndDrop() {
         leftId: startDot.id,
         rightId: matchedRightDot.id,
         correct: null,
-        instruction: currentInstruction, // Track the instruction for this match
+        instruction: currentInstruction // Track the instruction for this match
       });
 
-      startDot.el.classList.add("active-match");
-      matchedRightDot.el.classList.add("active-match");
+      startDot.el.classList.add('active-match');
+      matchedRightDot.el.classList.add('active-match');
       currentStep++;
 
       if (currentStep < guidanceSteps.length) {
         setTimeout(startGuidance, 500);
       } else {
-        document.getElementById("instruction-text").innerText =
-          "All items matched! Click 'Check Answers' to finish.";
+        document.getElementById("instruction-text").innerText = "All items matched! Click 'Check Answers' to finish.";
         speakText("All items matched! Click check answers to finish.");
-        document.getElementById("checkBtn").disabled = false;
+        document.getElementById('checkBtn').disabled = false;
       }
     }
 
     startDot = null;
-    document
-      .querySelectorAll(".dot.left, .dot.right")
-      .forEach((dot) => dot.classList.remove("active-drag"));
+    document.querySelectorAll('.dot.left, .dot.right').forEach(dot =>
+      dot.classList.remove('active-drag')
+    );
 
     drawLines();
   });
 }
 
 function drawLines() {
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  lines.forEach((line) => {
-    const color =
-      line.correct === null ? "black" : line.correct ? "green" : "red";
+  lines.forEach(line => {
+    const color = line.correct === null ? 'black' : (line.correct ? 'green' : 'red');
     drawLine(line.start, line.end, color);
   });
 
   if (tempLine) {
-    drawLine(tempLine.start, tempLine.end, "black");
+    drawLine(tempLine.start, tempLine.end, 'black');
   }
 }
 
-function drawLine(start, end, color = "black") {
+function drawLine(start, end, color = 'black') {
   if (!start || !end) return;
 
   const dx = end.x - start.x;
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
 
   ctx.beginPath();
   ctx.moveTo(start.x, start.y);
-  ctx.bezierCurveTo(
-    start.x + dx * 0.5,
-    start.y,
-    start.x + dx * 0.5,
-    end.y,
-    end.x,
-    end.y
-  );
+  ctx.bezierCurveTo(start.x + dx * 0.5, start.y, start.x + dx * 0.5, end.y, end.x, end.y);
   ctx.strokeStyle = color;
   ctx.lineWidth = 6;
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
   ctx.stroke();
 }
+
 
 // FIXED: Check answers based on the instruction each match was made for
 function checkAnswers() {
@@ -643,14 +614,14 @@ function checkAnswers() {
   let correctCount = 0;
   let wrongCount = 0;
 
-  lines.forEach((line) => {
+  lines.forEach(line => {
     let isCorrect = false;
 
     if (line.instruction) {
       // Find the game data item that matches this instruction
-      const gameItem = gameData
-        .slice(1)
-        .find((item) => item.instruction === line.instruction.label);
+      const gameItem = gameData.slice(1).find(item =>
+        item.instruction === line.instruction.label
+      );
 
       if (gameItem) {
         // Check if the match is correct for this specific instruction
@@ -671,6 +642,7 @@ function checkAnswers() {
           (right === oneThumb && left === twoText) ||
           (right === oneText && left === twoThumb) ||
           (right === oneThumb && left === twoThumb);
+
       }
     }
 
@@ -685,22 +657,19 @@ function checkAnswers() {
 
   drawLines();
 
-  const minutes = String(Math.floor(secondsElapsed / 60)).padStart(2, "0");
-  const seconds = String(secondsElapsed % 60).padStart(2, "0");
+  const minutes = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+  const seconds = String(secondsElapsed % 60).padStart(2, '0');
 
-  document.getElementById(
-    "scoreText"
-  ).innerText = `Correct: ${correctCount}\nWrong: ${wrongCount}\nTime Taken: ${minutes}:${seconds}`;
+  document.getElementById('scoreText').innerText =
+    `Correct: ${correctCount}\nWrong: ${wrongCount}\nTime Taken: ${minutes}:${seconds}`;
 
   setTimeout(() => {
-    document.getElementById("resultPopup").style.display = "flex";
-    document.body.classList.add("modal-open");
+    document.getElementById('resultPopup').style.display = 'flex';
+    document.body.classList.add('modal-open');
 
     if (correctCount > 0) {
-      resultAudio.play().catch(() => {});
-      const percentage = Math.floor(
-        (correctCount / guidanceSteps.length) * 100
-      );
+      resultAudio.play().catch(() => { });
+      const percentage = Math.floor((correctCount / guidanceSteps.length) * 100);
       const particleCount = Math.max(Math.floor(percentage), 25);
       triggerConfettiParticles(particleCount);
     } else {
@@ -710,11 +679,8 @@ function checkAnswers() {
 }
 
 function triggerConfettiParticles(particleCount) {
-  const confettiCanvas = document.getElementById("confetti-canvas");
-  const myConfetti = confetti.create(confettiCanvas, {
-    resize: true,
-    useWorker: true,
-  });
+  const confettiCanvas = document.getElementById('confetti-canvas');
+  const myConfetti = confetti.create(confettiCanvas, { resize: true, useWorker: true });
   const duration = 400;
   const end = Date.now() + duration;
 
@@ -733,21 +699,21 @@ function restartGame() {
 
   drawLines();
 
-  document.querySelectorAll(".dot.left, .dot.right").forEach((dot) => {
-    dot.classList.remove("active", "active-match");
+  document.querySelectorAll('.dot.left, .dot.right').forEach(dot => {
+    dot.classList.remove('active', 'active-match');
   });
 
   clearInterval(timerInterval);
   secondsElapsed = 0;
-  document.getElementById("timer-count").textContent = "00:00";
-  document.getElementById("resultPopup").style.display = "none";
-  document.body.classList.remove("modal-open");
+  document.getElementById('timer-count').textContent = '00:00';
+  document.getElementById('resultPopup').style.display = 'none';
+  document.body.classList.remove('modal-open');
   enableHoverSpeak();
   currentStep = 0;
   hasSpokenAllMatched = false;
 
   // Recreate and shuffle guidance steps
-  // createGuidanceSteps();
+  createGuidanceSteps();
 
   setDefaultImages();
   startTimer();

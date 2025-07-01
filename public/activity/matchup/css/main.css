@@ -76,7 +76,7 @@ button:disabled {
   padding: 10px 0;
 }
 
-#question-container > .side-image {
+#question-container>.side-image {
   flex: 0 0 270px;
   margin: 0;
 }
@@ -94,11 +94,13 @@ button:disabled {
   padding: 0 1rem;
   box-sizing: border-box;
 }
+
 #mainHeading {
 
   white-space: nowrap;
   overflow: hidden;
-  border-right: 0.15em solid orange; /* optional cursor effect */
+  border-right: 0.15em solid orange;
+  /* optional cursor effect */
 }
 
 /* Matching Items */
@@ -108,12 +110,14 @@ button:disabled {
   align-items: center;
   width: 100%;
 }
+
 .store.container-fluid {
   background: url(/activity/matchup/images/creampaper.png);
   border: 2px dashed #d45f42;
   border-radius: 2rem;
   padding: 20px;
 }
+
 .item {
   background: #fffbe0;
   padding: 15px 20px;
@@ -128,6 +132,7 @@ button:disabled {
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 
+
 .item.right {
   background: #e0fff5;
 }
@@ -137,6 +142,21 @@ button:disabled {
   max-width: 100%;
   user-select: none;
   pointer-events: none;
+}
+
+.item.left img {
+  max-height: 100%;
+  max-width: 100%;
+  user-select: none;
+  pointer-events: none;
+}
+
+.item_right_text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 90px;
 }
 
 /* Dots for Matching Lines */
@@ -163,35 +183,43 @@ button:disabled {
 
 .dot.left.active,
 .dot.right.active {
-   background: #0bdf75;
+  background: #0bdf75;
   border: 2px solid #333;
 }
-.instruction-text{
-  font-size: 1.2em; 
+
+.instruction-text {
+  font-size: 1.2em;
   font-family: 'Comic Sans MS', 'Fredoka', 'Poppins', cursive, sans-serif;
   font-size: 28px;
-  color: #4a2d8b; /* deep purple */
-  background-color: #fff3cd; /* light yellow */
-  border: 3px dashed #ffa07a; /* cute soft border */
+  color: #4a2d8b;
+  /* deep purple */
+  background-color: #fff3cd;
+  /* light yellow */
+  border: 3px dashed #ffa07a;
+  /* cute soft border */
   padding: 12px 20px;
   border-radius: 20px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
   max-width: 90%;
   margin: 10px auto;
   transition: transform 0.3s ease;
 }
+
 .instruction-text:hover {
   transform: scale(1.05);
-  background-color: #ffe0b3; /* lighter yellow on hover */
+  background-color: #ffe0b3;
+  /* lighter yellow on hover */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   cursor: pointer;
 }
+
 .instruction-text {
   border-right: 2px solid #4a2d8b;
   white-space: nowrap;
   overflow: hidden;
 }
+
 canvas {
   position: fixed;
   top: 0;
@@ -227,12 +255,21 @@ canvas {
   padding-top: 50px;
   backdrop-filter: blur(5px);
 }
+
 /* Up-Down animation */
 /* Up-down animation for the boy image */
 @keyframes floatUpDown {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
-  100% { transform: translateY(0); }
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
 }
 
 .float-updown {
@@ -241,9 +278,17 @@ canvas {
 
 /* Down-up animation for the girl image */
 @keyframes floatDownUp {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(20px); }
-  100% { transform: translateY(0); }
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(20px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
 }
 
 .float-downup {
@@ -263,8 +308,15 @@ canvas {
 }
 
 @keyframes modalFadeIn {
-  from { opacity: 0; transform: translateY(-30px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .close-btn {
@@ -325,7 +377,7 @@ canvas {
     flex-direction: column;
   }
 
-  #question-container > .side-image {
+  #question-container>.side-image {
     flex: none;
     margin-bottom: 1rem;
   }

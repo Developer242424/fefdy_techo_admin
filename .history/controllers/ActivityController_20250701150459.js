@@ -157,7 +157,7 @@ class ActivityController {
         });
 
         // console.log(questionsData)
-        // console.log(questionsData[0].data)
+        // // console.log(questionsData[0].data)
         const rawGameData = questionsData[0].data;
 
         const transformedGameData = rawGameData.map((item, index) => {

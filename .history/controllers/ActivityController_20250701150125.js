@@ -141,11 +141,11 @@ class ActivityController {
         const { sid, tid, lid, stid, qid, ust } = req.body;
         const questionsData = await Questions.findAll({
           where: {
-            subject: sid,
-            topic: tid,
-            level_id: lid,
-            sub_topic: stid,
-            question_type: qid,
+            subject: 1,
+            topic: 2,
+            level_id: 2,
+            sub_topic: 1,
+            question_type: 2,
             is_deleted: null,
             id: {
               [Op.notIn]: Array.from(previouslyServedIds),
@@ -159,7 +159,7 @@ class ActivityController {
         // console.log(questionsData)
         // console.log(questionsData[0].data)
         const rawGameData = questionsData[0].data;
-
+        
         const transformedGameData = rawGameData.map((item, index) => {
           if (index === 0 && item.question) {
             return { question: item.question };
@@ -178,14 +178,15 @@ class ActivityController {
             instruction: item.instruction,
             is_equal_one: {
               text: leftText,
-              thumbnail: leftThumbnail,
+              thumbnail: leftThumbnail
             },
             is_equal_two: {
               text: rightText,
-              thumbnail: rightThumbnail,
-            },
+              thumbnail: rightThumbnail
+            }
           };
         });
+
 
         return res.json(transformedGameData);
       } catch (error) {

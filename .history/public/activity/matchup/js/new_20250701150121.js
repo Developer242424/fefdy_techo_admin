@@ -206,7 +206,6 @@ function generateContent() {
 window.onload = () => {
   fetchQuestions(() => {
     generateContent();
-    createGuidanceSteps();
   });
 };
 
@@ -243,6 +242,7 @@ function createGuidanceSteps() {
 
   // Shuffle the guidance steps
   shuffle(guidanceSteps);
+  console.log(guidanceSteps);
 }
 
 function shuffle(array) {
@@ -341,7 +341,7 @@ window.addEventListener("load", () => {
   document.getElementById("timer-section").classList.remove("d-none");
 
   // Create guidance steps from gameData
-  // createGuidanceSteps();
+  createGuidanceSteps();
 
   intro.play().catch(() => {
     document.body.addEventListener("click", () => intro.play(), { once: true });
@@ -747,7 +747,7 @@ function restartGame() {
   hasSpokenAllMatched = false;
 
   // Recreate and shuffle guidance steps
-  // createGuidanceSteps();
+  createGuidanceSteps();
 
   setDefaultImages();
   startTimer();

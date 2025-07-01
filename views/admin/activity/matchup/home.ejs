@@ -15,12 +15,12 @@
     <link href="/activity/matchup/css/main.css" rel="stylesheet" />
     <style>
         #mainHeading {
-            font-size: 2.5rem;
+            font-size: 40px;
             font-weight: bold;
             color: #2c3e50;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
-            min-height: 60px;
+            min-height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -28,6 +28,18 @@
             /* Force visibility */
             opacity: 1 !important;
             /* Force opacity */
+        }
+
+        #canvas {
+            position: absolute;
+            /* Make the canvas position absolute */
+            top: 0;
+            /* Position it at the top of the document */
+            left: 0px;
+            pointer-events: none;
+            /* Allow clicks to pass through the canvas */
+            z-index: 9;
+            /* Ensure the canvas is on top but below interactive elements */
         }
     </style>
 </head>
@@ -59,7 +71,8 @@
 
                 <!-- Left Image -->
                 <div class="col-md-2 d-flex justify-content-center align-items-center mb-3 mb-md-0">
-                    <img src="/activity/matchup/images/boy-1.png" alt="Left Side Image" class="img-fluid rounded float-updown" />
+                    <img src="/activity/matchup/images/boy-1.png" alt="Left Side Image"
+                        class="img-fluid rounded float-updown" />
                 </div>
 
                 <!-- Matching Rows (Initially Hidden) -->
@@ -69,7 +82,8 @@
 
                 <!-- Right Image -->
                 <div class="col-md-2 d-flex justify-content-center align-items-center mt-3 mt-md-0">
-                    <img src="/activity/matchup/images/girl-1.png" alt="Right Side Image" class="img-fluid rounded float-downup" />
+                    <img src="/activity/matchup/images/girl-1.png" alt="Right Side Image"
+                        class="img-fluid rounded float-downup" />
                 </div>
             </div>
 
@@ -97,8 +111,7 @@
     </div>
 
     <!-- Canvas Overlays -->
-    <canvas id="canvas"
-        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000;"></canvas>
+    <canvas id="canvas"></canvas>
     <canvas id="confetti-canvas"
         style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99999;"></canvas>
 

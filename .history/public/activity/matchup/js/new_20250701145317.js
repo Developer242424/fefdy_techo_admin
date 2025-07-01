@@ -168,7 +168,7 @@ function generateContent() {
         <input type="hidden" value="${i}"/>
         ${
           left.thumbnail
-            ? `<img src="/${left.thumbnail}" alt="${left.text}" />`
+            ? `<img src="${left.thumbnail}" alt="${left.text}" />`
             : ""
         } <!-- Display image if thumbnail exists -->
       </div>
@@ -185,7 +185,7 @@ function generateContent() {
 
     ${
       right.thumbnail
-        ? `<img src="/${right.thumbnail}" alt="${right.text}" />`
+        ? `<img src="${right.thumbnail}" alt="${right.text}" />`
         : ""
     }  <!-- Display image if thumbnail exists -->
     <div class="dot right" data-id="${getDotId(
@@ -206,7 +206,6 @@ function generateContent() {
 window.onload = () => {
   fetchQuestions(() => {
     generateContent();
-    createGuidanceSteps();
   });
 };
 
@@ -341,7 +340,7 @@ window.addEventListener("load", () => {
   document.getElementById("timer-section").classList.remove("d-none");
 
   // Create guidance steps from gameData
-  // createGuidanceSteps();
+  createGuidanceSteps();
 
   intro.play().catch(() => {
     document.body.addEventListener("click", () => intro.play(), { once: true });
@@ -747,7 +746,7 @@ function restartGame() {
   hasSpokenAllMatched = false;
 
   // Recreate and shuffle guidance steps
-  // createGuidanceSteps();
+  createGuidanceSteps();
 
   setDefaultImages();
   startTimer();
