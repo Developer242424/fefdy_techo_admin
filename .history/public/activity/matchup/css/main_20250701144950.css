@@ -1,11 +1,11 @@
 @font-face {
-  font-family: "Rocher";
+  font-family: 'Rocher';
   src: url(https://assets.codepen.io/9632/RocherColorGX.woff2);
 }
 
 :root {
   --primary-color: #d45f42;
-  --correct-color: #4caf50;
+  --correct-color: #4CAF50;
   --incorrect-color: #f44336;
   --neutral-color: #f9f9f9;
   --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -29,7 +29,7 @@ h1 {
   margin: 10px;
   font-size: 40px;
   font-weight: 700;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 h2 {
@@ -76,7 +76,7 @@ button:disabled {
   padding: 10px 0;
 }
 
-#question-container > .side-image {
+#question-container>.side-image {
   flex: 0 0 270px;
   margin: 0;
 }
@@ -96,6 +96,7 @@ button:disabled {
 }
 
 #mainHeading {
+
   white-space: nowrap;
   overflow: hidden;
   border-right: 0.15em solid orange;
@@ -130,6 +131,7 @@ button:disabled {
   justify-content: center;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
+
 
 .item.right {
   background: #e0fff5;
@@ -187,7 +189,7 @@ button:disabled {
 
 .instruction-text {
   font-size: 1.2em;
-  font-family: "Comic Sans MS", "Fredoka", "Poppins", cursive, sans-serif;
+  font-family: 'Comic Sans MS', 'Fredoka', 'Poppins', cursive, sans-serif;
   font-size: 28px;
   color: #4a2d8b;
   /* deep purple */
@@ -375,7 +377,7 @@ canvas {
     flex-direction: column;
   }
 
-  #question-container > .side-image {
+  #question-container>.side-image {
     flex: none;
     margin-bottom: 1rem;
   }

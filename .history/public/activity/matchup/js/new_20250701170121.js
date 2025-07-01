@@ -211,9 +211,10 @@ window.onload = () => {
 };
 
 const canvas = document.getElementById("canvas");
-canvas.style.marginLeft = "22px";
+canvas.style.marginLeft = "10px";
 canvas.style.marginTop = "10px";
 
+const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 const dragAudio = document.getElementById("dragAudio");

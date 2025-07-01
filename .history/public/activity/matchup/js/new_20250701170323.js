@@ -211,7 +211,7 @@ window.onload = () => {
 };
 
 const canvas = document.getElementById("canvas");
-canvas.style.marginLeft = "22px";
+canvas.style.marginLeft = "10px";
 canvas.style.marginTop = "10px";
 
 const ctx = canvas.getContext("2d");

@@ -30,33 +30,16 @@
             /* Force opacity */
         }
 
-        .item.left {
-            margin-left: 20px;
-        }
-
         #canvas {
             position: absolute;
             /* Make the canvas position absolute */
             top: 0;
             /* Position it at the top of the document */
-            left: -20px;
+            left: 0px;
             pointer-events: none;
             /* Allow clicks to pass through the canvas */
             z-index: 9;
             /* Ensure the canvas is on top but below interactive elements */
-        }
-
-        .start-again-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 30px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow);
         }
     </style>
 </head>
@@ -118,21 +101,14 @@
     </section>
 
     <!-- Result Modal -->
-    <!-- Result Modal -->
     <div id="resultPopup" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="restartGame()" id="close-modal">&times;</span>
             <h2>Results</h2>
             <p id="scoreText"></p>
-
-            <!-- Button container with flexbox -->
-            <div class="d-flex justify-content-between w-100">
-                <button onclick="restartGame()" class="start-again-btn col-5">Restart</button>
-                <button class="start-again-btn col-5">Submit</button>
-            </div>
+            <button onclick="restartGame()" class="start-again-btn">Restart</button>
         </div>
     </div>
-
 
     <!-- Canvas Overlays -->
     <canvas id="canvas"></canvas>
