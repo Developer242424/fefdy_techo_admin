@@ -638,13 +638,13 @@ function drawLine(start, end, color = "black") {
 }
 
 // FIXED: Check answers based on the instruction each match was made for
-let correctCount = 0;
-let wrongCount = 0;
-
 function checkAnswers() {
   checkingAnswers = true;
   speechSynthesis.cancel();
   clearInterval(timerInterval);
+
+  let correctCount = 0;
+  let wrongCount = 0;
 
   lines.forEach((line) => {
     let isCorrect = false;

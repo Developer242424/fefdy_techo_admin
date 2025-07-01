@@ -163,7 +163,7 @@ class ActivityController {
         const transformedGameData = rawGameData.map((item, index) => {
           if (index === 0 && item.question) {
             return {
-              questionid: [questionsData[0].id],
+              questionid: [questionsData[0].data],
               question: item.question,
             };
           }

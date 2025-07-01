@@ -638,13 +638,13 @@ function drawLine(start, end, color = "black") {
 }
 
 // FIXED: Check answers based on the instruction each match was made for
-let correctCount = 0;
-let wrongCount = 0;
-
 function checkAnswers() {
   checkingAnswers = true;
   speechSynthesis.cancel();
   clearInterval(timerInterval);
+
+  let correctCount = 0;
+  let wrongCount = 0;
 
   lines.forEach((line) => {
     let isCorrect = false;
@@ -792,9 +792,9 @@ function completeTest() {
     stid,
     qid,
     ust,
-    correctAnswers: correctCount,
-    wrongAnswers: wrongCount,
-    totalTime: secondsElapsed,
+    correctAnswers,
+    wrongAnswers,
+    totalTime,
     questionIds,
   };
   $.ajax({
@@ -804,7 +804,7 @@ function completeTest() {
     data: JSON.stringify(data),
     success: function (res) {
       if (res.status === 200) {
-        restartGame();
+        startAgain();
         // location.reload();
       } else {
         console.warn("⚠️ Invalid question data received.");
