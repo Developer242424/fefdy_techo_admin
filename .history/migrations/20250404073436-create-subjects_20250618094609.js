@@ -16,10 +16,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
-      background: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
       thumbnail: {
         type: Sequelize.STRING,
         allowNull: true

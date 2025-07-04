@@ -178,6 +178,7 @@ class SubjectsController {
     });
 
     this.update = [
+      // 1. Handle file upload
       (req, res, next) => {
         const upload = getDynamicUploader("subjects").fields([
           { name: "edit_thumbnail", maxCount: 1 },
@@ -191,14 +192,16 @@ class SubjectsController {
         });
       },
 
+      // 2. Validate input
       check("edit_subject").notEmpty().withMessage("Subject is required"),
       check("edit_id").notEmpty().withMessage("Subject id is required"),
 
+      // 3. Handle update logic
       asyncHandler(async (req, res) => {
         const { edit_subject, edit_id } = req.body;
-        const thumbnailFile = req.files?.edit_thumbnail?.[0];
-        const backgroundFile = req.files?.edit_background?.[0];
+        const file = req.file;
 
+        // Get subject by ID
         const subject = await Subjects.findOne({ where: { id: edit_id } });
         if (!subject) {
           return res
@@ -206,37 +209,22 @@ class SubjectsController {
             .json({ status: 404, message: "Subject not found" });
         }
 
-        if (thumbnailFile) {
-          if (subject.thumbnail) {
-            const oldThumbPath = path.join(
-              __dirname,
-              "../public/",
-              subject.thumbnail
-            );
-            fs.unlink(oldThumbPath, (err) => {
-              if (err) console.warn(`Thumbnail delete warning: ${err.message}`);
-            });
-          }
-          subject.thumbnail = `uploads/subjects/${thumbnailFile.filename}`;
+        // If there's a new file, delete the old one
+        if (file && subject.thumbnail) {
+          // console.log(subject.thumbnail)
+          const oldPath = path.join(__dirname, "../public/", subject.thumbnail);
+          fs.unlink(oldPath, (err) => {
+            if (err) {
+              console.warn(`Old file delete warning: ${err.message}`);
+            }
+          });
+          subject.thumbnail = `uploads/subjects/${file.filename}`;
         }
 
-        if (backgroundFile) {
-          if (subject.background) {
-            const oldBgPath = path.join(
-              __dirname,
-              "../public/",
-              subject.background
-            );
-            fs.unlink(oldBgPath, (err) => {
-              if (err)
-                console.warn(`Background delete warning: ${err.message}`);
-            });
-          }
-          subject.background = `uploads/subjects/${backgroundFile.filename}`;
-        }
-
+        // Update subject fields
         subject.subject = edit_subject;
 
+        // Save updated subject
         await subject.save();
 
         return res

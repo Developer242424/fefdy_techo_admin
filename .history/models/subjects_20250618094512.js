@@ -9,7 +9,6 @@ Subjects.init(
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     subject: { type: DataTypes.STRING, allowNull: false },
     thumbnail: { type: DataTypes.STRING, allowNull: false },
-    background: { type: DataTypes.STRING, allowNull: false },
     entered_at: { type: DataTypes.DATE, allowNull: true },
     edited_at: { type: DataTypes.DATE, allowNull: true },
     is_deleted: { type: DataTypes.DATE, allowNull: true },

@@ -110,7 +110,7 @@ function renderTable(id, data = []) {
       { key: "action", orderable: false },
     ],
     showEntries: ["5", "10", "All"],
-    search: true,
+    search: true
   });
 }
 
@@ -171,10 +171,6 @@ function OpenEditModal(id) {
           .closest(".form-group")
           .find("a")
           .attr("href", `../` + data.thumbnail);
-        $("#edit_background")
-          .closest(".form-group")
-          .find("a")
-          .attr("href", `../` + data.background);
         OpenModal("subject_edit_modal");
       } else if (res.status === 401) {
         res.errors.forEach((error) => {
