@@ -39,7 +39,6 @@ class SubjectsController {
             id: value.id,
             subject: value.subject,
             thumbnail: value.thumbnail,
-            background: value.background,
             topics: topics,
           };
         })
