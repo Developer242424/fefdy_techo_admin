@@ -23,7 +23,6 @@ class SubjectsController {
       const subjects = await Subjects.findAll({
         where: {
           is_deleted: null,
-          // is_deleted
         },
       });
 
