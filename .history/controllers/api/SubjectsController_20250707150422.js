@@ -26,6 +26,7 @@ class SubjectsController {
         where: { id: user.id },
       });
       const sub_ids = JSON.parse(loginuser.subject);
+      console.log(sub_ids);
       const subjects = await Subjects.findAll({
         where: {
           // id: { [Op.in]: sub_ids },
@@ -47,7 +48,7 @@ class SubjectsController {
             subject: value.subject,
             thumbnail: value.thumbnail,
             background: value.background,
-            is_purchased: sub_ids.includes(String(value.id)) ? 1 : 0,
+            is_purchased: sub_ids.includes(`'${value.id}'`),
             topics: topics,
           };
         })

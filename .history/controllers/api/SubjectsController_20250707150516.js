@@ -47,7 +47,7 @@ class SubjectsController {
             subject: value.subject,
             thumbnail: value.thumbnail,
             background: value.background,
-            is_purchased: sub_ids.includes(String(value.id)) ? 1 : 0,
+            is_purchased: sub_ids.includes(String(value.id)),
             topics: topics,
           };
         })
