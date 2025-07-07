@@ -25,10 +25,9 @@ class SubjectsController {
       const loginuser = await LoginUsers.findOne({
         where: { id: user.id },
       });
-      const sub_ids = JSON.parse(loginuser.subject);
+      const sub_ids = JSON.parse(organisation.subject);
       const subjects = await Subjects.findAll({
         where: {
-          id: { [Op.in]: sub_ids },
           is_deleted: null,
         },
       });

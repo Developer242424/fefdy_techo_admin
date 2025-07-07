@@ -9,7 +9,6 @@ const Subtopic = require("../models/subtopic");
 const CategoryData = require("../models/categorydata");
 const Organisation = require("../models/organisation");
 const OrgDetails = require("../models/org_details");
-const LoginUsers = require("../models/loginusers");
 const Standards = require("../models/standards");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -298,14 +297,6 @@ class OrganisationController {
               }
             }
           }
-          await LoginUsers.update(
-            { subject: JSON.stringify(edit_subject) },
-            {
-              where: {
-                org_id: organisation.id,
-              },
-            }
-          );
           return res.status(200).json({
             status: 200,
             message: "Organisations is updated successfully",
