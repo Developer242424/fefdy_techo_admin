@@ -8,7 +8,6 @@ const LevelController = require("../controllers/api/LevelController");
 const SubtopicController = require("../controllers/api/SubtopicController");
 const WatchHistoryController = require("../controllers/api/WatchHistoryController");
 const ProfileController = require("../controllers/api/ProfileController");
-const CertificateController = require("../controllers/api/CertificateController");
 
 const router = express.Router();
 
@@ -31,7 +30,7 @@ router.post("/subtopics", SubtopicController.data);
 router.post("/subtopicdata", SubtopicController.subtopicData);
 router.post("/history-entry", WatchHistoryController.entry);
 router.post("/myprofile", ProfileController.data);
-router.post("/certificate", CertificateController.cerificateContent);
+router.post("/certificate", SubjectsController.cerificateContent);
 
 router.get("/pdf", (req, res) => {
   const pdfUrl = req.query.url;

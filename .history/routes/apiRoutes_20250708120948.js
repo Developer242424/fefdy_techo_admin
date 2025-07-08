@@ -31,7 +31,7 @@ router.post("/subtopics", SubtopicController.data);
 router.post("/subtopicdata", SubtopicController.subtopicData);
 router.post("/history-entry", WatchHistoryController.entry);
 router.post("/myprofile", ProfileController.data);
-router.post("/certificate", CertificateController.cerificateContent);
+router.post("/certificate", SubjectsController.cerificateContent);
 
 router.get("/pdf", (req, res) => {
   const pdfUrl = req.query.url;

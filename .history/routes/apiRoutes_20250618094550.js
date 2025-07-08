@@ -1,5 +1,5 @@
 const express = require("express");
-const request = require("request");
+const request = require('request');
 const { isAuthenticated } = require("../middleware/ApiHandler");
 const AuthController = require("../controllers/api/AuthController");
 const SubjectsController = require("../controllers/api/SubjectsController");
@@ -8,7 +8,6 @@ const LevelController = require("../controllers/api/LevelController");
 const SubtopicController = require("../controllers/api/SubtopicController");
 const WatchHistoryController = require("../controllers/api/WatchHistoryController");
 const ProfileController = require("../controllers/api/ProfileController");
-const CertificateController = require("../controllers/api/CertificateController");
 
 const router = express.Router();
 
@@ -31,18 +30,17 @@ router.post("/subtopics", SubtopicController.data);
 router.post("/subtopicdata", SubtopicController.subtopicData);
 router.post("/history-entry", WatchHistoryController.entry);
 router.post("/myprofile", ProfileController.data);
-router.post("/certificate", CertificateController.cerificateContent);
 
-router.get("/pdf", (req, res) => {
+router.get('/pdf', (req, res) => {
   const pdfUrl = req.query.url;
   if (!pdfUrl) return res.status(400).send("No URL provided");
 
-  res.setHeader("Content-Type", "application/pdf");
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Access-Control-Allow-Origin', '*');
 
   request
     .get(pdfUrl)
-    .on("error", () => res.status(500).send("Failed to load PDF"))
+    .on('error', () => res.status(500).send("Failed to load PDF"))
     .pipe(res);
 });
 
