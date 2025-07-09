@@ -170,18 +170,6 @@ $(function () {
       },
     });
   });
-
-  const options = {
-    dateFormat: "dd-mm-yy",
-    changeMonth: true,
-    changeYear: true,
-    yearRange: "1920:+0",
-  };
-
-  $("#dob").datepicker(options);
-  $("#edit_dob").datepicker(options);
-  $("#individual_dob").datepicker(options);
-  $("#edit_individual_dob").datepicker(options);
 });
 
 function LoadTableData() {
@@ -271,10 +259,6 @@ async function OpenEditModal(id) {
           $("#edit_id").val(data.id);
           $("#edit_name").val(data.name);
           $("#edit_mobile").val(data.mobile);
-          const formattedDob = moment(data.dob, "YYYY-MM-DD").format(
-            "DD-MM-YYYY"
-          );
-          $("#edit_dob").val(formattedDob);
           $("#edit_email").val(data.email);
           $("#edit_username").val(data.username);
           $("#edit_profile_image")
@@ -375,10 +359,6 @@ async function IndividualOpenEditModal(id) {
           $("#edit_individual_id").val(data.id);
           $("#edit_individual_name").val(data.name);
           $("#edit_individual_phone").val(data.mobile);
-          const formattedDob = moment(data.dob, "YYYY-MM-DD").format(
-            "DD-MM-YYYY"
-          );
-          $("#edit_individual_dob").val(formattedDob);
           $("#edit_individual_email").val(data.email);
           $("#edit_individual_username").val(data.username);
           $("#edit_individual_profile_image")

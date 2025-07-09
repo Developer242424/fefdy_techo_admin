@@ -113,7 +113,11 @@ class IndividualUsersListController {
             .json({ status: 400, message: "Username is already taken" });
         }
 
-        let parsedDob = moment(individual_dob, "DD-MM-YYYY", true);
+        let parsedDob = moment(
+          individual_dob,
+          ["YYYY-MM-DD", "MM/DD/YYYY", "DD-MM-YYYY"],
+          true
+        );
 
         if (!parsedDob.isValid()) {
           return res.status(200).json({
@@ -125,7 +129,7 @@ class IndividualUsersListController {
           name: individual_name,
           email: individual_email,
           mobile: individual_phone,
-          dob: parsedDob.format("YYYY-MM-DD"),
+          dob: moment(individual_dob).format("YYYY-MM-DD"),
           username: individual_username,
           password: await bcrypt.hash(individual_password, 10),
           profile_image: `uploads/user_profile/${file.filename}`,
@@ -225,19 +229,9 @@ class IndividualUsersListController {
           users.profile_image = `uploads/user_profile/${file.filename}`;
         }
 
-        let parsedDob = moment(edit_individual_dob, "DD-MM-YYYY", true);
-
-        if (!parsedDob.isValid()) {
-          return res.status(200).json({
-            status: 400,
-            message: "Invalid date of birth format.",
-          });
-        }
-
         users.name = edit_individual_name;
         users.email = edit_individual_email;
         users.mobile = edit_individual_phone;
-        users.dob = parsedDob.format("YYYY-MM-DD");
         users.username = edit_individual_username;
         users.subject = JSON.stringify(edit_individual_subject);
         users.level = edit_individual_level;

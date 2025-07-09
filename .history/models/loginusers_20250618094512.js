@@ -19,7 +19,6 @@ LoginUsers.init(
     name: { type: DataTypes.STRING, allowNull: true },
     email: { type: DataTypes.STRING, allowNull: true },
     mobile: { type: DataTypes.BIGINT, allowNull: true },
-    dob: { type: DataTypes.DATE, allowNull: true },
     username: { type: DataTypes.STRING, allowNull: true },
     password: { type: DataTypes.TEXT, allowNull: true },
     standard: { type: DataTypes.INTEGER, allowNull: true },

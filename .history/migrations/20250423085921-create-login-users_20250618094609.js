@@ -28,10 +28,6 @@ module.exports = {
         type: Sequelize.BIGINT,
         allowNull: true,
       },
-      dob: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
       username: {
         type: Sequelize.STRING,
         allowNull: true,

@@ -113,7 +113,11 @@ class IndividualUsersListController {
             .json({ status: 400, message: "Username is already taken" });
         }
 
-        let parsedDob = moment(individual_dob, "DD-MM-YYYY", true);
+        let parsedDob = moment(
+          individual_dob,
+          ["YYYY-MM-DD", "MM/DD/YYYY", "DD-MM-YYYY"],
+          true
+        );
 
         if (!parsedDob.isValid()) {
           return res.status(200).json({
@@ -125,7 +129,7 @@ class IndividualUsersListController {
           name: individual_name,
           email: individual_email,
           mobile: individual_phone,
-          dob: parsedDob.format("YYYY-MM-DD"),
+          dob: moment(individual_dob).format("YYYY-DD-MM"),
           username: individual_username,
           password: await bcrypt.hash(individual_password, 10),
           profile_image: `uploads/user_profile/${file.filename}`,

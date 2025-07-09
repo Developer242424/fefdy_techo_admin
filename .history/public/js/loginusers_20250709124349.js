@@ -272,7 +272,7 @@ async function OpenEditModal(id) {
           $("#edit_name").val(data.name);
           $("#edit_mobile").val(data.mobile);
           const formattedDob = moment(data.dob, "YYYY-MM-DD").format(
-            "DD-MM-YYYY"
+            "DD-MM-YY"
           );
           $("#edit_dob").val(formattedDob);
           $("#edit_email").val(data.email);
@@ -375,10 +375,7 @@ async function IndividualOpenEditModal(id) {
           $("#edit_individual_id").val(data.id);
           $("#edit_individual_name").val(data.name);
           $("#edit_individual_phone").val(data.mobile);
-          const formattedDob = moment(data.dob, "YYYY-MM-DD").format(
-            "DD-MM-YYYY"
-          );
-          $("#edit_individual_dob").val(formattedDob);
+          $("#edit_individual_dob").val(data.dob);
           $("#edit_individual_email").val(data.email);
           $("#edit_individual_username").val(data.username);
           $("#edit_individual_profile_image")

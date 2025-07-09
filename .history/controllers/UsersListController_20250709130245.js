@@ -148,7 +148,11 @@ class UsersListController {
               .status(200)
               .json({ status: 400, message: "Username is already taken" });
           }
-          let parsedDob = moment(dob, "DD-MM-YYYY", true);
+          let parsedDob = moment(
+            dob,
+            ["YYYY-MM-DD", "MM/DD/YYYY", "DD-MM-YYYY"],
+            true
+          );
 
           if (!parsedDob.isValid()) {
             return res.status(200).json({
@@ -162,7 +166,7 @@ class UsersListController {
             name,
             email,
             mobile,
-            dob: parsedDob.format("YYYY-MM-DD"),
+            dob: moment(dob).format("YYYY-DD-MM"),
             username,
             password: await bcrypt.hash(password, 10),
             standard,
@@ -367,7 +371,11 @@ class UsersListController {
           });
 
           const level = org_det?.levels ?? null;
-          let parsedDob = moment(edit_dob, "DD-MM-YYYY", true);
+          let parsedDob = moment(
+            edit_dob,
+            ["YYYY-MM-DD", "MM/DD/YYYY", "DD-MM-YYYY"],
+            true
+          );
 
           if (!parsedDob.isValid()) {
             return res.status(200).json({
@@ -380,13 +388,14 @@ class UsersListController {
             name: edit_name,
             email: edit_email,
             mobile: edit_mobile,
-            dob: parsedDob.format("YYYY-MM-DD"),
+            dob: moment(edit_dob).format("YYYY-DD-MM"),
             username: edit_username,
             standard: edit_standard,
             section: edit_section,
             subject: arr_sub,
             level,
           };
+          console.log(updateData);
 
           if (file) {
             updateData.profile_image = `uploads/user_profile/${file.filename}`;

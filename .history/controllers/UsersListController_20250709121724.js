@@ -148,21 +148,13 @@ class UsersListController {
               .status(200)
               .json({ status: 400, message: "Username is already taken" });
           }
-          let parsedDob = moment(dob, "DD-MM-YYYY", true);
-
-          if (!parsedDob.isValid()) {
-            return res.status(200).json({
-              status: 400,
-              message: "Invalid date of birth format.",
-            });
-          }
-
-          const insert = await LoginUsers.create({
+          console.log("Raw dob:", dob);
+          console.log({
             org_id,
             name,
             email,
             mobile,
-            dob: parsedDob.format("YYYY-MM-DD"),
+            dob: moment(dob).format("YYYY-MM-DD"),
             username,
             password: await bcrypt.hash(password, 10),
             standard,
@@ -173,11 +165,27 @@ class UsersListController {
             type: "student",
           });
 
-          return res.status(200).json({
-            status: 200,
-            message: "User created successfully",
-            data: insert,
-          });
+          // const insert = await LoginUsers.create({
+          //   org_id,
+          //   name,
+          //   email,
+          //   mobile,
+          //   dob: moment(dob).format("YYYY-MM-DD"),
+          //   username,
+          //   password: await bcrypt.hash(password, 10),
+          //   standard,
+          //   section,
+          //   profile_image: `uploads/user_profile/${file.filename}`,
+          //   subject: arr_sub,
+          //   level: level,
+          //   type: "student",
+          // });
+
+          // return res.status(200).json({
+          //   status: 200,
+          //   message: "User created successfully",
+          //   data: insert,
+          // });
         } catch (error) {
           return res.status(200).json({
             status: 500,
@@ -307,10 +315,6 @@ class UsersListController {
         .withMessage("Mobile number is required")
         .isMobilePhone("any")
         .withMessage("Invalid mobile number"),
-      check("edit_dob")
-        .trim()
-        .notEmpty()
-        .withMessage("Date of birth is required"),
       check("edit_username")
         .trim()
         .notEmpty()
@@ -330,7 +334,6 @@ class UsersListController {
             edit_name,
             edit_email,
             edit_mobile,
-            edit_dob,
             edit_username,
             edit_password,
             edit_standard,
@@ -367,20 +370,12 @@ class UsersListController {
           });
 
           const level = org_det?.levels ?? null;
-          let parsedDob = moment(edit_dob, "DD-MM-YYYY", true);
 
-          if (!parsedDob.isValid()) {
-            return res.status(200).json({
-              status: 400,
-              message: "Invalid date of birth format.",
-            });
-          }
           const updateData = {
             org_id: edit_org_id,
             name: edit_name,
             email: edit_email,
             mobile: edit_mobile,
-            dob: parsedDob.format("YYYY-MM-DD"),
             username: edit_username,
             standard: edit_standard,
             section: edit_section,
