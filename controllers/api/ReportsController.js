@@ -67,11 +67,12 @@ class ReportsController {
                levels.topic AS topic_id,
                levels.id AS level_id,
                levels.title AS level_title,
+               levels.level AS its_level,
                COALESCE(subtopics_per_level.subtopics, JSON_ARRAY()) AS subtopics
              FROM levels
              LEFT JOIN subtopics_per_level ON levels.id = subtopics_per_level.level_id
              WHERE levels.is_deleted IS NULL
-             ORDER BY levels.level
+             ORDER BY levels.level ASC
            ),
            
            levels_aggregated AS (
@@ -81,6 +82,7 @@ class ReportsController {
                  JSON_OBJECT(
                    'id', level_id,
                    'title', level_title,
+                   'its_level', its_level,
                    'subtopics', subtopics
                  )
                ) AS levels
@@ -116,6 +118,7 @@ class ReportsController {
            SELECT
              subjects.id,
              subjects.subject,
+             subjects.thumbnail,
              COALESCE(topics_aggregated.topics, JSON_ARRAY()) AS topics
            FROM subjects
            LEFT JOIN topics_aggregated ON subjects.id = topics_aggregated.subject_id
