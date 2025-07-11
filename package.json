@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cross-env TZ=Asia/Kolkata node server.js",
+    "start": "cross-env TZ=Asia/Kolkata node --max-old-space-size=4096 server.js",
     "dev": "cross-env TZ=Asia/Kolkata nodemon server.js"
   },
   "author": "",
