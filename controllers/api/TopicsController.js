@@ -149,6 +149,8 @@ class TopicsController {
 
             if (watchHistory.length === categories.length) {
               completedCount++;
+            }else{
+              completedCount--;
             }
           }
 
