@@ -9,6 +9,9 @@ const Subtopic = require("../../models/subtopic");
 const CategoryData = require("../../models/categorydata");
 const Category = require("../../models/category");
 const WatchHistory = require("../../models/watchhistory");
+const QuestionType = require("../../models/questiontype");
+const Questions = require("../../models/questions");
+const TestHistory = require("../../models/test_history");
 const { sequelize } = require("../../models");
 const { QueryTypes } = require("sequelize");
 const bcrypt = require("bcrypt");
@@ -43,6 +46,13 @@ class SubtopicController {
           where: { level_id: level, is_deleted: null },
           order: [["sort_order", "ASC"]],
         });
+
+        const ques_type = await QuestionType.findAll({
+          where: {
+            is_deleted: null,
+          },
+        });
+        const ques_ids = ques_type.map((q) => q.id);
 
         const data = await Promise.all(
           subtopics.map(async (value, index) => {
@@ -80,7 +90,29 @@ class SubtopicController {
             // console.log("index:" + index);
             // console.log("history length" + history.length);
             // console.log("cat length" + JSON.parse(value.category).length);
+            // console.log(ques_type.length);
+            // console.log("User id ", user.id);
+            // console.log("subtopic id ", value.id);
+            // console.log("question ids ", ques_ids);
+            const testHistories = await TestHistory.findAll({
+              where: {
+                is_deleted: null,
+                user_id: user.id,
+                sub_topic: value.id,
+                question_type: {
+                  [Op.in]: ques_ids,
+                },
+              },
+              attributes: ['question_type'],
+              group: ["question_type"],
+            });
+            // console.log("testHistories length", testHistories.length);
 
+            const is_completed =
+              categories.length === history.length &&
+              ques_type.length === testHistories.length
+                ? true
+                : false;
             return {
               id: value.id,
               subject: value.subject,
@@ -90,7 +122,7 @@ class SubtopicController {
               description: value.description,
               thumbnail: value.thumbnail,
               cat_data_ids: value.cat_data_ids,
-              is_completed: categories.length === history.length ? 1 : 0,
+              is_completed: is_completed ? 1 : 0,
             };
           })
         );
