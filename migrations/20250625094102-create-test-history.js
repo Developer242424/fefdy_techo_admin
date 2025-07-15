@@ -29,6 +29,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      question_type: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       question_ids: {
         type: Sequelize.JSON,
         allowNull: true,

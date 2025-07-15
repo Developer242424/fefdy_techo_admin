@@ -116,6 +116,7 @@ class ActivityController {
           topic: tid,
           level_id: lid,
           sub_topic: stid,
+          question_type: qid,
           question_ids: questionIds,
           correct_ans: correctAnswers,
           wrong_ans: wrongAnswers,
