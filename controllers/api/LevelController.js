@@ -8,6 +8,9 @@ const Level = require("../../models/level");
 const Organisation = require("../../models/organisation");
 const OrgDetails = require("../../models/org_details");
 const WatchHistory = require("../../models/watchhistory");
+const QuestionType = require("../../models/questiontype");
+const Questions = require("../../models/questions");
+const TestHistory = require("../../models/test_history");
 const { sequelize } = require("../../models");
 const { QueryTypes } = require("sequelize");
 const bcrypt = require("bcrypt");
@@ -52,6 +55,12 @@ class LevelController {
           where: { topic, is_deleted: null },
           order: [["level", "ASC"]],
         });
+        const ques_type = await QuestionType.findAll({
+          where: {
+            is_deleted: null,
+          },
+        });
+        const ques_ids = ques_type.map((q) => q.id);
         const data = await Promise.all(
           levels.map(async (value) => {
             const subtopic = await Subtopic.findAll({
@@ -96,8 +105,22 @@ class LevelController {
                     type: QueryTypes.SELECT,
                   }
                 );
-
-                if (watch_history_one.length === categories.length) {
+                const testHistories = await TestHistory.findAll({
+                  where: {
+                    is_deleted: null,
+                    user_id: user.id,
+                    sub_topic: sub.id,
+                    question_type: {
+                      [Op.in]: ques_ids,
+                    },
+                  },
+                  attributes: ["question_type"],
+                  group: ["question_type"],
+                });
+                if (
+                  watch_history_one.length === categories.length &&
+                  ques_type.length === testHistories.length
+                ) {
                   completedCount++;
                 }
               }
