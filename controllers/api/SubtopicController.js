@@ -103,7 +103,7 @@ class SubtopicController {
                   [Op.in]: ques_ids,
                 },
               },
-              attributes: ['question_type'],
+              attributes: ["question_type"],
               group: ["question_type"],
             });
             // console.log("testHistories length", testHistories.length);
@@ -113,6 +113,39 @@ class SubtopicController {
               ques_type.length === testHistories.length
                 ? true
                 : false;
+
+            let ttl_mark = 0;
+            let got_mark = 0;
+            await Promise.all(
+              ques_ids.map(async (value1, index1) => {
+                const testHistory = await TestHistory.findOne({
+                  where: {
+                    is_deleted: null,
+                    user_id: user.id,
+                    sub_topic: value.id,
+                    question_type: value1,
+                  },
+                  order: [["id", "Desc"]],
+                  limit: 1,
+                });
+                // console.log("user_id", user.id);
+                // console.log("sub_topic", value.id);
+                // console.log("question_type", value1);
+                // console.log("testhistory", testHistory);
+
+                if (testHistory) {
+                  console.log("Correct answer", testHistory.correct_ans);
+                  console.log("Wrong answer", testHistory.wrong_ans);
+                  ttl_mark +=
+                    (testHistory.correct_ans || 0) +
+                    (testHistory.wrong_ans || 0);
+                  got_mark += testHistory.correct_ans || 0;
+                }
+              })
+            );
+            // console.log("total mark", ttl_mark);
+            // console.log("got marks", got_mark);
+
             return {
               id: value.id,
               subject: value.subject,
@@ -123,6 +156,8 @@ class SubtopicController {
               thumbnail: value.thumbnail,
               cat_data_ids: value.cat_data_ids,
               is_completed: is_completed ? 1 : 0,
+              ttl_mark: ttl_mark,
+              got_mark: got_mark,
             };
           })
         );
