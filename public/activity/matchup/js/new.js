@@ -602,7 +602,13 @@ function drawLines() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  // Map to ensure only one match per instruction is checked
+  const seenInstructions = new Set();
   lines.forEach((line) => {
+    if (!line.instruction || seenInstructions.has(line.instruction.label))
+      return;
+    seenInstructions.add(line.instruction.label);
+
     const color =
       line.correct === null ? "black" : line.correct ? "green" : "red";
     drawLine(line.start, line.end, color);
@@ -646,35 +652,31 @@ function checkAnswers() {
   speechSynthesis.cancel();
   clearInterval(timerInterval);
 
+  correctCount = 0;
+  wrongCount = 0;
+
+  const seenInstructions = new Set(); // To avoid duplicates
+
   lines.forEach((line) => {
     let isCorrect = false;
 
-    if (line.instruction) {
-      // Find the game data item that matches this instruction
-      const gameItem = gameData
-        .slice(1)
-        .find((item) => item.instruction === line.instruction.label);
+    // Only check one line per instruction
+    if (!line.instruction || seenInstructions.has(line.instruction.label))
+      return;
+    seenInstructions.add(line.instruction.label);
 
-      if (gameItem) {
-        // Check if the match is correct for this specific instruction
-        const left = line.leftId;
-        const right = line.rightId;
+    const gameItem = gameData
+      .slice(1)
+      .find((item) => item.instruction === line.instruction.label);
 
-        const oneText = gameItem.is_equal_one.text;
-        const oneThumb = gameItem.is_equal_one.thumbnail;
-        const twoText = gameItem.is_equal_two.text;
-        const twoThumb = gameItem.is_equal_two.thumbnail;
+    if (gameItem) {
+      const left = line.leftId;
+      const right = line.rightId;
 
-        isCorrect =
-          (left === oneText && right === twoText) ||
-          (left === oneThumb && right === twoText) ||
-          (left === oneText && right === twoThumb) ||
-          (left === oneThumb && right === twoThumb) ||
-          (right === oneText && left === twoText) ||
-          (right === oneThumb && left === twoText) ||
-          (right === oneText && left === twoThumb) ||
-          (right === oneThumb && left === twoThumb);
-      }
+      const correctLeft = getDotId(gameItem.is_equal_one);
+      const correctRight = getDotId(gameItem.is_equal_two);
+
+      isCorrect = left === correctLeft && right === correctRight;
     }
 
     line.correct = isCorrect;
