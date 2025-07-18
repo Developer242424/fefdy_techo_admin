@@ -10,6 +10,7 @@ const WatchHistoryController = require("../controllers/api/WatchHistoryControlle
 const ProfileController = require("../controllers/api/ProfileController");
 const CertificateController = require("../controllers/api/CertificateController");
 const ReportsController = require("../controllers/api/ReportsController");
+const QuestionsController = require("../controllers/api/QuestionsController");
 
 const router = express.Router();
 
@@ -34,6 +35,7 @@ router.post("/history-entry", WatchHistoryController.entry);
 router.post("/myprofile", ProfileController.data);
 router.post("/certificate", CertificateController.cerificateContent);
 router.post("/wholereports", ReportsController.wholeReports);
+router.post("/questiontypes", QuestionsController.QuestionTypeList);
 
 router.get("/pdf", (req, res) => {
   const pdfUrl = req.query.url;

@@ -16,6 +16,8 @@ class QuestionType extends Model {
 QuestionType.init(
   {
     type: { type: DataTypes.STRING, allowNull: true },
+    thumbnail: { type: DataTypes.STRING, allowNull: true },
+    template: { type: DataTypes.STRING, allowNull: true },
     entered_at: {
       type: DataTypes.DATE,
       allowNull: true,

@@ -13,6 +13,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      thumbnail: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      template: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       entered_at: {
         type: Sequelize.DATE,
         allowNull: true,

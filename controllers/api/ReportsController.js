@@ -32,32 +32,79 @@ class ReportsController {
       try {
         const user = req.session.user;
         const data = await sequelize.query(
-          `WITH watch_count_per_subtopic AS (
+          `WITH question_type_ids AS (
+             SELECT id FROM question_type WHERE is_deleted IS NULL
+           ),
+           
+           watch_count_per_subtopic AS (
              SELECT
                subtopics.id AS subtopic_id,
                COUNT(*) AS complete_count
              FROM watch_history
              JOIN subtopics ON watch_history.subtopic = subtopics.id
-               AND watch_history.user_id = ${user.id}
+             WHERE watch_history.user_id = ${user.id}
                AND watch_history.status = '1'
                AND watch_history.is_deleted IS NULL
                AND subtopics.is_deleted IS NULL
              GROUP BY subtopics.id
            ),
            
+           latest_test_histories AS (
+             SELECT *
+             FROM (
+               SELECT
+                 th.id,
+                 th.sub_topic,
+                 th.question_type,
+                 th.correct_ans,
+                 th.wrong_ans,
+                 ROW_NUMBER() OVER (
+                   PARTITION BY th.sub_topic, th.question_type
+                   ORDER BY th.id DESC
+                 ) AS rn
+               FROM test_histories th
+               WHERE th.is_deleted IS NULL
+                 AND th.user_id = ${user.id}
+                 AND th.question_type IS NOT NULL
+             ) ranked
+             WHERE rn = 1
+           ),
+           
+           marks_per_subtopic AS (
+             SELECT
+               sub_topic AS subtopic_id,
+               SUM(COALESCE(correct_ans, 0) + COALESCE(wrong_ans, 0)) AS ttl_mark,
+               SUM(COALESCE(correct_ans, 0)) AS got_mark
+             FROM latest_test_histories
+             GROUP BY sub_topic
+           ),
+           
+           question_types_per_subtopic AS (
+             SELECT
+               sub_topic AS subtopic_id,
+               JSON_ARRAYAGG(question_type) AS question_types
+             FROM latest_test_histories
+             GROUP BY sub_topic
+           ),
+           
            subtopics_per_level AS (
              SELECT
-               subtopics.level_id AS level_id,
+               subtopics.level_id,
                JSON_ARRAYAGG(
                  JSON_OBJECT(
                    'id', subtopics.id,
                    'title', subtopics.title,
                    'category', CAST(subtopics.category AS JSON),
-                   'complete_count', COALESCE(watch_count_per_subtopic.complete_count, 0)
+                   'complete_count', COALESCE(watch_count_per_subtopic.complete_count, 0),
+                   'ttl_mark', COALESCE(marks_per_subtopic.ttl_mark, 0),
+                   'got_mark', COALESCE(marks_per_subtopic.got_mark, 0),
+                   'question_types', COALESCE(question_types_per_subtopic.question_types, JSON_ARRAY())
                  )
                ) AS subtopics
              FROM subtopics
              LEFT JOIN watch_count_per_subtopic ON subtopics.id = watch_count_per_subtopic.subtopic_id
+             LEFT JOIN marks_per_subtopic ON subtopics.id = marks_per_subtopic.subtopic_id
+             LEFT JOIN question_types_per_subtopic ON subtopics.id = question_types_per_subtopic.subtopic_id
              WHERE subtopics.is_deleted IS NULL
              GROUP BY subtopics.level_id
            ),
@@ -90,14 +137,28 @@ class ReportsController {
              GROUP BY topic_id
            ),
            
+           question_type_data AS (
+             SELECT
+               JSON_ARRAYAGG(
+                 JSON_OBJECT(
+                   'id', qt.id,
+                   'type', qt.type
+                 )
+               ) AS question_types
+             FROM question_type qt
+             WHERE qt.is_deleted IS NULL
+           ),
+           
            topics_per_subject AS (
              SELECT
                topics.subject AS subject_id,
                topics.id AS topic_id,
                topics.title AS topic_title,
-               COALESCE(levels_aggregated.levels, JSON_ARRAY()) AS levels
+               COALESCE(levels_aggregated.levels, JSON_ARRAY()) AS levels,
+               question_type_data.question_types
              FROM topics
              LEFT JOIN levels_aggregated ON topics.id = levels_aggregated.topic_id
+             CROSS JOIN question_type_data
              WHERE topics.is_deleted IS NULL
            ),
            
@@ -108,7 +169,8 @@ class ReportsController {
                  JSON_OBJECT(
                    'id', topic_id,
                    'title', topic_title,
-                   'levels', levels
+                   'levels', levels,
+                   'question_types', question_types
                  )
                ) AS topics
              FROM topics_per_subject
