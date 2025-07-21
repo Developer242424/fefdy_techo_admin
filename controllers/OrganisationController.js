@@ -288,24 +288,31 @@ class OrganisationController {
               });
 
               if (!check) {
-                await OrgDetails.create({
+                const createOrgDet = await OrgDetails.create({
                   org_id: organisation.id,
                   standard: value.standard,
                   section: value.section,
                   levels: parseInt(value.level),
                   stu_count: value.student_count,
                 });
+                if (createOrgDet) {
+                  LoginUsers.update(
+                    {
+                      subject: JSON.stringify(edit_subject),
+                      level: parseInt(value.level),
+                    },
+                    {
+                      where: {
+                        org_id: organisation.id,
+                        standard: value.standard,
+                        section: value.section,
+                      },
+                    }
+                  );
+                }
               }
             }
           }
-          await LoginUsers.update(
-            { subject: JSON.stringify(edit_subject) },
-            {
-              where: {
-                org_id: organisation.id,
-              },
-            }
-          );
           return res.status(200).json({
             status: 200,
             message: "Organisations is updated successfully",
