@@ -51,11 +51,6 @@ function checkAllSelected() {
       if (templateHtml) {
         $("#questionCardContainer").append($(templateHtml));
       }
-    } else if (questionType === "3") {
-      const templateHtml = $("#dragquestionCardTemplate").html();
-      if (templateHtml) {
-        $("#questionCardContainer").append($(templateHtml));
-      }
     }
     renumberCards();
     updateSubmitButton();
@@ -352,10 +347,6 @@ function OpenEditModal(id, type) {
             let ques_html_mat = makeHTMLforMatchUp(id, type, data.data);
             $(".questions_container").html(ques_html_mat);
             OpenModal("question_list_edit_modal");
-          } else if (type === 3 || type === "3") {
-            let ques_html_drag = makeHTMLforDrag(id, type, []);
-            $(".questions_container").html(ques_html_drag);
-            OpenModal("question_list_edit_modal");
           } else {
             return false;
           }
@@ -575,10 +566,5 @@ function makeHTMLforChooseUp(id, type, data) {
   html += `</div>`;
   html += `<input type="hidden" name="id" value="${id}">`;
   html += `<input type="hidden" name="question_type" value="${type}">`;
-  return html;
-}
-
-function makeHTMLforDrag(id, type, data) {
-  let html = `<p>Drag & Drop</p>`;
   return html;
 }
