@@ -44,6 +44,8 @@ class OpenAiTokensController {
             .json({ status: 400, message: "Today's limit is over" });
         }
 
+        const apiKey = process.env.OPENAI_API_KEY;
+
         const response = await axios.post(
           "https://api.openai.com/v1/chat/completions",
           {
@@ -62,8 +64,7 @@ class OpenAiTokensController {
           },
           {
             headers: {
-              Authorization:
-                "Bearer sk-fefdy-test-serviceaccount-iHDVelQ4DD6LtSEQrvUST3BlbkFJlqmdzcXIanBnsNJTDilP",
+              Authorization: `Bearer ${apiKey}`,
               "Content-Type": "application/json",
             },
           }
