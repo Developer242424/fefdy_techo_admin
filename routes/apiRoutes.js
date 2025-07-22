@@ -11,6 +11,7 @@ const ProfileController = require("../controllers/api/ProfileController");
 const CertificateController = require("../controllers/api/CertificateController");
 const ReportsController = require("../controllers/api/ReportsController");
 const QuestionsController = require("../controllers/api/QuestionsController");
+const OpenAiTokensController = require("../controllers/api/OpenAiTokensController");
 
 const router = express.Router();
 
@@ -36,6 +37,7 @@ router.post("/myprofile", ProfileController.data);
 router.post("/certificate", CertificateController.cerificateContent);
 router.post("/wholereports", ReportsController.wholeReports);
 router.post("/questiontypes", QuestionsController.QuestionTypeList);
+router.post("/entrytoken", OpenAiTokensController.entryTokens);
 
 router.get("/pdf", (req, res) => {
   const pdfUrl = req.query.url;
