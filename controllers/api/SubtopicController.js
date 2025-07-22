@@ -175,6 +175,7 @@ class SubtopicController {
 
     this.subtopicData = asyncHandler(async (req, res) => {
       try {
+        const user = req.session.user;
         const { subtopic } = req.body;
         const get = await Subtopic.findOne({
           where: {
@@ -200,11 +201,21 @@ class SubtopicController {
               },
               attributes: ["id", "source", "type"],
             });
+            const watch_history = await WatchHistory.findOne({
+              where: {
+                user_id: user.id,
+                subtopic: subtopic,
+                category: value.id,
+                status: "1",
+                is_deleted: null,
+              },
+            });
             return {
               id: value.id,
               title: value.title,
               type: value.type,
               thumbnail: value.thumbnail,
+              is_completed: watch_history ? 1 : 0,
               cat_data: cat_data,
             };
           })

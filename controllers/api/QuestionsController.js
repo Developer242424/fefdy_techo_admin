@@ -32,11 +32,32 @@ class QuestionsController {
   constructor() {
     this.QuestionTypeList = asyncHandler(async (req, res) => {
       try {
-        const data = await QuestionType.findAll({
+        const user = req.session.user;
+        const { subtopic } = req.body;
+        const question_types = await QuestionType.findAll({
           where: {
             is_deleted: null,
           },
         });
+        const data = await Promise.all(
+          question_types.map(async (value, index) => {
+            const test_history = await TestHistory.findOne({
+              where: {
+                user_id: user.id,
+                sub_topic: subtopic,
+                question_type: value.id,
+                is_deleted: null,
+              },
+            });
+            return {
+              id: value.id,
+              type: value.type,
+              thumbnail: value.thumbnail,
+              template: value.template,
+              is_completed: test_history ? 1 : 0,
+            };
+          })
+        );
         return res.status(200).json({ status: 200, data });
       } catch (error) {
         console.error("Create Subtopic Error:", error);
