@@ -164,6 +164,46 @@ class OpenAiTokensController {
           .json({ status: 500, message: "Internal server error", error });
       }
     });
+
+    this.convertAudio = asyncHandler(async (req, res) => {
+      try {
+        const user = req.session.user;
+        const { text } = req.body;
+        const apiKey = process.env.OPENAI_API_KEY;
+
+        const response = await axios.post(
+          "https://api.openai.com/v1/audio/speech",
+          {
+            model: "tts-1", // or "tts-1-hd"
+            input: text,
+            voice: "shimmer", // alloy, echo, fable, onyx, nova, shimmer
+            response_format: "mp3",
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              "Content-Type": "application/json",
+            },
+            responseType: "arraybuffer", // Important to handle MP3 binary data
+          }
+        );
+
+        // Set response headers to send audio file
+        res.setHeader("Content-Type", "audio/mpeg");
+        res.setHeader("Content-Disposition", "inline; filename=speech.mp3");
+        res.send(response.data);
+      } catch (error) {
+        console.error(
+          "Audio conversion error:",
+          error.response?.data || error.message
+        );
+        return res.status(500).json({
+          status: 500,
+          message: "Failed to convert text to audio",
+          error: error.response?.data || error.message,
+        });
+      }
+    });
   }
 }
 
