@@ -14,6 +14,7 @@ const IndividualUsersListController = require("../controllers/IndividualUsersLis
 const UsersImprtNExportController = require("../controllers/UsersImprtNExportController");
 const QuestionsController = require("../controllers/QuestionsController");
 const ActivityController = require("../controllers/ActivityController");
+const SentReportController = require("../controllers/SentReportController");
 
 const router = express.Router();
 
@@ -40,7 +41,10 @@ router.get("/match", (req, res) => {
 router.get("/match/home", (req, res) => {
   res.render("admin/activity/matchup/home", { layout: false });
 });
-router.post("/activity/questions/match/get", ActivityController.getQuestionsMatchup);
+router.post(
+  "/activity/questions/match/get",
+  ActivityController.getQuestionsMatchup
+);
 
 // ✅ Public routes (excluded from auth check)
 router.get("/login", AuthController.loginindex);
@@ -155,6 +159,8 @@ router.post("/questions-list/list", QuestionsController.list);
 router.post("/questions-list/data", QuestionsController.data);
 router.post("/questions-list/update", QuestionsController.update);
 router.post("/questions-list/destroy", QuestionsController.destroy);
+
+router.get("/sent-report", SentReportController.index);
 
 router.get("/sample", DashboardController.sample);
 

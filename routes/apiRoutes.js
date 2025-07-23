@@ -38,6 +38,7 @@ router.post("/certificate", CertificateController.cerificateContent);
 router.post("/wholereports", ReportsController.wholeReports);
 router.post("/questiontypes", QuestionsController.QuestionTypeList);
 router.post("/entrytoken", OpenAiTokensController.entryTokens);
+router.post("/entrytoken-translator", OpenAiTokensController.entryTokensTranslator);
 
 router.get("/pdf", (req, res) => {
   const pdfUrl = req.query.url;

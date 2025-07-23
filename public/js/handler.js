@@ -328,6 +328,43 @@ function getOrganisationsForDrop(id, selectedValue = null) {
   });
 }
 
+function getOrganisationsForDropMultiple(id, selectedValues = []) {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: "/admin/get-organisations-for-drop",
+      method: "POST",
+      success: function (res) {
+        let html = `<option disabled value="">Select Organisations</option>`;
+        if (res.status === 200) {
+          res.data.forEach((value) => {
+            html += `<option value="${value.id}">${value.org_name}</option>`;
+          });
+        }
+        $(`#${id}`).html(html);
+        const select = reinitSlimSelect(id);
+
+        // Handle multi-select values
+        if (Array.isArray(selectedValues) && selectedValues.length > 0) {
+          const selectedStrings = selectedValues.map(String); // ensure all are strings
+          select.setSelected(selectedStrings);
+        }
+
+        if (res.status !== 200)
+          ToastAlert("warning", res.message || "Something went wrong.");
+
+        resolve(select);
+      },
+      error: function (xhr) {
+        ToastAlert(
+          "warning",
+          xhr?.responseJSON?.message || "An error occurred."
+        );
+        reject("Error fetching subjects.");
+      },
+    });
+  });
+}
+
 function getQuestionTypesForDrop(id, selectedValue = null) {
   return new Promise((resolve, reject) => {
     $.ajax({
