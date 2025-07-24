@@ -14,6 +14,10 @@ require("dotenv").config();
 const session = require("express-session");
 const crypto = require("crypto");
 const { default: axios } = require("axios");
+const textToSpeech = require("@google-cloud/text-to-speech");
+const util = require("util");
+const fs = require("fs");
+const path = require("path");
 
 class OpenAiTokensController {
   constructor() {
@@ -31,6 +35,7 @@ class OpenAiTokensController {
         const check = await UsedTokenHistory.findAll({
           where: {
             user_id: user.id,
+            type: "dictionary",
             is_deleted: null,
             entered_at: {
               [Op.between]: [startOfToday, endOfToday],
@@ -38,7 +43,9 @@ class OpenAiTokensController {
           },
         });
         // console.log(check.length);
-        if (check.length >= 20) {
+        const percentage = (check.length / 20) * 100;
+        // console.log(percentage);
+        if (percentage >= 30) {
           return res
             .status(200)
             .json({ status: 400, message: "Today's limit is over" });
@@ -80,6 +87,7 @@ class OpenAiTokensController {
           user_id: user.id,
           used_tokens: totalTokens,
           used_request: 1,
+          type: "dictionary",
         };
         await UsedTokenHistory.create(obj);
         return res.status(200).json({ status: 200, message: assistantMessage });
@@ -105,6 +113,7 @@ class OpenAiTokensController {
         const check = await UsedTokenHistory.findAll({
           where: {
             user_id: user.id,
+            type: "translator",
             is_deleted: null,
             entered_at: {
               [Op.between]: [startOfToday, endOfToday],
@@ -112,7 +121,9 @@ class OpenAiTokensController {
           },
         });
         // console.log(check.length);
-        if (check.length >= 20) {
+        const percentage = (check.length / 20) * 100;
+        // console.log(percentage);
+        if (percentage >= 70) {
           return res
             .status(200)
             .json({ status: 400, message: "Today's limit is over" });
@@ -154,6 +165,7 @@ class OpenAiTokensController {
           user_id: user.id,
           used_tokens: totalTokens,
           used_request: 1,
+          type: "translator",
         };
         await UsedTokenHistory.create(obj);
         return res.status(200).json({ status: 200, message: assistantMessage });
@@ -168,42 +180,47 @@ class OpenAiTokensController {
     this.convertAudio = asyncHandler(async (req, res) => {
       try {
         const user = req.session.user;
-        const { text } = req.body;
-        const apiKey = process.env.OPENAI_API_KEY;
+        const { text, languageCode } = req.body;
 
-        const response = await axios.post(
-          "https://api.openai.com/v1/audio/speech",
-          {
-            model: "tts-1", // or "tts-1-hd"
-            input: text,
-            voice: "shimmer", // alloy, echo, fable, onyx, nova, shimmer
-            response_format: "mp3",
+        const client = new textToSpeech.TextToSpeechClient();
+
+        const request = {
+          input: { text },
+          voice: {
+            languageCode: languageCode,
+            name: getWavenetVoice(languageCode),
           },
-          {
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              "Content-Type": "application/json",
-            },
-            responseType: "arraybuffer", // Important to handle MP3 binary data
-          }
-        );
+          audioConfig: {
+            audioEncoding: "MP3",
+          },
+        };
+        // console.log(getWavenetVoice(languageCode))
 
-        // Set response headers to send audio file
+        const [response] = await client.synthesizeSpeech(request);
+
         res.setHeader("Content-Type", "audio/mpeg");
-        res.setHeader("Content-Disposition", "inline; filename=speech.mp3");
-        res.send(response.data);
+        res.setHeader("Content-Disposition", "inline; filename=output.mp3");
+        res.send(response.audioContent);
       } catch (error) {
-        console.error(
-          "Audio conversion error:",
-          error.response?.data || error.message
-        );
+        console.error("Audio conversion error:", error.message);
         return res.status(500).json({
           status: 500,
           message: "Failed to convert text to audio",
-          error: error.response?.data || error.message,
+          error: error.message,
         });
       }
     });
+
+    function getWavenetVoice(languageCode) {
+      const voices = {
+        "en-US": "en-US-Wavenet-D",
+        "ta-IN": "ta-IN-Wavenet-A",
+        "te-IN": "te-IN-Wavenet-A",
+        "ml-IN": "ml-IN-Wavenet-A",
+        "hi-IN": "hi-IN-Wavenet-A",
+      };
+      return voices[languageCode] || "en-US-Wavenet-D";
+    }
   }
 }
 

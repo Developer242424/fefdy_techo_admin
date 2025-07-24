@@ -18,6 +18,7 @@ UsedTokenHistory.init(
     user_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     used_tokens: { type: DataTypes.INTEGER, allowNull: true },
     used_request: { type: DataTypes.INTEGER, allowNull: true },
+    type: { type: DataTypes.STRING, allowNull: true },
     entered_at: { type: DataTypes.DATE, allowNull: true },
     edited_at: { type: DataTypes.DATE, allowNull: true },
     is_deleted: { type: DataTypes.DATE, allowNull: true },
