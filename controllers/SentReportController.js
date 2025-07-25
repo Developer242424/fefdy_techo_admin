@@ -40,10 +40,27 @@ class SentReportController {
         // const email = "cooltimesv7@gmail.com";
         const email = "developer@fefdypartners.com";
 
+        const chartUrl =
+          "https://quickchart.io/chart?c=" +
+          encodeURIComponent(
+            JSON.stringify({
+              type: "bar",
+              data: {
+                labels: ["Red", "Blue", "Yellow"],
+                datasets: [
+                  {
+                    label: "Votes",
+                    data: [12, 19, 3],
+                  },
+                ],
+              },
+            })
+          );
+
         const htmlElement = await new Promise((resolve, reject) => {
           res.render(
             "admin/sentreport/template",
-            { layout: false },
+            { layout: false, chartImage: chartUrl },
             (err, html) => {
               if (err) reject(err);
               else resolve(html);
