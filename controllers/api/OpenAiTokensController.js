@@ -138,7 +138,7 @@ class OpenAiTokensController {
             messages: [
               {
                 role: "system",
-                content: "You are a translation assistant",
+                content: "You are a professional translation assistant. Respond only with the translated text, no explanations.",
               },
               {
                 role: "user",
