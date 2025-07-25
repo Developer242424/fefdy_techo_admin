@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "fefdy-techno",
+  "private_key_id": "d36f3930e904438332f5938b3f52fb0446a8e709",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCPlnrhXsvSS2Rt\nuanuv5bOXgX9jWuQpm9Il7esUIUCRcvJw+7cY7HqiD9lp2mu9xtF/yqzUgk6aU/0\nqvIEy0C7NpHBY6LiENX/hIOUcddiJS71L5SNSwCQZxOfc7/qDvlo9Q8t18f3/NZm\nQes2SsxQx3SZp6D2oHBv3qSnZtY6b61N1a+JKcvTj3z6PqCyNmGHPlrTRmow9MKv\nbp2NG3wiRQoAiMASIUNcFz8byTiihIWj317c3DiruncAoWyxs3KGNrbRe4OQvbAi\nMG9QUHjtL9wKtvjmUg/xTPbyNCEMnEGVK7u2bUw8JrBTDBv04Q8nvjZzOMCmQ1xr\nxf/+QstvAgMBAAECggEACNstA2cvkW4WqNE0QtEB/K1+QhgYY9NtdrVA3g8Yp74P\n+9xVXbYvxuRAwMTVdwtaXR6yuV0HIQQA1fmQiYIodm4/CYYF3wVPJajnMrSI0SQI\n+ZTF3VHHHEuh7ApIHSgaSFfLvWCbPqzouRA6G977gMSkk5uWs892eo0+wO0jVnbt\nj8A6yhmWQorHadxkpNkUEGEGWGhYWuqKdZ0S3Oig0k8stTT8bmTka1lECjUxaPbe\npwlC0/gKDPQxLaRDiCG+7Fp9sHdy8e4MG6B2Xy5MdFnXgR/jdXTyIzwkT22aR8Pt\nP2rDjhYiIQC2P8mn1hbfyG/P3u+yRVi+2CY8empMUQKBgQDDQilVHmNYbPtDDi6i\nnoMoLB+GxwKYrIFL7bdBSbynmqjstSP7eulMpg/7/O2zIpmiiOa6MdlNAxK1tYZ6\nPf9rf9skEVYOZvzt6WJODowmrhjk8CWb/wfkqnOFIhZXD2eWv/GbIDYAk4VRYTc1\nMhpvy2UP+jur9vZp240nRu2mUQKBgQC8QWnXUb7hgaP8/4HXuXgTwqRhz6eCD5lN\nZBESe2jakkVhMb4GsjhNgNwTmhECPnIgQjt0+Yfla8cLHidL5PoJsxooo86PicPs\nQ3jlKqEUK9bJfEkwvStPRQ7yb8L9Jh2qkYC+obLq0J0clTmB8PlcHR2LrC2R2RE2\nhpG/HsolvwKBgDhFbfH44vqN1c+aW7hD5FqEdMV7vvTO6ig+psxq+rJ2sO4eufL0\nlh2f0gV1++7fLtWXjJ7mVNCL7S1u1gWOrniFjVsUn+9goM3Tr5/9M0jGbag0yTHu\nypCMyuP4UeXfK6RXRsLFAqsh2I7+bFGpUdMcE9EJ9X52mschHcnO+BgxAoGAc9bw\nkO0dPtguF3UF6b+XstkXm5RSp8Z/d862bp//wlc1V/xqyOYLnS1IvssT4kSYp176\nBR2y0KpEPYQdfCb28NcDprQ9W7fTFmPiVWmo2qerMCpJQzN0HgAJlYbN/kXhBV8p\nUKRhWvppYvgz/dBRMKw9zP9yvwdJ/zpJHsiMbTMCgYBBRpjvxJRnFeYWzvDIjYpx\nd8WxEMeRDf6ZQDRFhwPfGgZ9JzSqUM5BYrx0GBiqZvL33+lakhTwHLGxs/3RNw65\nVfdVNFya641g3rBOj3FqhMJ8NqlGXgyeOAD8U5T2FhPRZdAFFAZyZ35ppmsn7GFL\nKdHBGJrd9l9LmbBeH5qheA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "techno-service-account@fefdy-techno.iam.gserviceaccount.com",
+  "client_id": "101894696398322738945",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/techno-service-account%40fefdy-techno.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
