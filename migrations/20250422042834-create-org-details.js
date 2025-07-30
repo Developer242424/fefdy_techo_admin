@@ -13,6 +13,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      subject: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       standard: {
         type: Sequelize.INTEGER,
         allowNull: true,

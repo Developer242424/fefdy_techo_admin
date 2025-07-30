@@ -16,6 +16,17 @@ document.addEventListener("DOMContentLoaded", function () {
       tempDiv.innerHTML = `<div class="row form-row">
             <div class="col-sm-3">
                 <div class="form-group">
+                    <label>Subject</label>
+                    <select name="org_details[${
+                      orgIndex + 1
+                    }][subject]" class="form-control subject-dropdown">
+                        <option value="">Select Subject</option>
+                    </select>
+                    <p class="validate_error text-danger"></p>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
                     <label>Standard</label>
                     <select name="org_details[${
                       orgIndex + 1
@@ -75,9 +86,11 @@ document.addEventListener("DOMContentLoaded", function () {
       container.appendChild(newRow);
 
       // Initialize SlimSelect and load options
+      const subjectSelect = newRow.querySelector(".subject-dropdown");
       const standardSelect = newRow.querySelector(".standard-dropdown");
       const sectionSelect = newRow.querySelector(".section-dropdown");
       const levelSelect = newRow.querySelector(".level-dropdown");
+      getSubjectForDropByClass(subjectSelect);
       getStandardsForDrop(standardSelect);
       new SlimSelect({ select: sectionSelect });
       new SlimSelect({ select: levelSelect });
@@ -109,6 +122,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const tempDiv = document.createElement("div");
       tempDiv.innerHTML = `<div class="row form-row">
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label>Subject</label>
+                    <select name="edit_org_details[${editOrgIndex}][subject]" class="form-control subject-dropdown">
+                        <option value="">Select Subject</option>
+                    </select>
+                    <p class="validate_error text-danger"></p>
+                </div>
+            </div>
             <div class="col-sm-3">
                 <div class="form-group">
                     <label>Standard</label>
@@ -162,9 +184,11 @@ document.addEventListener("DOMContentLoaded", function () {
       container.appendChild(newRow);
 
       // Initialize SlimSelect and load options
+      const subjectSelect = newRow.querySelector(".subject-dropdown");
       const standardSelect = newRow.querySelector(".standard-dropdown");
       const sectionSelect = newRow.querySelector(".section-dropdown");
       const levelSelect = newRow.querySelector(".level-dropdown");
+      getSubjectForDropByClass(subjectSelect);
       getStandardsForDrop(standardSelect);
       new SlimSelect({ select: sectionSelect });
       new SlimSelect({ select: levelSelect });
@@ -185,10 +209,14 @@ document.addEventListener("DOMContentLoaded", function () {
 $(function () {
   LoadTableData();
 
-  getSubjectForDropMultiple("subject");
+  // getSubjectForDropMultiple("subject");
   const firstStandard = document.querySelector(".standard-dropdown");
   if (firstStandard) {
     getStandardsForDrop(firstStandard);
+  }
+  const firstSubject = document.querySelector(".subject-dropdown");
+  if (firstSubject) {
+    getSubjectForDropByClass(firstSubject);
   }
   new SlimSelect({ select: ".section-dropdown" });
   new SlimSelect({ select: ".level-dropdown" });
@@ -196,6 +224,10 @@ $(function () {
   const firstStandard1 = document.querySelector(".edit_standard-dropdown");
   if (firstStandard1) {
     getStandardsForDrop(firstStandard1);
+  }
+  const firstSubject1 = document.querySelector(".edit_subject-dropdown");
+  if (firstSubject1) {
+    getSubjectForDropByClass(firstSubject1);
   }
   new SlimSelect({ select: ".edit_section-dropdown" });
   new SlimSelect({ select: ".edit_level-dropdown" });
@@ -339,11 +371,6 @@ async function OpenEditModal(id) {
           const data = res.data;
           const data1 = res.data1;
 
-          const selectSubject = await getSubjectForDropMultiple(
-            "edit_subject",
-            JSON.parse(data.subject)
-          );
-
           $("#edit_id").val(data.id);
           $("#edit_org_name").val(data.org_name);
           $("#edit_name").val(data.name);
@@ -355,7 +382,7 @@ async function OpenEditModal(id) {
             .attr("href", `../${data.profile_image}`);
 
           if (data1.length > 0) {
-            $("#organisation_edit").html('');
+            $("#organisation_edit").html("");
           }
 
           const levels = window.LEVEL_COUNT || 0;
@@ -365,6 +392,15 @@ async function OpenEditModal(id) {
           }
           for (const value of data1) {
             html = `<div class="row form-row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <select name="edit_org_details[${editOrgIndex}][subject]" class="form-control edit_subject-dropdown">
+                                <option value="">Select Subject</option>
+                            </select>
+                            <p class="validate_error text-danger"></p>
+                        </div>
+                    </div>
                     <div class="col-sm-3">
                         <div class="form-group">
                             <label>Standard</label>
@@ -413,6 +449,9 @@ async function OpenEditModal(id) {
                 </div>`;
             const newRow = $(html);
             $("#organisation_edit").append(newRow);
+
+            const subjectSelect = newRow.find(".edit_subject-dropdown")[0];
+            getSubjectForDropByClass(subjectSelect, value.subject);
 
             const standardSelect = newRow.find(".edit_standard-dropdown")[0];
             getStandardsForDrop(standardSelect, value.standard);

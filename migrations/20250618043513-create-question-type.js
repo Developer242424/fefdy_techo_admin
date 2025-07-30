@@ -21,6 +21,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      question_limit: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       entered_at: {
         type: Sequelize.DATE,
         allowNull: true,

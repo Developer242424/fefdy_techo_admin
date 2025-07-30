@@ -58,7 +58,7 @@
                         <p class="validate_error text-danger" id="profile_image_error"></p>
                     </div>
                 </div>
-                <div class="col-sm-3">
+                <!-- <div class="col-sm-3">
                     <div class="form-group">
                         <label for="subject">Subject</label>
                         <select name="subject[]" multiple id="subject" class="form-control">
@@ -66,13 +66,22 @@
                         </select>
                         <p class="validate_error text-danger" id="subject_error"></p>
                     </div>
-                </div>
+                </div> -->
             </div>
 
             <!-- dynamic row start -->
 
             <div id="rowContainer">
                 <div class="row form-row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <select name="org_details[0][subject]" class="form-control subject-dropdown">
+                                <option value="">Select Subject</option>
+                            </select>
+                            <p class="validate_error text-danger"></p>
+                        </div>
+                    </div>
                     <div class="col-sm-3">
                         <div class="form-group">
                             <label>Standard</label>

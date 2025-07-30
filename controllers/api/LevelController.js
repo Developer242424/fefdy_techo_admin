@@ -33,6 +33,12 @@ class LevelController {
       try {
         const user = req.session.user;
         const { topic } = req.body;
+        const topics = await Topics.findOne({
+          where: {
+            id: topic,
+            is_deleted: null,
+          },
+        });
         if (!topic) {
           return res
             .status(200)
@@ -41,11 +47,13 @@ class LevelController {
         const org_details = await OrgDetails.findOne({
           where: {
             org_id: user.org_id,
+            subject: topics.subject,
             standard: user.standard,
             section: user.section,
             is_deleted: null,
           },
         });
+        // console.log(org_details);
         if (!org_details) {
           return res
             .status(200)

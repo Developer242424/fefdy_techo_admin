@@ -18,6 +18,7 @@ QuestionType.init(
     type: { type: DataTypes.STRING, allowNull: true },
     thumbnail: { type: DataTypes.STRING, allowNull: true },
     template: { type: DataTypes.STRING, allowNull: true },
+    question_limit: { type: DataTypes.INTEGER, allowNull: true },
     entered_at: {
       type: DataTypes.DATE,
       allowNull: true,

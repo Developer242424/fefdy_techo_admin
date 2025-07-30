@@ -3,10 +3,15 @@ $(function () {
 
   $("#sent_report_form").submit(function (e) {
     e.preventDefault();
+    const $form = $(this);
+    const $button = $form.find("button");
+    $button.text("Submitting...");
+    $button.attr("disabled", true);
+    const formData = new FormData(this);
     $.ajax({
       url: "/admin/sent-report/sent-mail",
       method: "POST",
-      //   data: formData,
+      data: formData,
       contentType: false,
       processData: false,
       success: function (res) {
@@ -24,6 +29,8 @@ $(function () {
         } else {
           ToastAlert("warning", res.message);
         }
+        $button.text("Submit");
+        $button.removeAttr("disabled");
       },
       error: function (xhr) {
         let errorMessage = "An error occurred.";

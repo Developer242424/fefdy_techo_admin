@@ -76,28 +76,30 @@ class OrganisationController {
         .withMessage("Email address is required")
         .isEmail()
         .withMessage("Enter a valid email address"),
-      check("subject")
-        .isArray({ min: 1 })
-        .withMessage("At least one subject must be selected"),
       asyncHandler(async (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
           return res.status(200).json({ status: 401, errors: errors.array() });
         }
-        const { org_name, name, mobile, email, subject, org_details } =
-          req.body;
+        const { org_name, name, mobile, email, org_details } = req.body;
         const file = req.file;
         if (!file) {
           return res
             .status(200)
             .json({ status: 400, message: "Thumbnail is required" });
         }
+        // console.log(org_details);
+        // return;
+        const uniqueSubjects = [
+          ...new Set(org_details.map((item) => item.subject)),
+        ];
+        // console.log(uniqueSubjects);
         const insert = await Organisation.create({
           org_name,
           name,
           mobile,
           email,
-          subject: JSON.stringify(subject),
+          subject: JSON.stringify(uniqueSubjects),
           profile_image: `uploads/org_profile/${file.filename}`,
         });
         // console.log("BODY:", req.body);
@@ -108,6 +110,7 @@ class OrganisationController {
           const check = await OrgDetails.findOne({
             where: {
               org_id: insert.id,
+              subject: value.subject,
               standard: value.standard,
               section: value.section,
             },
@@ -121,6 +124,7 @@ class OrganisationController {
           if (!check) {
             await OrgDetails.create({
               org_id: insert.id,
+              subject: value.subject,
               standard: value.standard,
               section: value.section,
               levels: parseInt(value.level),
@@ -222,9 +226,6 @@ class OrganisationController {
         .withMessage("Email address is required")
         .isEmail()
         .withMessage("Enter a valid email address"),
-      check("edit_subject")
-        .isArray({ min: 1 })
-        .withMessage("At least one subject must be selected"),
       asyncHandler(async (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -236,7 +237,6 @@ class OrganisationController {
             edit_name,
             edit_mobile,
             edit_email,
-            edit_subject,
             edit_org_details,
             edit_id,
           } = req.body;
@@ -264,11 +264,14 @@ class OrganisationController {
             });
             organisation.thumbnail = `uploads/org_profile/${file.filename}`;
           }
+          const uniqueSubjects = [
+            ...new Set(edit_org_details.map((item) => item.subject)),
+          ];
           (organisation.org_name = edit_org_name),
             (organisation.name = edit_name),
             (organisation.mobile = edit_mobile),
             (organisation.email = edit_email),
-            (organisation.subject = JSON.stringify(edit_subject));
+            (organisation.subject = JSON.stringify(uniqueSubjects));
           await organisation.save();
           await OrgDetails.update(
             { is_deleted: new Date() },
@@ -276,11 +279,13 @@ class OrganisationController {
               where: { org_id: organisation.id },
             }
           );
+          console.log(edit_org_details.length);
           for (const value of edit_org_details) {
             if (value) {
               const check = await OrgDetails.findOne({
                 where: {
                   org_id: organisation.id,
+                  subject: value.subject,
                   standard: value.standard,
                   section: value.section,
                   is_deleted: null,
@@ -290,6 +295,7 @@ class OrganisationController {
               if (!check) {
                 const createOrgDet = await OrgDetails.create({
                   org_id: organisation.id,
+                  subject: value.subject,
                   standard: value.standard,
                   section: value.section,
                   levels: parseInt(value.level),
@@ -298,7 +304,7 @@ class OrganisationController {
                 if (createOrgDet) {
                   LoginUsers.update(
                     {
-                      subject: JSON.stringify(edit_subject),
+                      subject: JSON.stringify(uniqueSubjects),
                       level: parseInt(value.level),
                     },
                     {

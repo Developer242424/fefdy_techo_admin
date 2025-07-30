@@ -59,15 +59,6 @@
                             id="edit_profile_image">
                         <a target="_blank">View file...</a>
                         <p class="validate_error text-danger" id="edit_profile_image_error"></p>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="form-group">
-                        <label for="edit_subject">Subject</label>
-                        <select name="edit_subject[]" multiple id="edit_subject" class="form-control">
-                            <option value="">Select Subject</option>
-                        </select>
-                        <p class="validate_error text-danger" id="edit_subject_error"></p>
                         <input type="hidden" name="edit_id" id="edit_id">
                     </div>
                 </div>
@@ -77,6 +68,15 @@
 
             <div id="organisation_edit">
                 <div class="row form-row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <select name="edit_org_details[0][subject]" class="form-control edit_subject-dropdown">
+                                <option value="">Select Subject</option>
+                            </select>
+                            <p class="validate_error text-danger"></p>
+                        </div>
+                    </div>
                     <div class="col-sm-3">
                         <div class="form-group">
                             <label>Standard</label>

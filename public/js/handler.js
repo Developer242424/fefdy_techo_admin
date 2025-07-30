@@ -46,6 +46,39 @@ function getSubjectForDrop(id, selectedValue = null) {
   });
 }
 
+function getSubjectForDropByClass(element, selectedValue = null) {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: "/admin/get-subjects-for-drop",
+      method: "POST",
+      success: function (res) {
+        let html = `<option value="">Select Subject</option>`;
+        if (res.status === 200 && Array.isArray(res.data)) {
+          res.data.forEach((value) => {
+            html += `<option value="${value.id}">${value.subject}</option>`;
+          });
+        }
+
+        $(element).html(html);
+        const select = new SlimSelect({ select: element });
+
+        if (selectedValue) {
+          select.setSelected([String(selectedValue)], true);
+        }
+
+        resolve(select);
+      },
+      error: function (xhr) {
+        ToastAlert(
+          "warning",
+          xhr?.responseJSON?.message || "An error occurred."
+        );
+        reject("Error fetching standards.");
+      },
+    });
+  });
+}
+
 function getSubjectForDropMultiple(id, selectedValues = []) {
   return new Promise((resolve, reject) => {
     $.ajax({
@@ -334,7 +367,7 @@ function getOrganisationsForDropMultiple(id, selectedValues = []) {
       url: "/admin/get-organisations-for-drop",
       method: "POST",
       success: function (res) {
-        let html = `<option disabled value="">Select Organisations</option>`;
+        let html = `<option value="">Select Organisations</option>`;
         if (res.status === 200) {
           res.data.forEach((value) => {
             html += `<option value="${value.id}">${value.org_name}</option>`;

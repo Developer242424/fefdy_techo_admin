@@ -11,6 +11,7 @@ class OrgDetails extends Model {
 OrgDetails.init(
   {
     org_id: { type: DataTypes.INTEGER, allowNull: true },
+    subject: { type: DataTypes.INTEGER, allowNull: true },
     standard: { type: DataTypes.INTEGER, allowNull: true },
     section: { type: DataTypes.STRING, allowNull: true },
     levels: { type: DataTypes.INTEGER, allowNull: true },
