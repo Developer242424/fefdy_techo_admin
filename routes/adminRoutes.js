@@ -51,6 +51,8 @@ router.get("/login", AuthController.loginindex);
 router.post("/login", AuthController.login);
 router.get("/logout", AuthController.logout);
 
+router.get("/sent-report/sent-mail/whole", SentReportController.sentMailWhole);
+
 // ✅ Now protect the rest
 router.use(isAuthenticated);
 
@@ -162,7 +164,6 @@ router.post("/questions-list/destroy", QuestionsController.destroy);
 
 router.get("/sent-report", SentReportController.index);
 router.post("/sent-report/sent-mail", SentReportController.sentMail);
-router.get("/sent-report/sent-mail/whole", SentReportController.sentMailWhole);
 
 router.get("/sample", DashboardController.sample);
 
