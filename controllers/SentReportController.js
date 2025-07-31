@@ -193,6 +193,14 @@ class SentReportController {
 
     this.sentMailWhole = asyncHandler(async (req, res) => {
       try {
+        const today = new Date();
+        const dayOfMonth = today.getDate();
+
+        if (dayOfMonth !== 30) {
+          return res
+            .status(200)
+            .json({ status: 400, message: "Date is not valid" });
+        }
         const organisations = await Organisation.findAll({
           where: { is_deleted: null },
         });
