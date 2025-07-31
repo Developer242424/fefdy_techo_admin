@@ -11,6 +11,7 @@ const Questions = require("../models/questions");
 const Organisation = require("../models/organisation");
 const OrgDetails = require("../models/org_details");
 const LoginUsers = require("../models/loginusers");
+const MailEntry = require("../models/mailentry");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { where, Sequelize, DATE, Op } = require("sequelize");
@@ -94,23 +95,6 @@ class SentReportController {
             });
           }
 
-          const chartUrl =
-            "https://quickchart.io/chart?c=" +
-            encodeURIComponent(
-              JSON.stringify({
-                type: "bar",
-                data: {
-                  labels: ["Red", "Blue", "Yellow"],
-                  datasets: [
-                    {
-                      label: "Votes",
-                      data: [12, 19, 3],
-                    },
-                  ],
-                },
-              })
-            );
-
           const htmlElement = await new Promise((resolve, reject) => {
             res.render(
               "admin/sentreport/template",
@@ -127,28 +111,28 @@ class SentReportController {
           });
           // return res.status(200).send(htmlElement);
 
-          // const transporter = nodemailer.createTransport({
-          //   host: "smtp.gmail.com",
-          //   port: 587,
-          //   secure: false,
-          //   auth: {
-          //     user: process.env.EMAIL_USER,
-          //     pass: process.env.EMAIL_PASS,
-          //   },
-          // });
-
           const transporter = nodemailer.createTransport({
-            host: "mail.fefdybraingym.com",
-            port: 465,
-            secure: true,
+            host: "smtp.gmail.com",
+            port: 587,
+            secure: false,
             auth: {
-              user: "noreply@fefdybraingym.com",
-              pass: "fIUv^9TYV}gg&=}c",
+              user: process.env.EMAIL_USER,
+              pass: process.env.EMAIL_PASS,
             },
           });
 
+          // const transporter = nodemailer.createTransport({
+          //   host: "mail.fefdybraingym.com",
+          //   port: 465,
+          //   secure: true,
+          //   auth: {
+          //     user: "noreply@fefdybraingym.com",
+          //     pass: "fIUv^9TYV}gg&=}c",
+          //   },
+          // });
+
           const mailOptions = {
-            from: process.env.EMAIL_USER,
+            from: "noreply@fefdybraingym.com",
             to: email,
             subject: "Mothly report from Fefdy Brain Gym",
             html: htmlElement,
@@ -158,10 +142,40 @@ class SentReportController {
                 path: path.join(__dirname, "../public/logo/logo.png"),
                 cid: "logoimg",
               },
+              {
+                filename: "Confetti.gif",
+                path: path.join(
+                  __dirname,
+                  "../public/logo/images/Confetti.gif"
+                ),
+                cid: "confettiimg",
+              },
+              {
+                filename: "Celebrations Begin.gif",
+                path: path.join(
+                  __dirname,
+                  "../public/logo/images/Celebrations Begin.gif"
+                ),
+                cid: "celebrationbg",
+              },
+              {
+                filename: "star.gif",
+                path: path.join(__dirname, "../public/logo/images/star.gif"),
+                cid: "starimg",
+              },
             ],
           };
 
           await transporter.sendMail(mailOptions);
+          await MailEntry.create({
+            from: "noreply@fefdybraingym.com",
+            to: email,
+            subject: "Mothly report from Fefdy Brain Gym",
+            template: htmlElement,
+            sent_date: new Date(),
+            from_type: "admin",
+            to_type: "organisation",
+          });
 
           return res
             .status(200)
@@ -176,6 +190,168 @@ class SentReportController {
         }
       }),
     ];
+
+    this.sentMailWhole = asyncHandler(async (req, res) => {
+      try {
+        const organisations = await Organisation.findAll({
+          where: { is_deleted: null },
+        });
+
+        for (const org of organisations) {
+          let email = null;
+
+          try {
+            const org_id = org.id;
+            const org_data = await Organisation.findOne({
+              where: { id: org_id, is_deleted: null },
+            });
+
+            if (!org_data) {
+              await MailEntry.create({
+                from: "noreply@fefdybraingym.com",
+                to: "unknown@fefdy.com",
+                subject: "400",
+                template: "Organisation not found.",
+                sent_date: new Date(),
+                from_type: "admin",
+                to_type: "organisation",
+              });
+              continue;
+            }
+
+            email = org_data.email;
+
+            if (!email || email === "null") {
+              await MailEntry.create({
+                from: "noreply@fefdybraingym.com",
+                to: email || "unknown@fefdy.com",
+                subject: "400",
+                template:
+                  "Email is not found in the selected organisation account.",
+                sent_date: new Date(),
+                from_type: "admin",
+                to_type: "organisation",
+              });
+              continue;
+            }
+
+            const data = await GetReportsData(org_id);
+
+            if (!data) {
+              await MailEntry.create({
+                from: "noreply@fefdybraingym.com",
+                to: email,
+                subject: "400",
+                template: "Organisation not found 123.",
+                sent_date: new Date(),
+                from_type: "admin",
+                to_type: "organisation",
+              });
+              continue;
+            }
+
+            const htmlElement = await new Promise((resolve, reject) => {
+              res.render(
+                "admin/sentreport/template",
+                {
+                  layout: false,
+                  logoCid: "logoimg",
+                  data: data,
+                },
+                (err, html) => {
+                  if (err) reject(err);
+                  else resolve(html);
+                }
+              );
+            });
+
+            const transporter = nodemailer.createTransport({
+              host: "mail.fefdybraingym.com",
+              port: 465,
+              secure: true,
+              auth: {
+                user: "noreply@fefdybraingym.com",
+                pass: "fIUv^9TYV}gg&=}c",
+              },
+            });
+
+            const mailOptions = {
+              from: "noreply@fefdybraingym.com",
+              to: email,
+              subject: "Monthly report from Fefdy Brain Gym",
+              html: htmlElement,
+              attachments: [
+                {
+                  filename: "logo.png",
+                  path: path.join(__dirname, "../public/logo/logo.png"),
+                  cid: "logoimg",
+                },
+                {
+                  filename: "Confetti.gif",
+                  path: path.join(
+                    __dirname,
+                    "../public/logo/images/Confetti.gif"
+                  ),
+                  cid: "confettiimg",
+                },
+                {
+                  filename: "Celebrations Begin.gif",
+                  path: path.join(
+                    __dirname,
+                    "../public/logo/images/Celebrations Begin.gif"
+                  ),
+                  cid: "celebrationbg",
+                },
+                {
+                  filename: "star.gif",
+                  path: path.join(__dirname, "../public/logo/images/star.gif"),
+                  cid: "starimg",
+                },
+              ],
+            };
+
+            await transporter.sendMail(mailOptions);
+            await MailEntry.create({
+              from: "noreply@fefdybraingym.com",
+              to: email,
+              subject: "Monthly report from Fefdy Brain Gym",
+              template: htmlElement,
+              sent_date: new Date(),
+              from_type: "admin",
+              to_type: "organisation",
+            });
+          } catch (err) {
+            await MailEntry.create({
+              from: "noreply@fefdybraingym.com",
+              to: email || "unknown@fefdy.com",
+              subject: "Internal Error While Sending Report",
+              template: err.message,
+              sent_date: new Date(),
+              from_type: "admin",
+              to_type: "organisation",
+            });
+            console.error(`Error sending to ${email}:`, err.message);
+            continue;
+          }
+        }
+
+        res.status(200).json({
+          status: 200,
+          message: "Emails processed for all organisations.",
+        });
+      } catch (err) {
+        console.error("Unexpected global error:", err);
+        await MailEntry.create({
+          from: "noreply@fefdybraingym.com",
+          to: null,
+          subject: "Unexpected internal server error.",
+          template: err.message,
+          sent_date: new Date(),
+          from_type: "admin",
+          to_type: "organisation",
+        });
+      }
+    });
   }
 }
 
@@ -187,7 +363,13 @@ async function GetReportsData(org_id) {
         is_deleted: null,
       },
     });
-    const orgSubjects = JSON.parse(organisation.subject);
+
+    if (!organisation) {
+      throw new Error("Organisation not found.");
+    }
+
+    const orgSubjects = JSON.parse(organisation.subject || "[]");
+
     const org_ids = await sequelize.query(
       `
       SELECT MIN(id) AS id, standard, levels
@@ -200,6 +382,10 @@ async function GetReportsData(org_id) {
         type: Sequelize.QueryTypes.SELECT,
       }
     );
+
+    if (!org_ids || org_ids.length === 0) {
+      throw new Error("Organisation details not found.");
+    }
 
     // Extract ids into an array
     const orgIds = org_ids.map((item) => item.id);
