@@ -162,7 +162,7 @@ router.post("/questions-list/destroy", QuestionsController.destroy);
 
 router.get("/sent-report", SentReportController.index);
 router.post("/sent-report/sent-mail", SentReportController.sentMail);
-router.post("/sent-report/sent-mail/whole", SentReportController.sentMailWhole);
+router.get("/sent-report/sent-mail/whole", SentReportController.sentMailWhole);
 
 router.get("/sample", DashboardController.sample);
 
