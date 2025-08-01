@@ -196,7 +196,7 @@ class SentReportController {
         const today = new Date();
         const dayOfMonth = today.getDate();
 
-        if (dayOfMonth !== 30) {
+        if (dayOfMonth !== 1) {
           return res
             .status(200)
             .json({ status: 400, message: "Date is not valid" });
