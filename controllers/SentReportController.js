@@ -111,25 +111,25 @@ class SentReportController {
           });
           // return res.status(200).send(htmlElement);
 
-          const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 587,
-            secure: false,
-            auth: {
-              user: process.env.EMAIL_USER,
-              pass: process.env.EMAIL_PASS,
-            },
-          });
-
           // const transporter = nodemailer.createTransport({
-          //   host: "mail.fefdybraingym.com",
-          //   port: 465,
-          //   secure: true,
+          //   host: "smtp.gmail.com",
+          //   port: 587,
+          //   secure: false,
           //   auth: {
-          //     user: "noreply@fefdybraingym.com",
-          //     pass: "fIUv^9TYV}gg&=}c",
+          //     user: process.env.EMAIL_USER,
+          //     pass: process.env.EMAIL_PASS,
           //   },
           // });
+
+          const transporter = nodemailer.createTransport({
+            host: "mail.fefdybraingym.com",
+            port: 465,
+            secure: true,
+            auth: {
+              user: "noreply@fefdybraingym.com",
+              pass: "fIUv^9TYV}gg&=}c",
+            },
+          });
 
           const mailOptions = {
             from: "noreply@fefdybraingym.com",
