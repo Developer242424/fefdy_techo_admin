@@ -170,7 +170,7 @@ class SentReportController {
           await MailEntry.create({
             from: "noreply@fefdybraingym.com",
             to: email,
-            subject: "Mothly report from Fefdy Brain Gym",
+            subject: "Monthly report from Fefdy Brain Gym",
             template: htmlElement,
             sent_date: new Date(),
             from_type: "admin",
