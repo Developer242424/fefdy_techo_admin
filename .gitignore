@@ -2,3 +2,4 @@
 .env
 /keys/*
 /public/uploads/*
+/git-filter-repo
