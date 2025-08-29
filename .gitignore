@@ -3,3 +3,5 @@
 /keys/*
 /public/uploads/*
 /git-filter-repo
+config.js
+/config/*
