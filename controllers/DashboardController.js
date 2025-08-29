@@ -45,7 +45,11 @@ class DashboardController {
     });
 
     this.getCounts = asyncHandler(async (req, res) => {
-      const orgCount = await Organisation.count();
+      const orgCount = await Organisation.count({
+        where: {
+          is_deleted: null,
+        },
+      });
       const ttlStuCount = await LoginUsers.count();
       const ttlActiveStuCount = await LoginUsers.findAndCountAll({
         where: {
@@ -407,6 +411,13 @@ class DashboardController {
                 ? Math.round((ttlActiveOrgCount.count / ttlOrgCount) * 100)
                 : 0;
 
+            const ttlOrgCountBySubject = await Organisation.count({
+              where: {
+                is_deleted: null,
+                subject: { [Op.like]: `%${value.id}%` },
+              },
+            });
+
             let orgResults = [];
 
             for (const org of ttlActiveOrgCount.rows) {
@@ -549,6 +560,7 @@ class DashboardController {
             // return summary per subject
             return {
               subject: value.subject,
+              ttlOrgCountBySubject,
               orgActivePercent,
               orgCompletionPercent: orgResults.length
                 ? Math.round(

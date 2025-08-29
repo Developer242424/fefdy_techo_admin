@@ -400,6 +400,11 @@ $(function () {
           ></canvas>
         </div>
         <div class="dash-stats">
+        <p>
+            <strong>${item.ttlOrgCountBySubject}</strong><br />
+            <span class="dash-label">Total schools</span>
+          </p>
+          <hr/>
           <p>
             <strong>${item.orgActivePercent}%</strong><br />
             <span class="dash-label">Active schools</span>
