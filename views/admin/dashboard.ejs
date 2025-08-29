@@ -1,0 +1,128 @@
+<% if (typeof title !=='undefined' ) { %>
+<h1 class="dash-title"><%= title %></h1>
+<p class="dash-subtitle">
+  Hi Admin, here’s an overview of your learners and organizations.
+</p>
+<% } else { %>
+<h1>Fefdy</h1>
+<% } %>
+<div class="dashboard-section">
+  <div class="overview-dash-cards">
+    <!-- Organizations -->
+    <div class="dash-card">
+      <div class="icon purple-bg"><i class="fa-solid fa-school"></i></div>
+      <div>
+        <h2 id="ttl_org"><span class="skeleton skeleton-number"></span></h2>
+        <h4 id="ttl_org_label">
+          <span class="skeleton skeleton-line wide"></span>
+        </h4>
+        <p id="ttl_org_line">
+          <span class="skeleton skeleton-line full"></span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Total Students -->
+    <div class="dash-card">
+      <div class="icon purple-bg"><i class="fa-solid fa-users"></i></div>
+      <div>
+        <h2 id="ttl_stu"><span class="skeleton skeleton-number"></span></h2>
+        <h4 id="ttl_stu_label">
+          <span class="skeleton skeleton-line wide"></span>
+        </h4>
+        <p id="ttl_stu_line">
+          <span class="skeleton skeleton-line full"></span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Active Students -->
+    <div class="dash-card">
+      <div class="icon purple-bg"><i class="fa-solid fa-chart-line"></i></div>
+      <div>
+        <h2 id="actve_stu"><span class="skeleton skeleton-number"></span></h2>
+        <h4 id="actve_stu_label">
+          <span class="skeleton skeleton-line wide"></span>
+        </h4>
+        <p id="actve_stu_line">
+          <span class="skeleton skeleton-line full"></span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Active Organisations -->
+    <div class="dash-card card-highlight">
+      <div>
+        <h2 id="active_org"><span class="skeleton skeleton-number"></span></h2>
+        <h4 id="active_org_label">
+          <span class="skeleton skeleton-line wide"></span>
+        </h4>
+        <p id="active_org_line">
+          <span class="skeleton skeleton-line full"></span>
+        </p>
+      </div>
+      <div class="progress-bar"></div>
+    </div>
+  </div>
+
+  <div class="dashboard-container-sub">
+    <h2>Subject-wise Insights</h2>
+
+    <!-- Chart -->
+    <div class="charts-container">
+      <!-- bar chart -->
+      <div class="bar-chart-container">
+        <canvas id="barChart"></canvas>
+        <div class="chart-loader"></div>
+      </div>
+
+      <!-- performance percentage -->
+      <div class="performance-container">
+        <h2>Performance Percentage</h2>
+        <div class="charts-row">
+          <!-- Skeleton Chart 1 -->
+          <div class="donut-chart-skeleton">
+            <div class="donut-chart-loader"></div>
+            <div class="donut-chart-loader-text"></div>
+            <div class="donut-chart-loader-label"></div>
+          </div>
+
+          <!-- Skeleton Chart 2 -->
+          <div class="donut-chart-skeleton">
+            <div class="donut-chart-loader"></div>
+            <div class="donut-chart-loader-text"></div>
+            <div class="donut-chart-loader-label"></div>
+          </div>
+
+          <!-- Skeleton Chart 3 -->
+          <div class="donut-chart-skeleton">
+            <div class="donut-chart-loader"></div>
+            <div class="donut-chart-loader-text"></div>
+            <div class="donut-chart-loader-label"></div>
+          </div>
+        </div>
+        <p class="note">Progress out of 8 levels per subject.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="participation-section">
+    <h2>School Participation by Subject</h2>
+    <div class="participation-cards">
+      <div class="participation-card-skeleton">
+        <div class="participation-card-loader-icon"></div>
+        <div class="participation-card-loader-text"></div>
+        <div class="participation-card-loader-subtext"></div> 
+    </div>
+      <div class="participation-card-skeleton">
+        <div class="participation-card-loader-icon"></div>
+        <div class="participation-card-loader-text"></div>
+        <div class="participation-card-loader-subtext"></div> 
+    </div>
+      <div class="participation-card-skeleton">
+        <div class="participation-card-loader-icon"></div>
+        <div class="participation-card-loader-text"></div>
+        <div class="participation-card-loader-subtext"></div> 
+    </div>
+  </div>
+</div>

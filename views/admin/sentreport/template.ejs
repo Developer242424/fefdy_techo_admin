@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Fefdy Report</title>
+</head>
+
+<body style="margin:0; padding:0; font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif; background-color:#ffffff;">
+
+  <table align="center" width="100%" cellpadding="0" cellspacing="0" border="0"
+    style="border:1px solid #f0d2d2; margin:0 auto;">
+    <table align="center" width="100px" cellpadding="0" cellspacing="0" border="0"
+      style="border:1px solid #f0d2d2; margin:0 auto;">
+      <!-- Header -->
+      <tr style="background: url('cid:confettiimg'); background-size:contain;" >
+        <td style="padding: 0px 20px;">
+          <img src="cid:logoimg" alt="Fefdy Logo"
+            style="height:48px; display:inline-block; vertical-align:middle; margin-right: 151px;">
+          <img src="cid:starimg" alt="Celebration Confetti" width="100"
+            style="display:inline-block; vertical-align:middle; border-radius:6px;">
+        </td>
+      </tr>
+
+
+      <!-- Greeting Section -->
+      <tr>
+        <td
+          style="background: url('cid:celebrationbg');background-size:contain; background-repeat: no-repeat; background-color:#f0fdf4; padding:32px; font-size:16px; line-height:1.6; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color:#2e2e2e; border-radius:8px;">
+
+          <p style="font-size:20px; font-weight:600; color:#1b5e20; margin-bottom:16px;">
+            <%
+              const date = new Date();
+              const year = date.getFullYear();
+              const monthNames = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+              ];
+              const month = monthNames[date.getMonth()];
+            %>
+            Monthly Report – <span style="text-decoration:underline; color:#388e3c;"><%= month %> <%= year %></span>
+          </p>
+
+          <p style="margin: 12px 0;">Dear <strong style="color:#1a237e;"><%= data.org_name %></strong>,</p>
+
+          <p style="margin: 12px 0;">
+            Greetings from <span style="font-style:italic; font-weight:500; color:#43a047;">Fefdy Brain Gym</span>!
+          </p>
+
+          <p style="margin: 12px 0;">
+            We’re excited to present your school’s <strong style="color:#1b5e20;">overall purchase summary</strong>
+            along
+            with a detailed <strong style="color:#1b5e20;">performance report</strong>.
+          </p>
+
+          <p style="margin: 12px 0;">
+            A total of <strong style="font-size:17px; color:#1a237e;"><%= data.ttl_students %> student<% if (data.ttl_students > 1) { %>s<% } %></strong> from your institution have
+            actively participated and shown commendable progress across multiple subjects and levels.
+          </p>
+
+          <p style="margin: 12px 0;">
+            Please find below a snapshot of your school’s <strong style="color:#1b5e20;">purchase details</strong> and
+            <strong style="color:#1b5e20;">student performance summary</strong>.
+          </p>
+        </td>
+      </tr>
+
+
+      <!-- Chart Section -->
+      <tr>
+        <td
+          style="padding: 32px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #e0e0e0; font-family: 'Segoe UI', Tahoma, sans-serif;">
+
+          <!-- Header -->
+          <p style="color:#999; font-size:13px; margin:0;">Purchase Overview</p>
+          <h2 style="margin:8px 0 24px 0; font-size:22px; color:#2e7d32;">Overall Purchase Summary</h2>
+
+          <!-- Level Labels -->
+
+          <% 
+            const getboughtlevels = data.getboughtlevels;
+            const defaultColors = ["#3496AF", "#FCDEBE", "#96D74A", "#FFA07A", "#DA70D6"];
+            const subjectColors = {};
+            getboughtlevels.forEach((item, index) => {
+              subjectColors[item.subject] = defaultColors[index % defaultColors.length];
+            });
+            const highestTtlLevel = getboughtlevels.reduce((max, item) => 
+              item.ttl_level > max.ttl_level ? item : max
+            );
+            <!-- console.log(highestTtlLevel) -->
+          %>
+
+          <table width="100%" cellpadding="6" cellspacing="0" style="font-size:14px; text-align:left;">
+            <tr>
+              <td style="width:100px;"></td>
+              <td>
+                <!-- Level labels -->
+                <div style="margin-bottom:12px;">
+                    <% for (let i = 0; i < highestTtlLevel.ttl_level; i++) { %>
+                      <span
+                        style="display:inline-block; width:18px; text-align:center; font-size:16px; color:#555; margin-right:6px; font-weight: 700;">
+                        L<%= i + 1 %>
+                      </span>
+                    <% } %>
+                </div>
+              </td>
+            </tr>
+
+            <% getboughtlevels.forEach(subject => { %>
+              <tr>
+                <td style="font-weight:600; color:#3496AF; font-size: 16px;"><%= subject.subject %></td>
+                <td>
+                  <% for (let i = 0; i < highestTtlLevel.ttl_level; i++) { 
+                       const color = i + 1 > subject.bought_level ? "#ccc" : subjectColors[subject.subject];
+                  %>
+                    <span
+                      style="display:inline-block; width:18px; height:18px; background:<%= color %>; border-radius:50%; margin-right:6px;"></span>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+            
+          </table>
+
+          <!-- Summary Paragraph -->
+            <%
+              const purchasedSubjects = getboughtlevels
+                .filter(subject => subject.bought_level > 0)
+                .map(subject => {
+                  const levelText = `<strong style="color:${subjectColors[subject.subject]};">${subject.bought_level} level${subject.bought_level > 1 ? 's' : ''} in ${subject.subject}</strong>`;
+                  return levelText;
+                });
+            
+              let purchaseSentence = '';
+              if (purchasedSubjects.length === 1) {
+                purchaseSentence = purchasedSubjects[0] + '.';
+              } else if (purchasedSubjects.length === 2) {
+                purchaseSentence = purchasedSubjects.join(' and ') + '.';
+              } else if (purchasedSubjects.length > 2) {
+                purchaseSentence = purchasedSubjects.slice(0, -1).join(', ') + ', and ' + purchasedSubjects.slice(-1) + '.';
+              }
+            %>              
+            
+            <p style="font-size:14px; line-height:1.6; margin-top:24px; color:#444;">
+              Excellent momentum this month! Your school has <%- purchaseSentence %>
+              Keep going to unlock all 8 levels per subject!
+            </p>
+
+          <!-- Legend -->
+          <p style="font-size:14px; margin-top:16px; color:#666;">
+            <% getboughtlevels.forEach(subject => { %>
+              <span style="display:inline-block; width:12px; height:12px; background:<%= subjectColors[subject.subject] %>; border-radius:50%;"></span>
+              <%= subject.subject %> &nbsp;&nbsp;
+            <% }) %>
+            <span
+              style="display:inline-block; width:12px; height:12px; background:#ccc; border-radius:50%; margin-right:4px;"></span>
+            Not Purchased
+          </p>
+        </td>
+      </tr>
+
+      <!-- Performance Breakdown -->
+       <tr>
+        <td style="padding: 30px; font-family: Arial, sans-serif; background-color: #f0fff5;">
+            <h3 style="font-size: 22px; color: #2e7d32; margin-bottom: 24px; font-weight: bold;">Student Performance
+            Summary
+          </h3>
+          <table width="100%" cellpadding="12" cellspacing="0"
+            style="background: #ffffff; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 14px;">
+        <tr>
+              <td colspan="2" style="padding: 16px;">
+                <table cellpadding="0" cellspacing="0" style="font-family: Arial, sans-serif;">
+                  <tr>
+                    <td style="padding: 4px 16px;">
+                      <span
+                        style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#C96868; vertical-align:middle;"></span>
+                    </td>
+                    <td> Above 60% </td>
+                    <td style="padding: 4px 16px;">
+                      <span
+                        style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#FADFA1; vertical-align:middle;"></span>
+                    </td>
+                    <td>40%–59%</td>
+                    <td style="padding: 4px 16px;">
+                      <span
+                        style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#A79277; vertical-align:middle;"></span>
+                    </td>
+                    <td>Below 40%</td>
+                    <td style="padding: 4px 16px;">
+                      <span
+                        style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#D7D7D7; vertical-align:middle;"></span>
+                    </td>
+                    <td>Not yet attended</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Subject Card -->
+             <% const wholeData = data.data %>
+             <% wholeData.forEach((value, index) => { %>
+                <tr>
+                    <td width="50%" valign="top" style="padding: 10px;">
+                    <table width="100%" cellpadding="10" cellspacing="0"
+                          style="background: #edf7e3; border-radius: 12px; box-shadow: inset 0 0 4px rgba(0,0,0,0.05);">
+                        <tr>
+                          <td align="center" style="font-weight: bold; font-size: 15px;text-decoration:underline; padding-bottom: 0px;">
+                            <%= value.standard %>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td align="center" style="font-weight: bold; font-size: 15px; padding-bottom: 10px;">
+                            <%= value.students %> STUDENT<% if (value.students > 1) { %>S<% } %>
+                          </td>
+                        </tr>
+
+                        <% const subData = value.data %>
+                        <% subData.forEach((sub_val, sub_ind) => { %>
+                            <tr>
+                                <td>
+                                    <div style="margin-bottom: 6px; font-weight: 500; font-style: italic;"><%= sub_val.subject %></div>
+                                    <table width="100%" cellspacing="0" cellpadding="0">
+                                        <tr>
+                                            <td style="width:<%= sub_val.sixtyAbove_percent %>%; background:#C96868; height:28px; border-radius: 8px 0 0 8px;">
+                                                <% if (sub_val.sixtyAbove_percent > 0) { %>
+                                                  <%= sub_val.sixtyAbove_percent %>%
+                                                <% } %>
+                                            </td>
+                                            <td style="width:<%= sub_val.fourtyAbove_percent %>%; background:#FADFA1; height:28px;">
+                                                <% if (sub_val.fourtyAbove_percent > 0) { %>
+                                                  <%= sub_val.fourtyAbove_percent %>%
+                                                <% } %>
+                                            </td>
+                                            <td style="width:<%= sub_val.fourtyBelow_percent %>%; background:#A79277; height:28px;">
+                                                <% if (sub_val.fourtyBelow_percent > 0) { %>
+                                                  <%= sub_val.fourtyBelow_percent %>%
+                                                <% } %>
+                                            </td>
+                                            <td style="width:<%= sub_val.notAttended_percent %>%; background:#D7D7D7; height:28px; border-radius: 0 8px 8px 0;">
+                                                <% if (sub_val.notAttended_percent > 0) { %>
+                                                  <%= sub_val.notAttended_percent %>%
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        <% }) %>
+
+                    </table>
+                    </td>
+                </tr>
+             <% }); %>
+
+        </table>
+        </td>
+       </tr>
+
+
+      <!-- Footer -->
+      <tr>
+        <td style="text-align: center; padding: 40px 20px 20px; color: #222; font-size: 14px; line-height: 1.6;">
+          <p>Thank you for your continued support and active participation.<br>
+            We look forward to welcoming even more enthusiastic participants in the future!</p>
+          <p style="margin-top: 30px; font-size: 13px; color: #333;">
+            Copyright © 2022. All Rights Reserved.<br>
+            <span style="font-weight: bold;">Fefdy BrainGym Team</span>
+          </p>
+        </td>
+      </tr>
+
+    </table>
+  </table>
+
+</body>
+
+</html>

@@ -1,0 +1,43 @@
+<% if (typeof title !=='undefined' ) { %>
+<h1><%= title %></h1>
+<% } else { %>
+<h1>Fefdy</h1>
+<% } %>
+
+<div class="col-sm-12">
+  <div class="card">
+    <div class="card-body">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <form id="sent_report_form" class="row">
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label for="subject">Subject</label>
+                  <select name="org_id" id="org_id">
+                    <!-- <option value="">Select Organisation</option> -->
+                  </select>
+                  <p class="validate_error text-danger" id="org_id_error"></p>
+                </div>
+              </div>
+              <div class="col-sm-4 text-center">
+                <div class="form-group mt-4">
+                  <button type="submit" class="btn btn-info form-submit-button">
+                    Sent Report
+                  </button>
+                </div>
+              </div>
+            </form>
+            <!--<form id="sent_report_organisations_form" class="row">-->
+            <!--  <div class="form-group mt-4">-->
+            <!--    <button type="submit" class="btn btn-info form-submit-button">-->
+            <!--      Sent Report 123-->
+            <!--    </button>-->
+            <!--  </div>-->
+            <!--</form>-->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
