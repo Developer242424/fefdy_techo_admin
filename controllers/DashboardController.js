@@ -576,9 +576,6 @@ class DashboardController {
           orgCompletionPercentData,
           status: 200,
         });
-        //test from server
-        //test from server
-        //from local to github
       } catch (err) {
         console.error("Error fetching single donut data:", err);
         return res
