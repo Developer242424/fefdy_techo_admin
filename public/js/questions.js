@@ -580,97 +580,66 @@ function makeHTMLforChooseUp(id, type, data) {
 
 // For Drag And Drop -->
 
-// Store chosen files per input (inputId => DataTransfer)
-// 🔹 Global file store for each input
-const fileStore = {};
+
 
 function previewThumbnail1(input, containerId) {
-  const maxFiles = 8;
   const previewContainer = document.getElementById(containerId);
 
-  // ✅ Use input.name instead of input.id for consistency
-  const key = input.name;
-  if (!fileStore[key]) {
-    fileStore[key] = new DataTransfer();
-  }
-  const dt = fileStore[key];
+  // Start fresh every time
+  let dt = new DataTransfer();
 
-  // ✅ Block immediately if already full
-  if (dt.files.length >= maxFiles) {
-    alert(`Maximum ${maxFiles} images allowed.`);
-    input.value = ""; // clear current selection
-    return;
-  }
-
-  // ✅ Filter out duplicates by file name
-  const currentNames = new Set(Array.from(dt.files).map((f) => f.name));
-  const selected = Array.from(input.files).filter(
-    (f) => !currentNames.has(f.name)
-  );
-
-  // ✅ Limit based on remaining slots
-  const remaining = maxFiles - dt.files.length;
-  const toAdd = selected.slice(0, remaining);
-  const skipped = selected.length - toAdd.length;
-
-  toAdd.forEach((file) => {
-    dt.items.add(file);
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const wrapper = document.createElement("div");
-      wrapper.classList.add("position-relative", "m-1");
-      wrapper.style.width = "100px";
-      wrapper.style.height = "100px";
-
-      const img = document.createElement("img");
-      img.src = e.target.result;
-      img.dataset.file = file.name;
-      img.classList.add("img-thumbnail");
-      img.style.width = "100%";
-      img.style.height = "100%";
-      img.style.objectFit = "cover";
-
-      const removeBtn = document.createElement("button");
-      removeBtn.innerHTML = "&times;";
-      removeBtn.type = "button";
-      removeBtn.classList.add(
-        "btn",
-        "btn-sm",
-        "btn-danger",
-        "position-absolute"
-      );
-      removeBtn.style.top = "2px";
-      removeBtn.style.right = "2px";
-
-      // ✅ Remove file on click
-      removeBtn.onclick = function () {
-        wrapper.remove();
-
-        const newDt = new DataTransfer();
-        Array.from(dt.files).forEach((f) => {
-          if (f.name !== file.name) {
-            newDt.items.add(f);
-          }
-        });
-        fileStore[key] = newDt;
-        input.files = newDt.files;
-      };
-
-      wrapper.appendChild(img);
-      wrapper.appendChild(removeBtn);
-      previewContainer.appendChild(wrapper);
-    };
-    reader.readAsDataURL(file);
+  // Add ONLY newly selected files
+  Array.from(input.files).forEach(file => {
+    if (dt.items.length < 8) {
+      dt.items.add(file);
+    } else {
+      alert("You can upload a maximum of 8 images.");
+    }
   });
 
-  // ✅ Update input with current files
+  // Update FileList
   input.files = dt.files;
-  input.value = ""; // reset so same file can be reselected
 
-  if (skipped > 0) {
-    alert(
-      `Only ${toAdd.length} images added. ${skipped} skipped. Maximum is ${maxFiles}.`
-    );
-  }
+  // Clear preview
+  previewContainer.innerHTML = "";
+
+  // Render thumbnails with remove button
+  Array.from(input.files).forEach((file, index) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "position-relative d-inline-block m-1";
+    wrapper.style.width = "80px";
+    wrapper.style.height = "80px";
+
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(file);
+    img.className = "img-thumbnail";
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.objectFit = "cover";
+
+    const removeBtn = document.createElement("span");
+    removeBtn.innerHTML = "&times;";
+    removeBtn.className = "btn btn-sm btn-danger position-absolute";
+    removeBtn.style.top = "0";
+    removeBtn.style.right = "0";
+    removeBtn.style.lineHeight = "15px";
+    removeBtn.style.padding = "0px 5px";
+    removeBtn.style.cursor = "pointer";
+    removeBtn.title = "Remove";
+
+    removeBtn.onclick = () => {
+      let newDt = new DataTransfer();
+      Array.from(input.files).forEach((f, i) => {
+        if (i !== index) newDt.items.add(f); // keep all except removed
+      });
+      input.files = newDt.files;
+      previewThumbnail1(input, containerId); // refresh
+    };
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(removeBtn);
+    previewContainer.appendChild(wrapper);
+  });
+
+  console.log("Updated:", input.name, input.files);
 }
