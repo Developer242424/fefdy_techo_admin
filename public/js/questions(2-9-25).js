@@ -51,11 +51,6 @@ function checkAllSelected() {
       if (templateHtml) {
         $("#questionCardContainer").append($(templateHtml));
       }
-    } else if (questionType === "3") {   // ✅ corrected from "1"
-      const templateHtml = $("#dragquestionCardTemplate").html();
-      if (templateHtml) {
-        $("#questionCardContainer").append($(templateHtml));
-      }
     }
     renumberCards();
     updateSubmitButton();
@@ -90,8 +85,6 @@ $(document).on("click", ".add-icon", function () {
     templateHtml = $("#matchInstructionCardTemplate").html();
   } else if (questionType === "1") {
     templateHtml = $("#questionCardTemplate").html();
-  } else if (questionType === "3") {   // ✅ corrected from "1"
-    templateHtml = $("#dragquestionCardTemplate").html();
   }
 
   if (!templateHtml) {
@@ -110,7 +103,7 @@ $(document).on("click", ".add-icon", function () {
 $(document).on("click", ".delete-icon", function () {
   const questionType = $("#question_type").val();
 
-  // When dealing with Question_Type 2, restrict deletion of all match-instruction cards   
+  // When dealing with Question_Type 2, restrict deletion of all match-instruction cards
   if (questionType === "2") {
     const $instructionCards = $(".match-instruction-card");
 
@@ -575,73 +568,3 @@ function makeHTMLforChooseUp(id, type, data) {
   html += `<input type="hidden" name="question_type" value="${type}">`;
   return html;
 }
-
-
-// For Drag And Drop -->
-
-
-
-
-
-function previewThumbnail(input) {
-  const containerId = input.closest(".form-group")
-                           .querySelector("div[id^='preview-container']")
-                           .id;
-  const previewContainer = document.getElementById(containerId);
-
-  const maxFiles = 8;
-  const currentCount = previewContainer.querySelectorAll("img").length;
-
-  // If adding these files exceeds the limit
-  if (currentCount + input.files.length > maxFiles) {
-    alert("You can only upload up to " + maxFiles + " images.");
-  }
-
-  // Process files but stop at limit
-  Array.from(input.files).forEach((file, index) => {
-    if (previewContainer.querySelectorAll("img").length >= maxFiles) return; // stop if limit reached
-
-    // Skip if already previewed
-    if (previewContainer.querySelector(`[data-file="${file.name}"]`)) return;
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const wrapper = document.createElement("div");
-      wrapper.classList.add("position-relative", "m-1");
-      wrapper.style.width = "100px";
-      wrapper.style.height = "100px";
-
-      const img = document.createElement("img");
-      img.src = e.target.result;
-      img.dataset.file = file.name; // track file name
-      img.classList.add("img-thumbnail");
-      img.style.width = "100%";
-      img.style.height = "100%";
-      img.style.objectFit = "cover";
-
-      const removeBtn = document.createElement("button");
-      removeBtn.innerHTML = "&times;";
-      removeBtn.type = "button";
-      removeBtn.classList.add("btn", "btn-sm", "btn-danger", "position-absolute");
-      removeBtn.style.top = "2px";
-      removeBtn.style.right = "2px";
-
-      removeBtn.onclick = function () {
-        wrapper.remove();
-        const dt = new DataTransfer();
-        Array.from(input.files).forEach(f => {
-          if (f.name !== file.name) dt.items.add(f);
-        });
-        input.files = dt.files;
-      };
-
-      wrapper.appendChild(img);
-      wrapper.appendChild(removeBtn);
-      previewContainer.appendChild(wrapper);
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-
-

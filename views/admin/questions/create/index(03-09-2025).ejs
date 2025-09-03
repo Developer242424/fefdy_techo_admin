@@ -300,80 +300,70 @@
             
                       <!--  drag and drop the following  -->
             
-<script type="text/template" id="dragquestionCardTemplate">
-  <div class="card question-card mt-3">
-    <div class="card-body">
-      <div class="container">
-        <div class="row">         
-          <div class="col-sm-12">
-            <div class="row">
-              <div class="col-sm-12">
-                <div class="form-group">
-                  <label>Question</label>
-                  <textarea name="array[][question][text]" class="form-control" rows="4"></textarea>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row">
-              <!-- Option 1 -->
-              <div class="col-sm-6">
-                <div class="row border-1 p-2 drag">
-                  <div class="col-sm-8">
-                    <div class="form-group">
-                      <label for="option_a">Option A</label>
-                      <input class="form-control" type="text" id="option_a" name="option_a" />
-                    </div>
-                  </div>
-                  <div class="col-sm-4">
-                    <div class="form-group">
-                      <label>Images</label><br>
-                     <input type="file" 
-         name="array[][option][option_a][thumbnail]" 
-         class="form-control-file thumbnail-input" 
-         multiple 
-         accept="image/*"
-         onchange="previewThumbnail(this)">
-                      <div id="preview-container_opection-a" class="d-flex mt-2"></div>
+  <script type="text/template" id="dragquestionCardTemplate">
+      <div class="card question-card mt-3">
+        <div class="card-body">
+          <div class="container">
+            <div class="row">         
+                  <div class="col-sm-12">
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <div class="form-group">
+                          <label>Question</label>
+                          <textarea name="array[][question][text]" class="form-control" rows="4"></textarea>
+                        </div>
+                      </div>
                     </div>
                     
-                    
-                    
-                    
-                    
-                  </div>
-                </div>
-              </div>
+                    <div class="row">
+                      <!-- Option 1 -->
+                      <div class="col-sm-6">
+                        <div class="row border-1">
+                          <div class="col-sm-8">
+                          <div class="form-group">
+                              <label for="option_a">Option A</label>
+                              <input class="form-control" type="text" id="option_a" name="option_a" />
+                          </div>
+                        </div>
+                          <div class="col-sm-4">
+                            <div class="form-group">
+                              <label>Images</label><br>
+                              <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                                  <i class="material-icons">image</i>
+                                  <img class="thumbnail-preview-img" style="display:none;">
+                                  <input type="file" name ="array[][option][option_a][thumbnail]" class="thumbnail-input multiselect" multiple="multiple" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                                </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
 
-              <!-- Option 2 -->
-              <div class="col-sm-6">
-                <div class="row  border-2 border-1 p-2 drag">
-                  <div class="col-sm-8">
-                    <div class="form-group">
-                      <label for="option_b">Option B</label>
-                      <input class="form-control" type="text" id="option_b" name="option_b" />
-                    </div>
+                      <!-- Option 2 -->
+                      <div class="col-sm-6">
+                        <div class="row border-1">
+                          <div class="col-sm-8">
+                         <div class="form-group">
+                              <label for="option_b">Option B</label>
+                              <input class="form-control" type="text" id="option_b" name="option_b" />
+                          </div>
+                          </div>
+                          <div class="col-sm-4">
+                            <div class="form-group">
+                              <label>Images</label><br>
+                              <div class="thumbnail-box"  onclick="this.querySelector('input[type=file]').click();">
+                                  <i class="material-icons">image</i>
+                                  <img class="thumbnail-preview-img" style="display:none;">
+                                  <input type="file" name ="array[][option][option_b][thumbnail]" class="thumbnail-input multiselect" multiple="multiple" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                               </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                   </div>
-                  <div class="col-sm-4">
-                    <div class="form-group">
-                      <label>Images</label><br>
-                            <input type="file" 
-         name="array[][option][option_a][thumbnail]" 
-         class="form-control-file thumbnail-input" 
-         multiple 
-         accept="image/*"
-         onchange="previewThumbnail(this)">
-                      <div id="preview-container_opection_b" class="d-flex mt-2"></div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</script>
-
+    </script>
             

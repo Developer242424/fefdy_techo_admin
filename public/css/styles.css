@@ -505,3 +505,40 @@ textarea.form-control {
 
 
 
+/*03-09*/
+
+
+.row.border-1.p-2.drag {
+    height: 200px;
+    max-height: 200px;
+}
+
+div#preview-container_opection-a {
+    position: relative;
+    right: 30pc;
+      width: 333%;
+    bottom: -1pc;
+}
+
+div#preview-container_opection_b {
+    position: relative;
+    right: 30pc;
+    width: 333%;
+    bottom: -1pc;
+}
+.row.border-2.border-1.p-2.drag {
+    border-width: 1px !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
