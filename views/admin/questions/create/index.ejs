@@ -310,65 +310,67 @@
               <div class="col-sm-12">
                 <div class="form-group">
                   <label>Question</label>
-                  <textarea name="array[][question][text]" class="form-control" rows="4"></textarea>
+                  <textarea name="array[0][question][text]" class="form-control" rows="4"></textarea>
                 </div>
               </div>
             </div>
             
             <div class="row">
-              <!-- Option 1 -->
+              <!-- Option A -->
               <div class="col-sm-6">
                 <div class="row border-1 p-2 drag">
                   <div class="col-sm-8">
                     <div class="form-group">
                       <label for="option_a">Option A</label>
-                      <input class="form-control" type="text" id="option_a" name="option_a" />
+                      <input class="form-control" type="text" id="option_a_text_0" name="array[0][options][option_a][text]" />
                     </div>
                   </div>
                   <div class="col-sm-4">
-                    <div class="form-group">
-                      <label>Images</label><br>
-                     <input type="file" 
-         name="array[][option][option_a][thumbnail]" 
-         class="form-control-file thumbnail-input" 
-         multiple 
-         accept="image/*"
-         onchange="previewThumbnail(this)">
-                      <div id="preview-container_opection-a" class="d-flex mt-2"></div>
+                    <div class="form-group mt-4">
+                      <label for="thumbnail-upload-a" class="custom-file-label">📷 Choose Images</label>
+                      <input 
+                        type="file"  
+                        id="thumbnail-upload-a" 
+                        name="array[0][options][option_a][images][]"  
+                        class="thumbnail-input" 
+                        multiple  
+                        accept="image/*" 
+                        onchange="previewThumbnail1(this, 'preview-container_option-a')" 
+                        style="display: none;">
+                      <!-- Preview container -->
+                      <div id="preview-container_option-a" class="d-flex flex-wrap mt-2"></div>
                     </div>
-                    
-                    
-                    
-                    
-                    
                   </div>
                 </div>
               </div>
 
-              <!-- Option 2 -->
+              <!-- Option B -->
               <div class="col-sm-6">
-                <div class="row  border-2 border-1 p-2 drag">
+                <div class="row border-2 p-2 drag">
                   <div class="col-sm-8">
                     <div class="form-group">
                       <label for="option_b">Option B</label>
-                      <input class="form-control" type="text" id="option_b" name="option_b" />
+                      <input class="form-control" type="text" id="option_b_text_0" name="array[0][options][option_b][text]" />
                     </div>
                   </div>
                   <div class="col-sm-4">
-                    <div class="form-group">
-                      <label>Images</label><br>
-                            <input type="file" 
-         name="array[][option][option_a][thumbnail]" 
-         class="form-control-file thumbnail-input" 
-         multiple 
-         accept="image/*"
-         onchange="previewThumbnail(this)">
-                      <div id="preview-container_opection_b" class="d-flex mt-2"></div>
+                    <div class="form-group mt-4">
+                      <label for="thumbnail-upload-b" class="custom-file-label">📷 Choose Images</label>
+                      <input 
+                        type="file"  
+                        id="thumbnail-upload-b" 
+                        name="array[0][options][option_b][images][]"  
+                        class="thumbnail-input" 
+                        multiple  
+                        accept="image/*" 
+                        onchange="previewThumbnail1(this, 'preview-container_option-b')" 
+                        style="display: none;">
+                      <div id="preview-container_option-b" class="d-flex flex-wrap mt-2"></div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </div><!-- /.row -->
           </div>
         </div>
       </div>
@@ -376,4 +378,4 @@
   </div>
 </script>
 
-            
+

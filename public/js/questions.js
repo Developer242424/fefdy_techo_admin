@@ -51,7 +51,8 @@ function checkAllSelected() {
       if (templateHtml) {
         $("#questionCardContainer").append($(templateHtml));
       }
-    } else if (questionType === "3") {   // ✅ corrected from "1"
+    } else if (questionType === "3") {
+      // ✅ corrected from "1"
       const templateHtml = $("#dragquestionCardTemplate").html();
       if (templateHtml) {
         $("#questionCardContainer").append($(templateHtml));
@@ -90,7 +91,8 @@ $(document).on("click", ".add-icon", function () {
     templateHtml = $("#matchInstructionCardTemplate").html();
   } else if (questionType === "1") {
     templateHtml = $("#questionCardTemplate").html();
-  } else if (questionType === "3") {   // ✅ corrected from "1"
+  } else if (questionType === "3") {
+    // ✅ corrected from "1"
     templateHtml = $("#dragquestionCardTemplate").html();
   }
 
@@ -110,7 +112,7 @@ $(document).on("click", ".add-icon", function () {
 $(document).on("click", ".delete-icon", function () {
   const questionType = $("#question_type").val();
 
-  // When dealing with Question_Type 2, restrict deletion of all match-instruction cards   
+  // When dealing with Question_Type 2, restrict deletion of all match-instruction cards
   if (questionType === "2") {
     const $instructionCards = $(".match-instruction-card");
 
@@ -576,33 +578,43 @@ function makeHTMLforChooseUp(id, type, data) {
   return html;
 }
 
-
 // For Drag And Drop -->
 
+// Store chosen files per input (inputId => DataTransfer)
+// 🔹 Global file store for each input
+const fileStore = {};
 
-
-
-
-function previewThumbnail(input) {
-  const containerId = input.closest(".form-group")
-                           .querySelector("div[id^='preview-container']")
-                           .id;
+function previewThumbnail1(input, containerId) {
+  const maxFiles = 8;
   const previewContainer = document.getElementById(containerId);
 
-  const maxFiles = 8;
-  const currentCount = previewContainer.querySelectorAll("img").length;
+  // ✅ Use input.name instead of input.id for consistency
+  const key = input.name;
+  if (!fileStore[key]) {
+    fileStore[key] = new DataTransfer();
+  }
+  const dt = fileStore[key];
 
-  // If adding these files exceeds the limit
-  if (currentCount + input.files.length > maxFiles) {
-    alert("You can only upload up to " + maxFiles + " images.");
+  // ✅ Block immediately if already full
+  if (dt.files.length >= maxFiles) {
+    alert(`Maximum ${maxFiles} images allowed.`);
+    input.value = ""; // clear current selection
+    return;
   }
 
-  // Process files but stop at limit
-  Array.from(input.files).forEach((file, index) => {
-    if (previewContainer.querySelectorAll("img").length >= maxFiles) return; // stop if limit reached
+  // ✅ Filter out duplicates by file name
+  const currentNames = new Set(Array.from(dt.files).map((f) => f.name));
+  const selected = Array.from(input.files).filter(
+    (f) => !currentNames.has(f.name)
+  );
 
-    // Skip if already previewed
-    if (previewContainer.querySelector(`[data-file="${file.name}"]`)) return;
+  // ✅ Limit based on remaining slots
+  const remaining = maxFiles - dt.files.length;
+  const toAdd = selected.slice(0, remaining);
+  const skipped = selected.length - toAdd.length;
+
+  toAdd.forEach((file) => {
+    dt.items.add(file);
 
     const reader = new FileReader();
     reader.onload = function (e) {
@@ -613,7 +625,7 @@ function previewThumbnail(input) {
 
       const img = document.createElement("img");
       img.src = e.target.result;
-      img.dataset.file = file.name; // track file name
+      img.dataset.file = file.name;
       img.classList.add("img-thumbnail");
       img.style.width = "100%";
       img.style.height = "100%";
@@ -622,17 +634,27 @@ function previewThumbnail(input) {
       const removeBtn = document.createElement("button");
       removeBtn.innerHTML = "&times;";
       removeBtn.type = "button";
-      removeBtn.classList.add("btn", "btn-sm", "btn-danger", "position-absolute");
+      removeBtn.classList.add(
+        "btn",
+        "btn-sm",
+        "btn-danger",
+        "position-absolute"
+      );
       removeBtn.style.top = "2px";
       removeBtn.style.right = "2px";
 
+      // ✅ Remove file on click
       removeBtn.onclick = function () {
         wrapper.remove();
-        const dt = new DataTransfer();
-        Array.from(input.files).forEach(f => {
-          if (f.name !== file.name) dt.items.add(f);
+
+        const newDt = new DataTransfer();
+        Array.from(dt.files).forEach((f) => {
+          if (f.name !== file.name) {
+            newDt.items.add(f);
+          }
         });
-        input.files = dt.files;
+        fileStore[key] = newDt;
+        input.files = newDt.files;
       };
 
       wrapper.appendChild(img);
@@ -641,7 +663,14 @@ function previewThumbnail(input) {
     };
     reader.readAsDataURL(file);
   });
+
+  // ✅ Update input with current files
+  input.files = dt.files;
+  input.value = ""; // reset so same file can be reselected
+
+  if (skipped > 0) {
+    alert(
+      `Only ${toAdd.length} images added. ${skipped} skipped. Maximum is ${maxFiles}.`
+    );
+  }
 }
-
-
-
