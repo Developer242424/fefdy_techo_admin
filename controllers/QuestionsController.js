@@ -164,6 +164,12 @@ class QuestionsController {
             ) {
               question_text = value.data?.[0]?.question || "";
               question_thumbnail = "";
+            } else if (
+              value.question_type === 3 ||
+              value.question_type === "3"
+            ) {
+              question_text = value.data?.[0]?.question || "";
+              question_thumbnail = "";
             }
 
             return {
