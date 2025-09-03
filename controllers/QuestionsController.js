@@ -113,6 +113,15 @@ class QuestionsController {
             status: 200,
             message: "Questions created successfully",
           });
+        } else if (question_type === 3 || question_type === "3") {
+          await this.#BuildStructureDragOne(
+            { subject, topic, level, sub_topic, question_type, array },
+            req.files
+          );
+          return res.status(200).json({
+            status: 200,
+            message: "Questions created successfully",
+          });
         }
 
         return res.status(200).json({
@@ -400,6 +409,46 @@ class QuestionsController {
       sub_topic: requests.sub_topic,
       question_type: requests.question_type,
       data: array,
+    };
+
+    await Questions.create(obj);
+  }
+
+  async #BuildStructureDragOne(requests, files) {
+    const array = requests.array;
+
+    const fileMap = {};
+    files.forEach((file) => {
+      const match = file.fieldname.match(/option_(\w+)/);
+      if (match) {
+        const optionKey = match[1]; // option_a → "a"
+        if (!fileMap[optionKey]) fileMap[optionKey] = [];
+        fileMap[optionKey].push(`uploads/questions/${file.filename}`);
+      }
+      // console.log("fileMap...", fileMap);
+      // console.log("file.fieldname...", file.fieldname);
+    });
+
+    const result = [];
+
+    result.push({
+      question: array[0].question.text || "Drag the items and drop.",
+    });
+    Object.keys(array[0].options).forEach((optKey) => {
+      result.push({
+        name: array[0].options[optKey].text,
+        images: fileMap[optKey.replace("option_", "")] || [],
+      });
+    });
+
+    // console.log("Final structured array:", result);
+    const obj = {
+      subject: requests.subject,
+      topic: requests.topic,
+      level_id: requests.level,
+      sub_topic: requests.sub_topic,
+      question_type: requests.question_type,
+      data: result,
     };
 
     await Questions.create(obj);
