@@ -166,6 +166,7 @@ router.post("/questions-list/list", QuestionsController.list);
 router.post("/questions-list/data", QuestionsController.data);
 router.post("/questions-list/update", QuestionsController.update);
 router.post("/questions-list/destroy", QuestionsController.destroy);
+router.post("/questions-list/remove-image/drag-one", QuestionsController.removeImageDragOne);
 
 router.get("/sent-report", SentReportController.index);
 router.post("/sent-report/sent-mail", SentReportController.sentMail);

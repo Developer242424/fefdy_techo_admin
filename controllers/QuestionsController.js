@@ -310,6 +310,59 @@ class QuestionsController {
           }
 
           newData = newArray;
+        } else if (question_type == 3 || question_type === "3") {
+          let array = req.body.array;
+          const oldArray = question.data;
+          const files = req.files;
+          const newArray = [];
+
+          // console.log("files...", files);
+
+          array.forEach((item, index) => {
+            const images = [];
+            const name = item.name || null;
+            const question = item.question || null;
+
+            if (item.images && Array.isArray(item.images)) {
+              images.push(...item.images);
+            }
+
+            const thumbField = `array[${index}][images][]`;
+            console.log("thumbField...", thumbField);
+
+            files.forEach((file) => {
+              if (file.fieldname === thumbField) {
+                images.push(`uploads/questions/${file.filename}`);
+              }
+            });
+
+            if (question) {
+              newArray.push({ question });
+            } else {
+              newArray.push({ name, images });
+            }
+          });
+
+          // console.log("array...", array);
+          // console.log("oldArray...", oldArray);
+          // console.log("newArray...", newArray);
+
+          const mergedArray = newArray.map((item, index) => {
+            const oldItem = oldArray[index];
+            if (item.question) {
+              return { question: item.question };
+            }
+            const oldImages = oldItem && oldItem.images ? oldItem.images : [];
+            const newImages = item.images || [];
+
+            return {
+              name: item.name,
+              images: [...oldImages, ...newImages],
+            };
+          });
+          // console.log("mergedArray...", mergedArray);
+
+          newData = mergedArray;
         } else {
           return res.status(200).json({
             status: 400,
@@ -349,6 +402,58 @@ class QuestionsController {
         });
       } catch (error) {
         console.error("Update Question Error:", error);
+        return res.status(200).json({
+          status: 500,
+          message: "Internal server error - " + error.message,
+          error,
+        });
+      }
+    });
+
+    this.removeImageDragOne = asyncHandler(async (req, res) => {
+      try {
+        const { id, name, img } = req.body;
+        if (!id || !name || !img) {
+          return res.status(200).json({
+            status: 400,
+            message: "Question ID, name and img are required",
+          });
+        }
+        const question = await Questions.findByPk(id);
+        if (!question) {
+          return res
+            .status(404)
+            .json({ status: 404, message: "Question not found" });
+        }
+        const data = question.data;
+        if (question.question_type != 3 && question.question_type !== "3") {
+          return res.status(200).json({
+            status: 400,
+            message: "This operation is only for Drag One question type",
+          });
+        }
+        const updatedData = data.map((item) => {
+          if (item.name === name) {
+            const relativePath = img.startsWith("/") ? img.slice(1) : img;
+            const filePath = path.join(__dirname, "..", `/${relativePath}`);
+            if (fs.existsSync(filePath)) {
+              fs.unlinkSync(filePath);
+            }
+            return {
+              ...item,
+              images: item.images.filter((i) => i !== img),
+            };
+          }
+          return item;
+        });
+        // console.log("Updated Data...", updatedData);
+        question.data = updatedData;
+        await question.save();
+        return res.status(200).json({
+          status: 200,
+          message: "Image removed successfully",
+        });
+      } catch (error) {
         return res.status(200).json({
           status: 500,
           message: "Internal server error - " + error.message,

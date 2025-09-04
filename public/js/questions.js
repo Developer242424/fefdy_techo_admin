@@ -357,7 +357,7 @@ function OpenEditModal(id, type) {
             $(".questions_container").html(ques_html_mat);
             OpenModal("question_list_edit_modal");
           } else if (type === 3 || type === "3") {
-            let ques_html_mat = makeHTMLforDragOne(id, type, data.data);;
+            let ques_html_mat = makeHTMLforDragOne(id, type, data.data);
             $(".questions_container").html(ques_html_mat);
             OpenModal("question_list_edit_modal");
           } else {
@@ -379,11 +379,6 @@ function OpenEditModal(id, type) {
     ToastAlert("error", err);
   }
 }
-
-
-
-
-
 
 function DeleteData(id) {
   Swal.fire({
@@ -515,81 +510,119 @@ function makeHTMLforMatchUp(id, type, data) {
   return html;
 }
 
-
+[
+  {
+    question: "Drag the items and drop",
+  },
+  {
+    name: "No Face",
+    images: [
+      "uploads/questions/1756894025603-478157528.png",
+      "uploads/questions/1756894025604-833922662.png",
+    ],
+  },
+  {
+    name: "Dummy",
+    images: [
+      "uploads/questions/1756894025604-438999995.jpeg",
+      "uploads/questions/1756894025606-4816251.png",
+      "uploads/questions/1756894025606-45869527.png",
+    ],
+  },
+];
 
 // Drag one
-    function makeHTMLforDragOne(id, type, data) {
-      let html = ``;
-      data.forEach((value, index) => {
-        if (index !== 0) {
-          html += `<div class="row border_1 mb-1">
+function makeHTMLforDragOne(id, type, data) {
+  let html = ``;
+  data.forEach((value, index) => {
+    if (index !== 0) {
+      html += `<div class="row border_1 mb-1">
             <div class="col-sm-12">
               <div class="form-group">
-                <label for="array[${index}][instruction]">opection A</label>
-                <textarea class="form-control new" name="array[${index}][instruction]" rows="1">${
-            value.instruction ?? ""
-          }</textarea>
-                <p class="validate_error text-danger" id="array[${index}][instruction]_error"></p>
+                <label for="array[${index}][name]">option ${index}</label>
+                <textarea class="form-control new" name="array[${index}][name]" rows="1">${
+        value.name ?? ""
+      }</textarea>
+                <p class="validate_error text-danger" id="array[${index}][name]_error"></p>
               </div>
           <div class="col-lg-12">
               <div class="form-group mt-4">
                 <!-- Choose Images Button -->
-                <label for="thumbnail-upload-a" class="btn btn-primary">Choose Images</label>
+                <label for="thumbnail-upload-${index}" class="btn btn-primary">Choose Images</label>
             
-                <input  type="file" id="thumbnail-upload-a"  name="array[0][options][option_a][images][]"  class="thumbnail-input"multiple accept="image/*"onchange="previewThumbnailedit(this, 'preview-container_edit_option-a')" style="display:none;">
+                <input  type="file" id="thumbnail-upload-${index}"  name="array[${index}][images][]"  class="thumbnail-input"multiple accept="image/*"onchange="previewThumbnailedit(this, 'preview-container_edit_option-${index}')" style="display:none;">
             
                 <!-- Preview Container -->
               <div class="col-sm-12">
               <div class="row mt-2">
-                <div id="preview-container_edit_option-a" class="col-12 d-flex">
+                <div id="preview-container_edit_option-${index}" class="col-12 d-flex">
                   <!-- Previews will appear here -->
                 </div>
               </div>
       </div>
             
-      <!-- Static Dummy Images -->
       
-          <div class="col-lg-12 d-flex">
-              <div class="form-group mt-4 position-relative m-2" style="width:100px;height:100px;">
-                <img src="https://via.placeholder.com/100" class="img-thumbnail" style="width:100%; height:100%;object-fit:cover;">
+          <div class="col-lg-12 d-flex preview_old_images">`;
+      for (const img of value.images || []) {
+        html += `<div class="form-group mt-4 position-relative m-2" style="width:100px;height:100px;">
+                <img src="/${img}" class="img-thumbnail" style="width:100%; height:100%;object-fit:cover;">
                 <button type="button" 
                         class="btn btn-sm btn-danger position-absolute top-0 end-0" 
                         style="border-radius:50%;" 
-                        onclick="this.parentElement.remove()">&times;</button>
-              </div>
-              <div class="form-group mt-4 position-relative m-2" style="width:100px;height:100px;">
-                <img src="https://via.placeholder.com/100" class="img-thumbnail" style="width:100%; height:100%;object-fit:cover;">
-                <button type="button" 
-                        class="btn btn-sm btn-danger position-absolute top-0 end-0" 
-                        style="border-radius:50%;" 
-                        onclick="this.parentElement.remove()">&times;</button>
-              </div>
-            </div>
+                        onclick="removeImageDragOne(${id}, ${type}, '${value.name}', '${img}')">&times;</button>
+              </div>`;
+      }
+      html += `</div>
                
                
             </div>
           </div>
         </div>
           </div>`;
-        } else {
-          html += `<div class="row">
+    } else {
+      html += `<div class="row">
             <div class="col-sm-12">
               <div class="form-group">
                 <label for="array[${index}][question]">Question</label>
                 <textarea class="form-control new" name="array[${index}][question]" rows="2">${
-            value.question ?? ""
-          }</textarea>
+        value.question ?? ""
+      }</textarea>
                 <p class="validate_error text-danger" id="array[${index}][question]_error"></p>
               </div>
             </div>
           </div>`;
-        }
-      });
-      html += `<input type="hidden" name="id" value="${id}">`;
-      html += `<input type="hidden" name="question_type" value="${type}">`;
-    
-      return html;
     }
+  });
+  html += `<input type="hidden" name="id" value="${id}">`;
+  html += `<input type="hidden" name="question_type" value="${type}">`;
+
+  return html;
+}
+
+function removeImageDragOne(id, type, name, img) {
+  if (type === 3 || type === "3") {
+    $.ajax({
+      url: "/admin/questions-list/remove-image/drag-one",
+      type: "POST",
+      data: {
+        id: id,
+        name: name,
+        img: img,
+      },
+      success: function (res) {
+        if (res.status === 200) {
+          ToastAlert("success", res.message);
+          $(`img[src='/${img}']`).parent().remove(); // Remove the image from the UI
+        } else {
+          ToastAlert("warning", res.message);
+        }
+      },
+      error: function (xhr, status, error) {
+        ToastAlert("error", "Error: " + error, "error");
+      },
+    });
+  }
+}
 
 // drag one end
 
@@ -632,9 +665,13 @@ function makeHTMLforChooseUp(id, type, data) {
           <div class="col-sm-7">
             <div class="form-group">
               <label>
-                <input type="checkbox" name="option[option_${opt}][is_answer]" class="limit-checkbox" ${option.is_answer ? "checked" : ""}> Option ${label}
+                <input type="checkbox" name="option[option_${opt}][is_answer]" class="limit-checkbox" ${
+      option.is_answer ? "checked" : ""
+    }> Option ${label}
               </label>
-              <textarea class="form-control" name="option[option_${opt}][text]" rows="1">${ option.text ?? ""}</textarea>
+              <textarea class="form-control" name="option[option_${opt}][text]" rows="1">${
+      option.text ?? ""
+    }</textarea>
               <p class="validate_error text-danger" id="option_option_${opt}_text_error"></p>
             </div>
           </div>
@@ -663,8 +700,6 @@ function makeHTMLforChooseUp(id, type, data) {
 
 // For Drag And Drop -->
 
-
-
 function previewThumbnail1(input, containerId) {
   const previewContainer = document.getElementById(containerId);
 
@@ -672,7 +707,7 @@ function previewThumbnail1(input, containerId) {
   let dt = new DataTransfer();
 
   // Add ONLY newly selected files
-  Array.from(input.files).forEach(file => {
+  Array.from(input.files).forEach((file) => {
     if (dt.items.length < 8) {
       dt.items.add(file);
     } else {
@@ -727,30 +762,25 @@ function previewThumbnail1(input, containerId) {
   console.log("Updated:", input.name, input.files);
 }
 
-
-
-
-
-
-
 // drag one
-
 
 function previewThumbnailedit(input, containerId) {
   const previewContainer = document.getElementById(containerId);
 
   // Keep old + new files
   const dt = new DataTransfer();
-  Array.from(input.files).forEach(file => dt.items.add(file));
+  Array.from(input.files).forEach((file) => dt.items.add(file));
 
   // Only clear dynamic uploaded previews (not dummy ones)
-  Array.from(previewContainer.querySelectorAll("[data-uploaded='true']")).forEach(el => el.remove());
+  Array.from(
+    previewContainer.querySelectorAll("[data-uploaded='true']")
+  ).forEach((el) => el.remove());
 
   Array.from(dt.files).forEach((file, index) => {
     if (!file.type.startsWith("image/")) return;
 
     const reader = new FileReader();
-    reader.onload = e => {
+    reader.onload = (e) => {
       const wrapper = document.createElement("div");
       wrapper.classList.add("position-relative", "m-2");
       wrapper.style.width = "100px";
@@ -778,19 +808,10 @@ function removeImage(index, inputId, containerId) {
   const input = document.getElementById(inputId);
 
   const dt = new DataTransfer();
-  Array.from(input.files)
-    .forEach((file, i) => {
-      if (i !== index) dt.items.add(file);
-    });
+  Array.from(input.files).forEach((file, i) => {
+    if (i !== index) dt.items.add(file);
+  });
 
   input.files = dt.files;
   previewThumbnailedit(input, containerId);
 }
-
-
-
-
-
-
-
-
