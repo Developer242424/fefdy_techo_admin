@@ -356,10 +356,6 @@ function OpenEditModal(id, type) {
             let ques_html_mat = makeHTMLforMatchUp(id, type, data.data);
             $(".questions_container").html(ques_html_mat);
             OpenModal("question_list_edit_modal");
-          } else if (type === 3 || type === "3") {
-            let ques_html_mat = makeHTMLforDragOne(id, type, data.data);;
-            $(".questions_container").html(ques_html_mat);
-            OpenModal("question_list_edit_modal");
           } else {
             return false;
           }
@@ -379,11 +375,6 @@ function OpenEditModal(id, type) {
     ToastAlert("error", err);
   }
 }
-
-
-
-
-
 
 function DeleteData(id) {
   Swal.fire({
@@ -515,84 +506,6 @@ function makeHTMLforMatchUp(id, type, data) {
   return html;
 }
 
-
-
-// Drag one
-    function makeHTMLforDragOne(id, type, data) {
-      let html = ``;
-      data.forEach((value, index) => {
-        if (index !== 0) {
-          html += `<div class="row border_1 mb-1">
-            <div class="col-sm-12">
-              <div class="form-group">
-                <label for="array[${index}][instruction]">opection A</label>
-                <textarea class="form-control new" name="array[${index}][instruction]" rows="1">${
-            value.instruction ?? ""
-          }</textarea>
-                <p class="validate_error text-danger" id="array[${index}][instruction]_error"></p>
-              </div>
-          <div class="col-lg-12">
-              <div class="form-group mt-4">
-                <!-- Choose Images Button -->
-                <label for="thumbnail-upload-a" class="btn btn-primary">Choose Images</label>
-            
-                <input  type="file" id="thumbnail-upload-a"  name="array[0][options][option_a][images][]"  class="thumbnail-input"multiple accept="image/*"onchange="previewThumbnailedit(this, 'preview-container_edit_option-a')" style="display:none;">
-            
-                <!-- Preview Container -->
-              <div class="col-sm-12">
-              <div class="row mt-2">
-                <div id="preview-container_edit_option-a" class="col-12 d-flex">
-                  <!-- Previews will appear here -->
-                </div>
-              </div>
-      </div>
-            
-      <!-- Static Dummy Images -->
-      
-          <div class="col-lg-12 d-flex">
-              <div class="form-group mt-4 position-relative m-2" style="width:100px;height:100px;">
-                <img src="https://via.placeholder.com/100" class="img-thumbnail" style="width:100%; height:100%;object-fit:cover;">
-                <button type="button" 
-                        class="btn btn-sm btn-danger position-absolute top-0 end-0" 
-                        style="border-radius:50%;" 
-                        onclick="this.parentElement.remove()">&times;</button>
-              </div>
-              <div class="form-group mt-4 position-relative m-2" style="width:100px;height:100px;">
-                <img src="https://via.placeholder.com/100" class="img-thumbnail" style="width:100%; height:100%;object-fit:cover;">
-                <button type="button" 
-                        class="btn btn-sm btn-danger position-absolute top-0 end-0" 
-                        style="border-radius:50%;" 
-                        onclick="this.parentElement.remove()">&times;</button>
-              </div>
-            </div>
-               
-               
-            </div>
-          </div>
-        </div>
-          </div>`;
-        } else {
-          html += `<div class="row">
-            <div class="col-sm-12">
-              <div class="form-group">
-                <label for="array[${index}][question]">Question</label>
-                <textarea class="form-control new" name="array[${index}][question]" rows="2">${
-            value.question ?? ""
-          }</textarea>
-                <p class="validate_error text-danger" id="array[${index}][question]_error"></p>
-              </div>
-            </div>
-          </div>`;
-        }
-      });
-      html += `<input type="hidden" name="id" value="${id}">`;
-      html += `<input type="hidden" name="question_type" value="${type}">`;
-    
-      return html;
-    }
-
-// drag one end
-
 function makeHTMLforChooseUp(id, type, data) {
   let html = `<div class="row">
     <div class="col-sm-8">
@@ -632,9 +545,13 @@ function makeHTMLforChooseUp(id, type, data) {
           <div class="col-sm-7">
             <div class="form-group">
               <label>
-                <input type="checkbox" name="option[option_${opt}][is_answer]" class="limit-checkbox" ${option.is_answer ? "checked" : ""}> Option ${label}
+                <input type="checkbox" name="option[option_${opt}][is_answer]" class="limit-checkbox" ${
+      option.is_answer ? "checked" : ""
+    }> Option ${label}
               </label>
-              <textarea class="form-control" name="option[option_${opt}][text]" rows="1">${ option.text ?? ""}</textarea>
+              <textarea class="form-control" name="option[option_${opt}][text]" rows="1">${
+      option.text ?? ""
+    }</textarea>
               <p class="validate_error text-danger" id="option_option_${opt}_text_error"></p>
             </div>
           </div>
@@ -726,71 +643,3 @@ function previewThumbnail1(input, containerId) {
 
   console.log("Updated:", input.name, input.files);
 }
-
-
-
-
-
-
-
-// drag one
-
-
-function previewThumbnailedit(input, containerId) {
-  const previewContainer = document.getElementById(containerId);
-
-  // Keep old + new files
-  const dt = new DataTransfer();
-  Array.from(input.files).forEach(file => dt.items.add(file));
-
-  // Only clear dynamic uploaded previews (not dummy ones)
-  Array.from(previewContainer.querySelectorAll("[data-uploaded='true']")).forEach(el => el.remove());
-
-  Array.from(dt.files).forEach((file, index) => {
-    if (!file.type.startsWith("image/")) return;
-
-    const reader = new FileReader();
-    reader.onload = e => {
-      const wrapper = document.createElement("div");
-      wrapper.classList.add("position-relative", "m-2");
-      wrapper.style.width = "100px";
-      wrapper.style.height = "100px";
-      wrapper.setAttribute("data-uploaded", "true"); // mark as uploaded
-
-      wrapper.innerHTML = `
-        <img src="${e.target.result}" 
-             class="img-thumbnail" 
-             style="width:100%;height:100%;object-fit:cover;">
-        <button type="button" 
-                class="btn btn-sm btn-danger position-absolute top-0 end-0" 
-                style="border-radius:50%;" 
-                onclick="removeImage(${index}, '${input.id}', '${containerId}')">&times;</button>
-      `;
-      previewContainer.appendChild(wrapper);
-    };
-    reader.readAsDataURL(file);
-  });
-
-  input.files = dt.files;
-}
-
-function removeImage(index, inputId, containerId) {
-  const input = document.getElementById(inputId);
-
-  const dt = new DataTransfer();
-  Array.from(input.files)
-    .forEach((file, i) => {
-      if (i !== index) dt.items.add(file);
-    });
-
-  input.files = dt.files;
-  previewThumbnailedit(input, containerId);
-}
-
-
-
-
-
-
-
-
