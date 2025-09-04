@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <title>Sweet World Quiz</title>
+    <link href="/activity/dragdropone/css/styles.css" rel="stylesheet" />
+    <link href="/activity/dragdropone/css/drop.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <style>
+      button.nav-button.text-align {
+        background: red;
+      }
+
+      .quiz-container {
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+      }
+
+      .nav-button {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 30px;
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow);
+      }
+    </style>
+  </head>
+
+  <body data-spy="scroll" class="pattern" data-target=".navbar-custom">
+    <div class="container-fluid">
+      <div class="row">
+        <section class="store" id="store">
+          <div class="container">
+            <div class="quiz-container">
+              <div
+                id="question-container text-center"
+                style="text-align: center"
+              >
+                <br />
+                <button class="nav-button text-align" onclick="startQuiz()">
+                  Play
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <script>
+      function goFullscreen(id) {
+        var element = document.getElementById(id);
+        if (element.mozRequestFullScreen) {
+          element.mozRequestFullScreen();
+        } else if (element.webkitRequestFullScreen) {
+          element.webkitRequestFullScreen();
+        }
+      }
+
+      function startQuiz() {
+        const params = new URLSearchParams(window.location.search);
+        const sid = params.get("sid");
+        const tid = params.get("tid");
+        const lid = params.get("lid");
+        const stid = params.get("stid");
+        const qid = params.get("qid");
+        const ust = params.get("ust");
+
+        const data = {
+          sid,
+          tid,
+          lid,
+          stid,
+          qid,
+          ust,
+        };
+        window.open(
+          `/admin/drag-drop/home?sid=${sid}&tid=${tid}&lid=${lid}&stid=${stid}&qid=${qid}&ust=${ust}`,
+          "_blank"
+        );
+      }
+    </script>
+  </body>
+</html>

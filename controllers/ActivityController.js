@@ -135,7 +135,7 @@ class ActivityController {
         });
       }
     });
-    
+
     this.getQuestionsMatchup = asyncHandler(async (req, res) => {
       try {
         // console.log("Body....", req.body);
@@ -188,6 +188,54 @@ class ActivityController {
               text: rightText,
               thumbnail: rightThumbnail,
             },
+          };
+        });
+
+        return res.json(transformedGameData);
+      } catch (error) {
+        console.error("Error fetching random questions:", error);
+        return res.status(500).json({
+          message: "Internal server error",
+          error,
+        });
+      }
+    });
+
+    this.getQuestionsDragDropOne = asyncHandler(async (req, res) => {
+      try {
+        // console.log("Body....", req.body);
+        const { sid, tid, lid, stid, qid, ust } = req.body;
+        const questionsData = await Questions.findOne({
+          where: {
+            subject: sid,
+            topic: tid,
+            level_id: lid,
+            sub_topic: stid,
+            question_type: qid,
+            is_deleted: null,
+            id: {
+              [Op.notIn]: Array.from(previouslyServedIds),
+            },
+          },
+          order: [Sequelize.literal("RAND()")],
+          limit: 1,
+          raw: true,
+        });
+
+        // console.log("Questions match  up", questionsData)
+        // console.log("Questions match  up onedata only", questionsData[0].data)
+        const rawGameData = questionsData.data;
+        const transformedGameData = rawGameData.map((item, index) => {
+          if (index === 0 && item.question) {
+            return {
+              questionid: [questionsData.id],
+              question: item.question,
+            };
+          }
+
+          return {
+            name: item.name,
+            images: item.images || [],
           };
         });
 

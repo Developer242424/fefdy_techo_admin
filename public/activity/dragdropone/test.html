@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reversed Image Example</title>
+  <style>
+    body {
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .image-container {
+      text-align: center;
+    }
+
+    img {
+      width: 300px;
+      height: auto;
+      border: 5px solid #444;
+      border-radius: 10px;
+    }
+
+    .reversed-image {
+      transform: scaleX(-1);
+    }
+  </style>
+</head>
+<body>
+  <div class="image-container">
+    <h2>Reversed Image</h2>
+    <img src="images/boy-pulling-wagon.png" class="reversed-image" alt="Reversed Truck Image">
+  </div>
+</body>
+</html>

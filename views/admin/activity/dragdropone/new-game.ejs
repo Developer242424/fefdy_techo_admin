@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Match Game with Sounds & Timer</title>
+
+  <!-- Bootstrap CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Custom CSS -->
+  <link href="/activity/dragdropone/css/styles.css" rel="stylesheet" />
+  <link href="/activity/dragdropone/css/drop.css" rel="stylesheet" />
+
+  <link href="/activity/dragdropone/css/main.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.slim.js"
+    integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <style>
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    #mainHeading {
+      font-family: 'Fredoka One', cursive;
+      font-size: 3.5rem;
+      color: var(--bs-light-bg-subtle);
+      display: inline-block;
+      animation: bounce 1.5s infinite ease-in-out, glow 1.5s infinite alternate;
+      text-align: center;
+    }
+
+    /* Bounce up and down */
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-15px);
+      }
+    }
+
+    /* Simple glowing effect */
+    @keyframes glow {
+      0% {
+        text-shadow: 0 0 5px #ff6600, 0 0 10px #ff9933;
+      }
+
+      100% {
+        text-shadow: 0 0 15px #ff6600, 0 0 25px #ff9933;
+      }
+    }
+
+    /* Loader gif */
+    #overlay img {
+      width: 100%;
+      height: 100%;
+    }
+
+    #game-content {
+      display: none;
+    }
+  </style>
+</head>
+
+<body class="pattern">
+  <section class="store noselect py-4">
+    <div class="container-fluid">
+      <h2 id="mainHeading" class="text-center mb-4" style="visibility: visible; border-right: none">
+      </h2>
+      <!-- Audio Assets -->
+      <audio id="introAudio" src="/activity/dragdropone/intro.mp3" preload="auto"></audio>
+      <audio id="clickAudio" src="/activity/dragdropone/sounds/mouse-click.mp3" preload="auto"></audio>
+      <audio id="dragAudio" src="/activity/dragdropone/drag.mp3" preload="auto"></audio>
+      <audio id="dropSound" src="/activity/dragdropone/drop.mp3" preload="auto"></audio>
+      <audio id="correctAudio" src="/activity/dragdropone/correct.mp3" preload="auto"></audio>
+      <audio id="wrongAudio" src="/activity/dragdropone/wrong.mp3" preload="auto"></audio>
+      <audio id="resultAudio" src="/activity/dragdropone/result.mp3" preload="auto"></audio>
+      <audio id="backgorundAudio" src="/activity/dragdropone/backgorund.mp3" preload="auto" loop></audio>
+      <audio id="timerAudio" src="/activity/dragdropone/b685d05b-1086-4103-a878-17526779e3ff.mp3"></audio>
+
+
+      <!-- Sounds -->
+      <audio id="hoverSound" src="/activity/dragdropone/hover.mp3"></audio>
+      <audio id="clickSound" src="/activity/dragdropone/click.mp3"></audio>
+      <audio id="dragSound" src="/activity/dragdropone/drag.mp3"></audio>
+
+
+
+      <div id="question-container" class="row rounded justify-content-center mx-0">
+        <div class="col-md-2 d-flex justify-content-center align-items-center mb-3 mb-md-0">
+          <img style="pointer-events: none" src="/activity/dragdropone/images/boy-pulling-wagon.png" alt="Left Side Image"
+            class="img-fluid rounded float-updown purchase-tro" />
+        </div>
+        <!-- Matching area shown by default -->
+        <div class="col-md-8" id="matching-area">
+          <div id="image-list"></div>
+          <div id="dropContainer" class="drop-container d-flex justify-content-around"></div>
+        </div>
+
+        <div class="col-md-2 d-flex justify-content-center align-items-center mt-3 mt-md-0">
+          <img style="pointer-events: none" src="/activity/dragdropone/images/animals-truk.png" alt="Right Side Image"
+            class="img-fluid rounded float-updown animals-truk" />
+        </div>
+
+
+        <div class="row mt-4 " id="timer-section">
+          <div class="col-md-6 text-start" id="timer-column">
+            <div id="timer">
+              Time: <span id="timer-count">00:00</span> Seconds
+            </div>
+          </div>
+          <div class="col-md-6 text-end" id="check-btn-column">
+            <button id="checkBtn" disabled>Check Answers</button>
+          </div>
+
+        </div>
+      </div>
+
+      <div id="overlay">
+        <img src="/activity/dragdropone/images/sample.gif" alt="Start Game Animation" />
+        <div class="start-text">Click to Start Game 🔊</div>
+      </div>
+
+      <!-- Main content (game area) -->
+      <div id="game-content" style="display: none"></div>
+
+      <!-- Timer and Check Button -->
+
+
+    </div>
+  </section>
+
+
+  <!-- Result Modal -->
+  <div id="resultPopup" class="modal">
+    <div class="modal-content">
+      <!-- <span class="close-btn" onclick="restartGame()" id="close-modal">&times;</span> -->
+      <h2>Quiz Results</h2>
+      <p id="scoreText"></p>
+      <div class="popup_button">
+        <button class="submit" id="completeBtn">Submit</button>
+        <button class="restart_active" onclick="restartGame()">Restart</button>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- JS -->
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="/activity/dragdropone/js/drop.js"></script>
+  <!-- new script -->
+
+</body>
+
+</html>

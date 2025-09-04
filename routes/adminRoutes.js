@@ -46,22 +46,36 @@ router.post(
   ActivityController.getQuestionsMatchup
 );
 
-// ✅ Public routes (excluded from auth check)
+router.get("/drag-drop", (req, res) => {
+  res.render("admin/activity/dragdropone/index", { layout: false });
+});
+router.get("/drag-drop/home", (req, res) => {
+  res.render("admin/activity/dragdropone/new-game", { layout: false });
+});
+router.post(
+  "/activity/questions/drag-drop/get",
+  ActivityController.getQuestionsDragDropOne
+);
+
+// Public routes (excluded from auth check)
 router.get("/login", AuthController.loginindex);
 router.post("/login", AuthController.login);
 router.get("/logout", AuthController.logout);
 
 router.get("/sent-report/sent-mail/whole", SentReportController.sentMailWhole);
 
-// ✅ Now protect the rest
+// Now protect the rest
 router.use(isAuthenticated);
 
-// ✅ Protected routes
+// Protected routes
 router.get("/dashboard", DashboardController.index);
-router.post("/get-counts", DashboardController.getCounts)
-router.post("/get-chart-data", DashboardController.getChartData)
-router.post("/get-charts-data", DashboardController.getChartsData)
-router.post("/get-single-donut-charts-data", DashboardController.getSingleDonutData)
+router.post("/get-counts", DashboardController.getCounts);
+router.post("/get-chart-data", DashboardController.getChartData);
+router.post("/get-charts-data", DashboardController.getChartsData);
+router.post(
+  "/get-single-donut-charts-data",
+  DashboardController.getSingleDonutData
+);
 
 router.post("/get-subjects-for-drop", HandlerController.getSubjectForDrop);
 router.post(
@@ -166,7 +180,10 @@ router.post("/questions-list/list", QuestionsController.list);
 router.post("/questions-list/data", QuestionsController.data);
 router.post("/questions-list/update", QuestionsController.update);
 router.post("/questions-list/destroy", QuestionsController.destroy);
-router.post("/questions-list/remove-image/drag-one", QuestionsController.removeImageDragOne);
+router.post(
+  "/questions-list/remove-image/drag-one",
+  QuestionsController.removeImageDragOne
+);
 
 router.get("/sent-report", SentReportController.index);
 router.post("/sent-report/sent-mail", SentReportController.sentMail);
