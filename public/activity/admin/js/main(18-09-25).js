@@ -133,45 +133,39 @@ function loadQuestion() {
     ((currentQuestion + 1) / questions.length) * 100
   }%`;
 
-const answerCount = question.correct.length;
+  // Display question
+    questionContainer.innerHTML = `
+        <div class="quiz-question">
+            <h2 id="question-text">${question.question}</h2>
+        </div>
+        <img src="${publicURL+question.image}" 
+             alt="question image" 
+             style="display:${question.image ? "block" : "none"}" 
+             class="question-image">
+        <div class="audio-icon" onclick="speakQuestionOrResult()">
+            <i class="fa fa-volume-up"></i>
+        </div>
+    `;
+    
+    // Add hover speech after element is created
+    const qText = document.getElementById("question-text");
+    if (qText) {
+      qText.addEventListener("mouseenter", () => {
+        speakText(qText.innerText);
+      });
+    }
 
-  // Display question with "Answer Count"
-  questionContainer.innerHTML = `
-      <div class="quiz-question">
-          
-          <h2 id="question-text">${question.question}</h2>
-          
-      </div>
-      <img src="${publicURL+question.image}" 
-           alt="question image"   
-           style="display:${question.image ? "block" : "none"}" 
-           class="question-image">
-           
-      <div class="audio-icon" onclick="speakQuestionOrResult()">
-          <i class="fa fa-volume-up"></i>
-         
-      </div>
-       <p class="answer-count">${answerCount} Answer${answerCount > 1 ? "s" : ""} </p>
-  `;
-    
-  // Add hover speech after element is created
-  const qText = document.getElementById("question-text");
-  if (qText) {
-    qText.addEventListener("mouseenter", () => {
-      speakText(qText.innerText);
-    });
-  }
-    
- const questionTextElement = document.getElementById("question-text");
+  const questionTextElement = document.getElementById("question-text");
   stopCurrentSpeech();
 
-  
- if (
+  // Only type and speak if first time / unanswered (do not repeat)
+  if (
     userAnswers[currentQuestion] === null ||
     (currentQuestion === 0 && userAnswers[0].length === 0)
   ) {
-    speakQuestion(question.question); 
+    speakQuestion(question.question); // handles both type & speak
   } else {
+    // This should only happen when the question is being loaded for the first time
     typeQuestionText(question.question, questionTextElement);
     speakText(question.question);
   }
@@ -179,7 +173,8 @@ const answerCount = question.correct.length;
   // Clear previous answers
   answersContainer.innerHTML = "";
 
-  question.options.forEach((option, index) => {
+  // Loop through options
+    question.options.forEach((option, index) => {
     const optionDiv = document.createElement("div");
     optionDiv.classList.add("answer-option");
 
@@ -193,6 +188,7 @@ const answerCount = question.correct.length;
     optionText.classList.add("option-text");
     optionText.textContent = option.text;
 
+    // 👉 Add hover speech for image
     optionImage.addEventListener("mouseenter", () => {
       speakText(option.text);
     });
@@ -200,6 +196,7 @@ const answerCount = question.correct.length;
     optionDiv.appendChild(optionImage);
     optionDiv.appendChild(optionText);
 
+    // 🔁 Your existing selection logic here...
     if (!isTransitioning) {
       optionDiv.onclick = () => selectAnswer(index);
       optionDiv.style.pointerEvents = "auto";
@@ -211,11 +208,13 @@ const answerCount = question.correct.length;
     answersContainer.appendChild(optionDiv);
   });
 
-  
+  // Ensure Next button is disabled at the start of each new question
   updateNavigationButtons();
+
+  // Start timers if not already started
   if (!timer) startTimer();
   startReminderTimer();
-}
+ }
 
     function typeQuestionText(text, el, callback = null) {
       el.innerHTML = ""; // Clear the text initially
@@ -430,7 +429,7 @@ document.getElementById("total-correct").innerHTML =
   // Show modal
   document.getElementById("result-modal").style.display = "block";
 
-  
+  // 🔊 Play sound only if some correct answers
   if (correctAnswers > 0) { 
     new Audio("result.mp3").play();
   }
@@ -448,7 +447,7 @@ function startAgain() {
   const stid = params.get("stid");
   const qid = params.get("qid");
   const ust = params.get("ust");
-  
+
   const data = {
     sid,
     tid,
@@ -459,7 +458,7 @@ function startAgain() {
   };
   window.location.href = `/admin/chooseup?sid=${sid}&tid=${tid}&lid=${lid}&stid=${stid}&qid=${qid}&ust=${ust}`;
   
-// Stop any ongoing confetti animation
+  // Stop any ongoing confetti animation
 //   if (confettiAnimationId) {
 //     cancelAnimationFrame(confettiAnimationId);
 //     confettiAnimationId = null;
@@ -529,55 +528,44 @@ function selectAnswer(selectedIndex) {
   const optionDivs = document.querySelectorAll(".answer-option");
   const optionDiv = optionDivs[selectedIndex];
 
-let correctClickedCount = 0; // reset this at the start of each question
+  if (!isTransitioning) {
+    isTransitioning = true;
 
-if (!isTransitioning) {
-  isTransitioning = true;
+    // Wrong answer clicked
+    if (!correctSet.has(selectedIndex)) {
+      optionDiv.classList.add("incorrect");
+      optionDiv.innerHTML += '<div class="result-icon"><i class="fa fa-times colour-red"></i></div>';
 
-  // Wrong answer clicked
-  if (!correctSet.has(selectedIndex)) {
-    optionDiv.classList.add("incorrect");
-    optionDiv.innerHTML += '<div class="result-icon"><i class="fa fa-times colour-red"></i></div>';
-
-    // Show ALL correct answers immediately
-    question.correct.forEach((correctIndex) => {
-      const correctOptionDiv = optionDivs[correctIndex];
-      if (!correctOptionDiv.classList.contains("correct")) {
+      // Show correct answers immediately
+      question.correct.forEach((correctIndex) => {
+        const correctOptionDiv = optionDivs[correctIndex];
         correctOptionDiv.classList.add("correct");
         correctOptionDiv.innerHTML += '<div class="result-icon"><i class="fa fa-check colour-green"></i></div>';
-      }
-    });
+      });
 
-    wrongAudio.play();
+      // Play wrong sound
+      wrongAudio.play();
 
-    wrongAudio.onended = () => {
-      const correctAnswerText = question.correct
-        .map((i) => question.options[i].text)
-        .join(" and ");
-      speakText(`The correct answer is ${correctAnswerText}`);
-    };
+      // Speak correct answer only ONCE after wrong sound
+      wrongAudio.onended = () => {
+        const correctAnswerText = question.correct
+          .map((i) => question.options[i].text)
+          .join(" and ");
+        speakText(`The correct answer is ${correctAnswerText}`);
+      };
 
-    wrongAnswers++;
-  } 
+      wrongAnswers++;
+    } 
     // For correct answers
-    else {
-    if (correctClickedCount === 0) {  
-      // ✅ Show only on the *first* correct click
+   else {
       optionDiv.classList.add("correct");
       optionDiv.innerHTML += '<div class="result-icon"><i class="fa fa-check colour-green"></i></div>';
-    } else {
-      // Second correct click → no new symbol
-      optionDiv.classList.add("correct");
+      correctAudio.play();
+      correctAnswers++;
     }
-
-    correctClickedCount++;  
-    correctAudio.play();
-    correctAnswers++;
-  }
-    setTimeout(() => {
-    isTransitioning = false;
-  }, 500);
+    
      
+
     optionDiv.classList.add("selected");
     optionDiv.style.pointerEvents = "none"; // Disable further clicks
     
@@ -594,7 +582,7 @@ if (!isTransitioning) {
             stopCurrentSpeech();
             showResultModal();
           }
-        }, 1000);
+        }, 1000); // Wait 1 second before transitioning to next question
       });
     }
   }
@@ -607,7 +595,7 @@ const introAudio = document.getElementById("introAudio");
 const BACKGROUND_NORMAL_VOLUME = 0.3;
 const BACKGROUND_DUCK_VOLUME = 0.05;
 
-backgroundAudio.volume = BACKGROUND_NORMAL_VOLUME; 
+backgroundAudio.volume = BACKGROUND_NORMAL_VOLUME; // Initial volume
 
 function duckBackgroundAudio() {
   backgroundAudio.volume = BACKGROUND_DUCK_VOLUME;
@@ -626,8 +614,8 @@ function stopCurrentSpeech() {
 }
 
 function speakText(text, callback = null) {
-  stopCurrentSpeech(); 
-  duckBackgroundAudio(); 
+  stopCurrentSpeech(); // Stop any ongoing speech
+  duckBackgroundAudio(); // Lower background music
 
   currentSpeech = new SpeechSynthesisUtterance(text);
   currentSpeech.lang = "en-US";
@@ -641,7 +629,7 @@ function speakText(text, callback = null) {
   window.speechSynthesis.speak(currentSpeech);
 }
 
- function speakQuestion(text) {
+function speakQuestion(text) {
   stopCurrentSpeech();
   duckBackgroundAudio();
 
@@ -661,9 +649,9 @@ function speakText(text, callback = null) {
   currentSpeech.lang = "en-US";
   currentSpeech.onend = () => {
     currentSpeech = null;
-    restoreBackgroundAudio(); 
+    restoreBackgroundAudio();
   };
-  window.speechSynthesis.speak(currentSpeech); 
+  window.speechSynthesis.speak(currentSpeech);
 }
 
 function playIntro() {
@@ -676,57 +664,58 @@ window.onload = () => {
     .play()
     .then(() => {
       console.log("🔊 intro.mp3 playing");
-      
     })
     .catch(() => {
       document.getElementById("clickPrompt").style.display = "block";
     });
 
-    introAudio.onended = () => {
+  introAudio.onended = () => {
     backgroundAudio.muted = false;
     backgroundAudio.volume = BACKGROUND_NORMAL_VOLUME;
     backgroundAudio.play().catch((err) => {
       console.warn("🔇 Background audio autoplay blocked", err);
     });
   };
-  
+
   fetchQuestions(() => {
     loadQuestion();
     startReminderTimer();
   });
 };
 
+function startQuiz() {
+  // hide prompt
+  document.getElementById("clickPrompt").style.display = "none";
 
-    function startQuiz() {
-      // hide prompt
-      document.getElementById("clickPrompt").style.display = "none";
-    
-      // now safe to play background music
-      backgroundAudio.muted = false;
-      backgroundAudio.volume = BACKGROUND_NORMAL_VOLUME;
-      backgroundAudio.play();
-    
-      loadQuestion();
-      startReminderTimer();
-      startTimer();
-    }
-    
-    function playEffectSound(src, onEndCallback = null) {
-      duckBackgroundAudio();
-      const sound = new Audio(src);
-      sound.play();
-      sound.onended = () => {
-        restoreBackgroundAudio();
-        if (onEndCallback) onEndCallback();
-      };
-    }
+  // now safe to play background music
+  backgroundAudio.muted = false;
+  backgroundAudio.volume = BACKGROUND_NORMAL_VOLUME;
+  backgroundAudio.play();
 
-    function markAnswerFeedback(selectedSet, correctSet, callback, speak = true) {
-    const answerOptions = document.querySelectorAll(".answer-option");
-    
-    answerOptions.forEach((opt, idx) => {
+  loadQuestion();
+  startReminderTimer();
+  startTimer();
+}
+
+// Add ducking to sound effects (inside checkAnswer and toggleAnswerQ0)
+function playEffectSound(src, onEndCallback = null) {
+  duckBackgroundAudio();
+  const sound = new Audio(src);
+  sound.play();
+  sound.onended = () => {
+    restoreBackgroundAudio();
+    if (onEndCallback) onEndCallback();
+  };
+}
+
+// Inside your existing checkAnswer:
+function markAnswerFeedback(selectedSet, correctSet, callback, speak = true) {
+  const answerOptions = document.querySelectorAll(".answer-option");
+
+  answerOptions.forEach((opt, idx) => {
     const isSelected = selectedSet.has(idx);
     const isCorrect = correctSet.has(idx);
+
     if (isSelected && isCorrect) {
       opt.classList.add("correct");
       opt.innerHTML +=
@@ -740,8 +729,9 @@ window.onload = () => {
       opt.innerHTML +=
         '<div class="result-icon"><i class="fa fa-check colour-green"></i></div>';
     }
+
     opt.style.pointerEvents = "none";
-    });
+  });
 
   const correctText = [...correctSet]
     .map((i) => questions[currentQuestion].options[i].text)
@@ -754,9 +744,9 @@ window.onload = () => {
   } else {
     setTimeout(callback, 0);
   }
- }
- 
- function completeTest() {
+}
+
+function completeTest() {
   const params = new URLSearchParams(window.location.search);
   const sid = params.get("sid");
   const tid = params.get("tid");
@@ -764,7 +754,7 @@ window.onload = () => {
   const stid = params.get("stid");
   const qid = params.get("qid");
   const ust = params.get("ust");
-  
+
   const data = {
     sid,
     tid,
@@ -774,16 +764,16 @@ window.onload = () => {
     ust,
     correctAnswers,
     wrongAnswers,
-    totalTime, 
+    totalTime,
     questionIds,
-  };        
-  $.ajax({  
-    url: "/admin/activity/questions/history",                                                                   
-    method: "POST",  
+  };
+  $.ajax({
+    url: "/admin/activity/questions/history",
+    method: "POST",
     contentType: "application/json",
     data: JSON.stringify(data),
-    success: function (res) {  
-      if (res.status === 200) { 
+    success: function (res) {
+      if (res.status === 200) {
         startAgain();
         // location.reload();
       } else {
@@ -795,7 +785,7 @@ window.onload = () => {
       if (xhr.responseJSON && xhr.responseJSON.message) {
         errorMessage = xhr.responseJSON.message;
       }
-      console.warn("⚠️", errorMessage);  
+      console.warn("⚠️", errorMessage);
     },
   });
 }

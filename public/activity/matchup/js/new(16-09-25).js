@@ -49,8 +49,8 @@
 // Function to dynamically generate content based on the JSON data
     function derangedShuffle(original) {
       let shuffled;
-      let attempts = 0;
-      
+      let attempts = 0;    
+    
       do {
         shuffled = original.slice().sort(() => Math.random() - 0.5);
         attempts++;
@@ -74,7 +74,7 @@
   mainHeading.textContent = gameData[0].question;
 
   const matchingArea = document.getElementById("matching-area");
-  matchingArea.innerHTML = ""; 
+  matchingArea.innerHTML = ""; // Clear any previous content
 
   const leftItems = gameData.slice(1).map((item) => item.is_equal_one);
   const rightItems = derangedShuffle(
@@ -114,32 +114,33 @@
     `;
     row.appendChild(leftColumn);
 
+
     // Right Column
     const rightColumn = document.createElement("div");
     rightColumn.classList.add("col-6", "text-end");
     rightColumn.innerHTML = `
-    <div class="item right d-inline-block dummy" data-id="${getDotId(right)}">
     <div class="item right d-inline-block image" data-id="${getDotId(right)}">
     <!-- Display text inside <p> tag with class item_right_text if text exists -->
     ${right.text ? `<p class="item_right_text">${right.text}</p>` : ""}
     
     ${
-      right.thumbnail   
+      right.thumbnail
         ? `<img src="/${right.thumbnail}" alt="${right.text}" />`
         : ""
-    }  <!-- Display image if thumbnail exists -->
-    <div class="dot-box">
+    }  <!-- Display image if thumbnail exists -->  
     <div class="dot right" data-id="${getDotId(
       right
-    )}"></div> </div>
-    <!-- Use getDotId() here -->
+    )}"></div>  <!-- Use getDotId() here -->
     <input type="hidden" value="${originalIndex}"/>
     </div>
     `;
-     
+    
+                      
     row.appendChild(rightColumn);
+    
         matchingArea.appendChild(row);
       }
+    
       enableDragAndDrop();
     }
 
@@ -338,14 +339,10 @@ intro.addEventListener("ended", () => {
           instructionBox.dataset.fulltext || instructionBox.textContent.trim();
         if (typingInProgress) {
           stopTypingAndShowFullText("instruction-text");
-        }else if (text) {
-    // Display the text immediately
-    const instructionEl = document.getElementById("instruction-text");
-    instructionEl.textContent = text; // No typing animation
-
-    // Speak the text
-    speakTextWithBackgroundControl(text);
-}
+        } else if (text) {
+          typeHeadingText(text, "instruction-text", 50);
+          speakTextWithBackgroundControl(text);
+        }
       });
     }
     
@@ -672,9 +669,10 @@ function checkAnswers() {
     
     // ✅ Update scoreText with HTML instead of \n
     document.getElementById("scoreText").innerHTML = `
-    <div class="score-item">⭐ Total Correct: <br><span class="score">${correctCount} / ${totalQuestions}</span></div>
-     
-   <div class="score-item">Total Time Taken : <span>${minutes}:${seconds}</span></div>
+      <div class="score-item">⭐ Total Correct: <span>${correctCount} / ${totalQuestions}</span></div>
+      <div class="score-item">✅ Correct Answers: <span>${correctCount}</span></div>
+      <div class="score-item">❌ Wrong Answers: <span>${wrongCount}</span></div>
+      <div class="score-item">⏰Time Taken: <span>${minutes}:${seconds}</span></div>
     `;
     
       setTimeout(() => {
@@ -777,7 +775,6 @@ function checkAnswers() {
         totalTime: secondsElapsed,
         questionIds,
       };
-      
       $.ajax({
         url: "/admin/activity/questions/history",
         method: "POST",
@@ -796,12 +793,12 @@ function checkAnswers() {
           if (xhr.responseJSON && xhr.responseJSON.message) {
             errorMessage = xhr.responseJSON.message;
           }
-          console.warn("⚠️", errorMessage);       
+          console.warn("⚠️", errorMessage);
         },
       });
     }
     
     
     
-   
+    
     

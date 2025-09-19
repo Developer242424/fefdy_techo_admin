@@ -18,7 +18,7 @@ h2 {
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  cursor: pointer;       
+  cursor: pointer;
   overflow: hidden;
 }
 
@@ -74,28 +74,29 @@ h2#mainHeading {
 }
 
 .top-container img {
-    width: 60px;
-    height: 60px;
-    border-radius: 10px;
-    cursor: grab;
+  width: 84px;
+  height: 86px;
+  /* border: 2px solid #ccc; */
+  border-radius: 10px;
+  cursor: grab;
 }
 
 .drop-container {
   display: flex;
   justify-content: center;
-
+  gap: 50px;
 }
 
 .drop-box-1 {
-    position: absolute;
-    bottom: 109px;
-    right: 39pc;
-    background: none !important;
-    max-width: 237px;
-    width: 232px;
-    border: 3px dashed #999;
-    height: auto;
-    border-radius: 10px;
+  position: absolute;
+  bottom: 25px;
+  right: 57pc;
+  background: none !important;
+  max-width: 237px;
+  width: 232px;
+  border: 3px dashed #999;
+  height: auto;
+  border-radius: 10px;
 }
 
 .drop-box-1 h3 {
@@ -107,19 +108,17 @@ h2#mainHeading {
   rotate: 30deg;
   margin: 5px;
 }
-.modal-content h2 {
-    font-size: 39px;
-}
 
 .drop-box-2 {
-    border: 3px dashed #999;
-    position: absolute;
-      bottom: 109px;
-    background: none !important;
-    max-width: 237px;
-    width: 232px;
-    left: 39pc;
-    border-radius: 10px;
+  border: 3px dashed #999;
+  position: absolute;
+  bottom: 2pc;
+  right: 0pc;
+  background: none !important;
+  max-width: 237px;
+  width: 232px;
+  left: 56pc;
+  border-radius: 10px;
 }
 
 .drop-box-2 h3 {
@@ -138,17 +137,18 @@ h2#mainHeading {
 }
 
 img.img-fluid.rounded.float-updown.purchase-tro {
-    position: relative;
-    top: 4pc;
-    left: 3pc;
+  position: relative;
+  top: 8pc;
+  left: 6pc;
 }
 
 img.img-fluid.rounded.float-updown.animals-truk {
-    position: relative;
-    top: 6pc;
-    right: 4pc;
-    width: 211%;
+  position: relative;
+  top: 11pc;
+  right: 7pc;
+  width: 200%;
 }
+
 div#fruitBox {
   position: relative;
   bottom: 6pc;
@@ -218,13 +218,13 @@ div#animalBox {
 }
 
 .empty-text {
-    font-family: 'Fredoka One', cursive;
-    font-size: 42px;
-
-    color: #fff;
-    display: inline-block;
-    text-align: center;
-    margin: 19px auto;
+  font-family: 'Fredoka One', cursive;
+  font-size: 2.5rem;
+  /* color: var(--bs-pink); */
+  color: #fff;
+  display: inline-block;
+  text-align: center;
+  margin: 19px auto;
 }
 
 .empty-text:hover {
@@ -235,64 +235,63 @@ div#animalBox {
 p.empty-pera-1 {
     color: #ff4394;
     font-family: 'Fredoka One', cursive;
-    font-size: 26px;
-    letter-spacing: 3.2px;
+    font-size: 38px;
+    letter-spacing: 6.2px;
     font-weight: 700;
     filter: drop-shadow(0px 3px 2px black);
     position: relative;
-    bottom: 19pc;
+    bottom: 16pc;
     height: auto;
     right: 12pc;
     z-index: 2;
-    
 }
 
 p.empty-pera-2 {
     color: #ff4394;
     font-family: 'Fredoka One', cursive;
-    font-size: 26px;
-    letter-spacing: 3.2px;
+    font-size: 38px;
+    letter-spacing: 6.2px;
     font-weight: 700;
     filter: drop-shadow(0px 3px 2px black);
     position: relative;
-    bottom: 19pc;
+    bottom: 16pc;
     min-height: 98px;
     height: auto;
     left: 13pc;
 }
 
 .top-container {
-    margin: 30px auto;
-    height: 253px;
-    width: 50%;
-    padding: 30px;
-    background: #fff8dc;
-    border-radius: 20px;
-    position: relative;
-    transform: translateZ(15px) scale(1.05);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-    overflow-y: auto;
-    scrollbar-width: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
+  margin: 70px auto;
+  height: 253px;
+  width: 50%;
+  padding: 30px;
+  background: #fff8dc;
+  border-radius: 20px;
+  position: relative;
+  transform: translateZ(15px) scale(1.05);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+  scrollbar-width: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
 }
 
 /* Glowing animated border using ::before */
 .top-container::before {
-    content: "";
-    position: absolute;
-    top: 0px;
-    height: auto;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-    border-radius: 24px;
-    background: linear-gradient(270deg, #ff3f8b, #ff8c00, #ff3f8b, #ff8c00);
-    background-size: 600% 600%;
-    animation: glowingBorder 4s linear infinite;
-    z-index: -1;
-    filter: blur(6px);
-    opacity: 0.75;
+  content: "";
+  position: absolute;
+  top: -4px;
+  height: 253px;
+  bottom: -4px;
+  left: -4px;
+  right: -4px;
+  border-radius: 24px;
+  background: linear-gradient(270deg, #ff3f8b, #ff8c00, #ff3f8b, #ff8c00);
+  background-size: 600% 600%;
+  animation: glowingBorder 4s linear infinite;
+  z-index: -1;
+  filter: blur(6px);
+  opacity: 0.75;
 }
 
 /* Inner solid border */
@@ -411,14 +410,14 @@ button.restart_active {
 
 /* Timer Section Container */
 #timer-section {
-    background: #fff;
-    backdrop-filter: blur(10px);
-    border-radius: 5px;
-    padding: 15px 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    position: relative;
-    top: -62px;
-    width: 90%;
+  background: #fff;
+  backdrop-filter: blur(10px);
+  border-radius: 5px;
+  padding: 15px 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  position: relative;
+  top: 54px;
+  width: 90%;
 }
 
 
@@ -464,11 +463,7 @@ button.restart_active {
 }
 
 
-.dot {
-  touch-action: none;
-  -webkit-user-drag: none;
-  user-select: none;
-}
+
 
 
 
@@ -506,7 +501,7 @@ button.restart_active {
 #mainHeading
  {
     font-family: 'Fredoka One', cursive;
-    font-size: 30px !important;
+    font-size: 2.5rem !important;
     color: var(--bs-light-bg-subtle);
     display: inline-block;
     animation: bounce 1.5s infinite ease-in-out, glow 1.5s infinite alternate;
@@ -514,239 +509,51 @@ button.restart_active {
 }
 
 @media (min-width: 1900px) {
-#mainHeading {
-    font-family: 'Fredoka One', cursive;
-    font-size: 46px !important;
-    color: var(--bs-light-bg-subtle);
-    display: inline-block;
-    animation: bounce 1.5s infinite ease-in-out, glow 1.5s infinite alternate;
-    text-align: center;
-}
-    #timer-section {
-    background: #fff;
-    backdrop-filter: blur(10px);
-    border-radius: 5px;
-    padding: 15px 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    position: relative;
-    top: 70px;
-    width: 90%;
-}
-    img.img-fluid.rounded.float-updown.purchase-tro {
-        position: relative;
-        top: 12pc;
-        left: 7pc;
+      #mainHeading {
+      font-family: 'Fredoka One', cursive;
+      font-size: 3.5rem;
+      color: var(--bs-light-bg-subtle);
+      display: inline-block;
+      animation: bounce 1.5s infinite ease-in-out, glow 1.5s infinite alternate;
+      text-align: center;
     }
-.drop-box-1 {
-    position: absolute;
-    bottom: 0px;
-    right: 56pc;
-    background: none !important;
-    max-width: 237px;
-    width: 232px;
-    height: auto;
-    border-radius: 10px;
-}
-    .drop-box-2 {
-        position: absolute;
-        bottom: 0px;
-        background: none !important;
-        max-width: 237px;
-        width: 232px;
-        left: 55pc;
-        border-radius: 10px;
-    }
-img.img-fluid.rounded.float-updown.animals-truk {
-    position: relative;
-    top: 15pc;
-    right: 7pc;
-    width: 211%;
 }
 
-p.empty-pera-1 {
-    color: #ff4394;
-    font-family: 'Fredoka One', cursive;
-    font-size: 33px;
-    letter-spacing: 5.2px;
-    font-weight: 700;
-    filter: drop-shadow(0px 3px 2px black);
-    position: relative;
-    bottom: 13pc;
-    height: auto;
-    right: 14pc;
-    z-index: 2;
-}
 
-p.empty-pera-2 {
-    color: #ff4394;
-    font-family: 'Fredoka One', cursive;
-    font-size: 33px;
-    letter-spacing: 5.2px;
-    font-weight: 700;
-    filter: drop-shadow(0px 3px 2px black);
-    position: relative;
-    bottom: 13pc;
-    min-height: 98px;
-    height: auto;
-    left: 12pc;
-}
-    
-}
-
-    .modal .modal-content {
-        box-shadow: -1px 6px 0.3px #eee8d0, 1px 6px 0.3px #eee8d0, 0 -6px 0.3px #eee8d0, -6px 0 0.3px #eee8d0, 6px 0 0.3px #eee8d0, -6px -6px 0.3px #eee8d0, 6px -6px 0.3px #eee8d0, -6px 6px 0.3px #eee8d0, 6px 6px 0.3px #eee8d0, 6px 6px 3px rgba(0, 0, 0, 0.8);
-        border-radius: 1rem;
-    }
 
 @media (min-width: 1500px) and (max-width: 1850px) {
     
-    #timer-section {
-    background: #fff;
-    backdrop-filter: blur(10px);
-    border-radius: 5px;
-    padding: 15px 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    position: relative;
-    top: 26px;
-    width: 90%;
-}
-    
-    img.img-fluid.rounded.float-updown.purchase-tro {
-    position: relative;
-    top: 8pc;
-    left: 4pc;
-}
-
-img.img-fluid.rounded.float-updown.animals-truk {
-    position: relative;
-    top: 10pc;
-    right: 4pc;
-    width: 211%;
-}
-
-.drop-box-1 {
+    .drop-box-1 {
     position: absolute;
-    bottom: 49px;
-    right: 43pc;
+    bottom: 57px;
+    right: 41pc;
     background: none !important;
     max-width: 237px;
     width: 232px;
+    border: 3px dashed #999;
     height: auto;
     border-radius: 10px;
 }
-
-.drop-box-2 {
+    
+    .drop-box-2 {
     position: absolute;
-    bottom: 49px;
+    bottom: 3pc;
+    right: 0pc;
     background: none !important;
     max-width: 237px;
     width: 232px;
     left: 43pc;
     border-radius: 10px;
 }
-p.empty-pera-1 {
-    color: #ff4394;
-    font-family: 'Fredoka One', cursive;
-    font-size: 26px;
-    letter-spacing: 3.2px;
-    font-weight: 700;
-    filter: drop-shadow(0px 3px 2px black);
-    position: relative;
-    bottom: 15pc;
-    height: auto;
-    /* right: 12pc; */
-    z-index: 2;
-}
-
-p.empty-pera-2 {
-    color: #ff4394;
-    font-family: 'Fredoka One', cursive;
-    font-size: 26px;
-    letter-spacing: 3.2px;
-    font-weight: 700;
-    filter: drop-shadow(0px 3px 2px black);
-    position: relative;
-    bottom: 15pc;
-    min-height: 98px;
-    height: auto;
-    /* left: 13pc; */
-}
-
-#mainHeading {
-    font-size: 37px !important;
-  
-}
-
-}
-
-
-@media (max-width: 1280px) {
-    
-    .drop-box-1 {
+    .drop-box {
+    border: 4px dashed #ffffff;
+    border-radius: 12px;
+    padding: 10px;
+    min-height: 200px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
     position: absolute;
-    bottom: 109px;
-    right: 36pc;
-    max-width: 237px;
-    width: 191px;
-    height: auto;
 }
-
-.drop-box-2 {
-    position: absolute;
-    bottom: 109px;
-    max-width: 237px;
-    width: 191px;
-    left: 36pc;
 }
-
-#timer-section {
-    position: relative;
-    top: -37px;
-    width: 90%;
-}
-
-.drop-box-1 img {
-    width: 43px;
-    rotate: 30deg;
-    margin: 5px;
-}
-
-p.empty-pera-1 {
-    color: #ff4394;
-    font-family: 'Fredoka One', cursive;
-    font-size: 26px;
-    letter-spacing: 3.2px;
-    font-weight: 700;
-    filter: drop-shadow(0px 3px 2px black);
-    position: relative;
-    bottom: 19pc;
-    height: auto;
-    right: 9pc;
-    z-index: 2;
-    margin: auto;
-    
-}
-
-p.empty-pera-2 {
-    color: #ff4394;
-    font-family: 'Fredoka One', cursive;
-    font-size: 26px;
-    letter-spacing: 3.2px;
-    font-weight: 700;
-    filter: drop-shadow(0px 3px 2px black);
-    position: relative;
-    bottom: 17pc;
-    min-height: 98px;
-    height: auto;
-    left: 10pc;
-    margin: auto;
-}
-    
-    
-}
-
-
-
 
 
 

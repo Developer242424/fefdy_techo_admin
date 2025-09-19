@@ -81,7 +81,7 @@
             <audio id="correctAudio" src="/activity/matchup/correct.mp3" preload="auto"></audio>
             <audio id="wrongAudio" src="/activity/matchup/wrong.mp3" preload="auto"></audio>
             <audio id="resultAudio" src="/activity/matchup/result.mp3" preload="auto"></audio>
-            <audio id="backgorundAudio" src="/activity/matchup/" preload="auto"></audio>
+            <audio id="backgorundAudio" src="/activity/matchup/backgorund.mp3" preload="auto"></audio>
 
             <!-- Matching Section -->
             <div id="question-container" class="row rounded justify-content-center mx-0">
@@ -118,17 +118,19 @@
     </section>
 
     <!-- Result Modal -->
-        <div id="resultPopup" class="modal">
+    <!-- Result Modal -->
+    <div id="resultPopup" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="restartGame()" id="close-modal">&times;</span>
-            <h2 class="modal_he">Quiz Results</h2>
+            <h2>Results</h2>
             <p id="scoreText"></p>
 
+            <!-- Button container with flexbox -->
             <div class="d-flex justify-content-between w-100">
                 <button onclick="restartGame()" class="start-again-btn col-5">Restart</button>
                 <button class="start-again-btn col-5" onclick="completeTest()">Submit</button>
             </div>
-        </div> 
+        </div>
     </div>
 
 

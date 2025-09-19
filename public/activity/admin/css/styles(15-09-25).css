@@ -1,8 +1,5 @@
 @charset "UTF-8";
 
-
-
-
 /*------------------------------------------------------------------
 
 [Master Stylesheet]
@@ -16,7 +13,7 @@ Primary use:	HTML Theme
 -------------------------------------------------------------------*/
 /*------------------------------------------------------------------
 
-[Table of contents]      
+[Table of contents]
 
 1. Base / #base
 	1.1. Body / #body
@@ -33,7 +30,7 @@ Primary use:	HTML Theme
 
 3. Layout / #layout
 	3.1. Header / #header
-	3.2. Features / #features 
+	3.2. Features / #features
 	3.3. Gallery / #gallery
 	3.4. Store / #store
 	3.5. Testimonials / #testimonials
@@ -58,23 +55,28 @@ Tertiary Font: "Changa", Verdana, sans-serif;
 /*------------------------------------------------------------------
 
 1. Base / #base
-    1.1. Body / #body
+   1.1. Body / #body
 
 -------------------------------------------------------------------*/
 html, body {
   color: #383838;
   font-size: 18px;
-  /*background-color: #79f1f2;*/
   font-family: "Changa", Verdana, sans-serif;
   font-weight: 300;
+   cursor: default !important;
   text-rendering: optimizeLegibility; }
   @media (min-width: 768px) {
     html, body {
       font-size: 20px !important;
+      
+      scrollbar-width: none;
       padding-right: 0px !important; } }
 
+
+
 section {
-  padding: 3rem 1rem; }
+    padding: 0rem 1rem;
+}
 
 
 h1 {
@@ -85,12 +87,14 @@ h2 { text-shadow: 3px 3px 0 var(--color-secondary), 6px 6px 0 var(--color-tertia
     font-family: bungee, sans-serif;
     font-weight: 400;
     text-transform: uppercase;
-    font-size: 50px;
+    font-size: 30px;
     text-align: center;
     margin: 0;
     color: var(--color-primary);
     animation: shadows 1.2s ease-in infinite;
     letter-spacing: 0.4rem;
+    margin-bottom: 12px !important;
+    margin-top: 18px !important;
 }
 
 
@@ -121,7 +125,11 @@ input:focus, textarea:focus, button:focus {
   line-height: 1.6rem; }
   @media (max-width: 768px) {
     .section-description {
-      width: 85%; } }
+      width: 85%; }
+      
+      
+      
+  }
 
 /*------------------------------------------------------------------
 
@@ -175,23 +183,22 @@ h2, h3 {
     display: flex;
     justify-content: center;
     align-items: center;
-  background-image: url(/activity/matchup/images/bg.jpg); 
+  background-image: url(../images/space.jpg); 
     background-repeat: repeat;
     background-size: cover;
     animation: moveBackground 60s linear infinite;
-        overflow-x: clip;
 }
 @keyframes moveBackground {
     from {
         background-position: 0 0;
     }
     to {
-        background-position: 5000px 0px;
-    } 
-} 
+        background-position: 5000px 100px;
+    }
+}
 
 .pattern-dark {
-  background-image: url(/activity/matchup/images/background-green.jpg);
+  background-image: url(../images/background-green.jpg);
   background-size: cover; }
 
 .box {
@@ -229,7 +236,7 @@ label:not(#foo) > input[type='checkbox'] + span {
   padding: 0px 48px 2px 24px;
   /* Make look clickable because they are */
   cursor: pointer;
-  background-image: url(/activity/matchup/images/checks.png);
+  background-image: url(../images/checks.png);
   background-size: 18px auto;
   background-position: 0px -18px;
   background-repeat: no-repeat;
@@ -243,14 +250,14 @@ label:not(#foo) > input[type='checkbox'] + span {
     Change from unchecked to checked graphic
 */
 label:not(#foo) > input[type='radio']:checked + span {
-  background-image: url(/activity/matchup/images/checks.png);
+  background-image: url(../images/checks.png);
   background-size: 18px auto;
   background-position: 0px -36px;
   background-repeat: no-repeat;
   height: 18px; }
 
 label:not(#foo) > input[type='checkbox']:checked + span {
-  background-image: url(/activity/matchup/images/checks.png);
+  background-image: url(../images/checks.png);
   background-size: 18px auto;
   background-position: 0px 0px;
   background-repeat: no-repeat;
@@ -266,7 +273,7 @@ label:not(#foo) > input[type='checkbox']:checked + span {
     left: 0;
     margin-right: 82px;
     right: 50%;
-    background: url(/activity/matchup/images/divider-sprite.png) repeat-x 50% 0;
+    background: url(../images/divider-sprite.png) repeat-x 50% 0;
     content: "";
     height: 55px;
     position: absolute;
@@ -275,14 +282,14 @@ label:not(#foo) > input[type='checkbox']:checked + span {
     left: 50%;
     margin-left: 82px;
     right: 0;
-    background: url(/activity/matchup/images/divider-sprite.png) repeat-x 50% 0;
+    background: url(../images/divider-sprite.png) repeat-x 50% 0;
     content: "";
     height: 55px;
     position: absolute;
     top: 0; }
 
 .Divider-rule {
-  background: url(/activity/matchup/images/divider-sprite.png) repeat-x 50% 100%;
+  background: url(../images/divider-sprite.png) repeat-x 50% 100%;
   border: 0;
   height: 55px;
   left: 50%;
@@ -311,7 +318,7 @@ option {
 
 -------------------------------------------------------------------*/
 .navbar-custom {
-  background: url(/activity/matchup/images/menu-pattern.jpg);
+  background: url(../images/menu-pattern.jpg);
   z-index: 3;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); }
 
@@ -326,7 +333,7 @@ option {
   height: auto; }
 
 a.navbar-logo {
-  background-image: url(/activity/matchup/images/logo-compact.png);
+  background-image: url(../images/logo-compact.png);
   width: 50px;
   height: 42px;
   background-size: 50px auto;
@@ -480,7 +487,7 @@ a.navbar-logo {
     .button-game {
       font-size: 15px !important; } }
   .button-game .button-game-bg-mid {
-    background: url(/activity/matchup/images/button-sprite.png) repeat-x 0 0;
+    background: url(../images/button-sprite.png) repeat-x 0 0;
     display: block;
     font-family: "Changa", Verdana, sans-serif;
     letter-spacing: 1px;
@@ -500,7 +507,7 @@ a.navbar-logo {
       .button-game .button-game-bg-mid {
         padding: 0px; } }
   .button-game .button-game-bg-mid:after {
-    background: url(/activity/matchup/images/button-sprite.png) repeat-x 0 -54px;
+    background: url(../images/button-sprite.png) repeat-x 0 -54px;
     content: "";
     height: 54px;
     left: 0;
@@ -522,7 +529,7 @@ a.navbar-logo {
     position: relative;
     z-index: 1; }
   .button-game .button-game-bg-left {
-    background: url(/activity/matchup/images/button-sprite.png) no-repeat 0 -108px;
+    background: url(../images/button-sprite.png) no-repeat 0 -108px;
     height: 54px;
     left: -20px;
     position: absolute;
@@ -530,7 +537,7 @@ a.navbar-logo {
     width: 51px;
     z-index: 1; }
   .button-game .button-game-bg-right {
-    background: url(/activity/matchup/images/button-sprite.png) no-repeat 0 -162px;
+    background: url(../images/button-sprite.png) no-repeat 0 -162px;
     height: 54px;
     position: absolute;
     right: -20px;
@@ -629,7 +636,7 @@ button.close {
 
 -------------------------------------------------------------------*/
 header {
-  background-image: linear-gradient(rgba(218, 245, 238, 0.1), rgba(98, 181, 81, 0.1)), url(/activity/matchup/images/Sweet-World.jpg);
+  background-image: linear-gradient(rgba(218, 245, 238, 0.1), rgba(98, 181, 81, 0.1)), url(../images/Sweet-World.jpg);
   height: 75vh;
   background-position: 0 75%; }
   @media (max-width: 768px) {
@@ -696,7 +703,7 @@ header {
 .features {
   padding-top: 1.5%; }
   .features .container {
-    background: url(/activity/matchup/images/creampaper.png);
+    background: url(../images/creampaper.png);
     padding: 2rem;
     border: 2px dashed #d45f42;
     border-radius: 2rem;
@@ -759,7 +766,7 @@ h2.tips {
     .gallery {
       padding: 1.5% 0; } }
   .gallery .container {
-    background: url(/activity/matchup/images/creampaper.png);
+    background: url(../images/creampaper.png);
     padding: 2rem;
     border: 2px dashed #d45f42;
     border-radius: 2rem;
@@ -828,9 +835,9 @@ h2.tips {
       font-size: 600%; } }
 
 .slider-arrow-left {
-  background: url(/activity/matchup/images/carousel-sprite.png) no-repeat 0 0; }
+  background: url(../images/carousel-sprite.png) no-repeat 0 0; }
   .slider-arrow-left:after {
-    background: url(/activity/matchup/images/carousel-sprite.png) no-repeat -86px 0; }
+    background: url(../images/carousel-sprite.png) no-repeat -86px 0; }
   .slider-arrow-left:hover:after {
     opacity: 1; }
   @media only screen and (min-device-width: 1024px) and (max-device-width: 1024px) and (min-device-height: 1366px) and (max-device-height: 1366px) and (min-width: 1024px) and (max-width: 1024px) {
@@ -847,9 +854,9 @@ h2.tips {
       left: 20px; } }
 
 .slider-arrow-right {
-  background: url(/activity/matchup/images/carousel-sprite.png) no-repeat -172px 0; }
+  background: url(../images/carousel-sprite.png) no-repeat -172px 0; }
   .slider-arrow-right:after {
-    background: url(/activity/matchup/images/carousel-sprite.png) no-repeat -258px 0; }
+    background: url(../images/carousel-sprite.png) no-repeat -258px 0; }
   .slider-arrow-right:hover:after {
     opacity: 1; }
   @media only screen and (min-device-width: 1024px) and (max-device-width: 1024px) and (min-device-height: 1366px) and (max-device-height: 1366px) and (min-width: 1024px) and (max-width: 1024px) {
@@ -893,7 +900,7 @@ h2.tips {
   width: 100%;
   margin-left: -30%; }
   .carousel-indicators li {
-    background: url(/activity/matchup/images/slider-dots.png) no-repeat 0 -28px;
+    background: url(../images/slider-dots.png) no-repeat 0 -28px;
     cursor: pointer;
     display: inline-block;
     height: 28px;
@@ -914,7 +921,7 @@ h2.tips {
   background-color: transparent; }
 
 .modal-corner {
-  background: url(/activity/matchup/images/modal.png) no-repeat;
+  background: url(../images/modal.png) no-repeat;
   position: absolute;
   height: 18px;
   width: 18px; }
@@ -943,28 +950,28 @@ h2.tips {
   position: absolute; }
 
 .modal-border-top {
-  background: url(/activity/matchup/images/modal-frame.png) 0 0 repeat-x;
+  background: url(../images/modal-frame.png) 0 0 repeat-x;
   height: 18px;
   left: 0;
   right: 0;
   top: -18px; }
 
 .modal-border-right {
-  background: url(/activity/matchup/images/modal.png) -272px 0 repeat-y;
+  background: url(../images/modal.png) -272px 0 repeat-y;
   bottom: 0;
   right: -18px;
   top: 0;
   width: 18px; }
 
 .modal-border-bottom {
-  background: url(/activity/matchup/images/modal-frame.png) 0 -18px repeat-x;
+  background: url(../images/modal-frame.png) 0 -18px repeat-x;
   bottom: -18px;
   height: 18px;
   left: 0;
   right: 0; }
 
 .modal-border-left {
-  background: url(/activity/matchup/images/modal.png) -254px 0 repeat-y;
+  background: url(../images/modal.png) -254px 0 repeat-y;
   bottom: 0;
   left: -18px;
   top: 0;
@@ -997,11 +1004,16 @@ h2.tips {
 -------------------------------------------------------------------*/
 .store {
   padding-top: 1.5%;
-  width: 90%;
+  width: 80%;
   margin-bottom: 1.25rem; }
   @media (min-width: 768px) {
-    .store {
-      margin-bottom: 0.25rem; } }
+    /*.store {*/
+    /*  margin-bottom: 0.25rem;*/
+    /*  }*/
+
+    
+    
+      }
   .store .items-container {
     padding: 0 10%;
     text-align: center; }
@@ -1016,7 +1028,7 @@ h2.tips {
     .store .item-3, .store .item-4 {
       margin-top: 0rem; } }
   .store .container-fluid {
-    background: url(/activity/matchup/images/creampaper.png);
+    background: url(../images/creampaper.png);
     
     border: 2px dashed #d45f42;
     border-radius: 2rem;
@@ -1059,7 +1071,7 @@ h2.tips {
   color: #112a2b; }
 
 .bottom-wrapper {
-  background: url(/activity/matchup/images/blog-separator-2.png) 50% 100% no-repeat;
+  background: url(../images/blog-separator-2.png) 50% 100% no-repeat;
   position: relative; }
 
 .gallery-item {
@@ -1374,7 +1386,7 @@ ul#model-feats {
     margin: 1rem auto 3rem auto;
     text-shadow: 1px 1px 0px #e4f1f1; }
   .contact .container {
-    background: url(/activity/matchup/images/creampaper.png);
+    background: url(../images/creampaper.png);
     padding: 2rem 2rem 4rem 2rem;
     border: 2px dashed #d45f42;
     border-radius: 2rem;
@@ -1599,7 +1611,7 @@ ul#model-feats {
   margin-left: -90px;
   margin-top: -23px;
   position: absolute;
-  background: url(/activity/matchup/images/video-play.png) no-repeat;
+  background: url(../images/video-play.png) no-repeat;
   background-position: 0px 0px;
   cursor: pointer; }
   .youtube-player .play:hover {
@@ -1625,7 +1637,7 @@ ul#model-feats {
 @font-face {
   font-family: "Ionicons";
   src: url("../fonts/ionicons.eot");
-  src: url("../fonts/ionicons.eot#iefix") format("embedded-opentype"), url("../fonts/ionicons.ttf") format("truetype"), url("../fonts/ionicons.woff") format("woff"), url("/activity/matchup/images/ionicons.svg#Ionicons") format("svg");
+  src: url("../fonts/ionicons.eot#iefix") format("embedded-opentype"), url("../fonts/ionicons.ttf") format("truetype"), url("../fonts/ionicons.woff") format("woff"), url("../images/ionicons.svg#Ionicons") format("svg");
   font-weight: normal;
   font-style: normal; }
 .ion, .ionicons,
@@ -4572,5 +4584,39 @@ ul#model-feats {
 
 .ion-xbox:before {
   content: ""; }
+  
+  
+@media (min-width: 1900px) {
+      h2 {
+   
+    font-size: 50px;
+
+}
+section {
+  padding: 3rem 1rem; }
+
+.quiz-question {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0px;
+    color: #333;
+    display: block;
+    text-align: center;
+}
+
+  }
+  
+  
+  
+   .store {
+    padding-top: 1.5%;
+    width: 100%;
+    margin-bottom: 1.25rem;
+}
+  
+  
+  
+  
+  
 
 /*# sourceMappingURL=styles.css.map */

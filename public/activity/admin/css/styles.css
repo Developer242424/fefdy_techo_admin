@@ -1,8 +1,5 @@
 @charset "UTF-8";
 
-
-
-
 /*------------------------------------------------------------------
 
 [Master Stylesheet]
@@ -58,13 +55,12 @@ Tertiary Font: "Changa", Verdana, sans-serif;
 /*------------------------------------------------------------------
 
 1. Base / #base
-    1.1. Body / #body
+   1.1. Body / #body
 
 -------------------------------------------------------------------*/
 html, body {
   color: #383838;
   font-size: 18px;
-  /* background-color: #79f1f2; */
   font-family: "Changa", Verdana, sans-serif;
   font-weight: 300;
    cursor: default !important;
@@ -72,10 +68,15 @@ html, body {
   @media (min-width: 768px) {
     html, body {
       font-size: 20px !important;
+      
+      scrollbar-width: none;
       padding-right: 0px !important; } }
 
+
+
 section {
-  padding: 3rem 1rem; }
+    padding: 0rem 1rem;
+}
 
 
 h1 {
@@ -86,12 +87,14 @@ h2 { text-shadow: 3px 3px 0 var(--color-secondary), 6px 6px 0 var(--color-tertia
     font-family: bungee, sans-serif;
     font-weight: 400;
     text-transform: uppercase;
-    font-size: 50px;
+    font-size: 30px;
     text-align: center;
     margin: 0;
     color: var(--color-primary);
     animation: shadows 1.2s ease-in infinite;
     letter-spacing: 0.4rem;
+    margin-bottom: 12px !important;
+    margin-top: 18px !important;
 }
 
 
@@ -122,7 +125,11 @@ input:focus, textarea:focus, button:focus {
   line-height: 1.6rem; }
   @media (max-width: 768px) {
     .section-description {
-      width: 85%; } }
+      width: 85%; }
+      
+      
+      
+  }
 
 /*------------------------------------------------------------------
 
@@ -1000,8 +1007,13 @@ h2.tips {
   width: 80%;
   margin-bottom: 1.25rem; }
   @media (min-width: 768px) {
-    .store {
-      margin-bottom: 0.25rem; } }
+    /*.store {*/
+    /*  margin-bottom: 0.25rem;*/
+    /*  }*/
+
+    
+    
+      }
   .store .items-container {
     padding: 0 10%;
     text-align: center; }
@@ -4572,5 +4584,102 @@ ul#model-feats {
 
 .ion-xbox:before {
   content: ""; }
+  
+  
+   @media (min-width: 1900px) {
+          h2 {
+       
+        font-size: 50px;
+    
+    }
+    section {
+      padding: 3rem 1rem; }
 
-/*# sourceMappingURL=styles.css.map */
+    .quiz-question {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0px;
+        color: #333;
+        display: block;
+        text-align: center;
+    }
+   }
+    .store {
+        padding-top: 1.5%;
+        width: 100%;
+        margin-bottom: 1.25rem;
+    }
+    
+    
+    
+    
+    .score-item.animaction {
+        background: #d2d0d0;
+        width: 187px;
+        font-family: 'Rocher';
+        margin: auto;
+        border-radius: 11px;
+        font-size: 54px;
+        font-size: 58px;
+    }
+    
+    
+    
+    h2.modal_he {
+    font-size: 41px !important;
+    font-family: unset;
+    letter-spacing: 6.2px;
+}
+    
+    .answer-count {
+        font-size: 27px;
+        font-weight: bold;
+        color: #cc6346;
+        margin-bottom: 7px;
+        display: grid;
+        justify-content: space-evenly;
+        /* border: 1px solid; */
+    }
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  
+
+
+
+
+
+
+
+
+
+
+

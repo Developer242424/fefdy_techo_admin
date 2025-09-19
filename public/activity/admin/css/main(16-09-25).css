@@ -444,15 +444,18 @@
                 cursor: pointer;
                 transition: all 0.3s ease;
                 box-shadow: var(--shadow);
-            }    
+            }     
+            
+               
           }
           
-            #correct-total {
-                color: #ffffff;
-                font-weight: bold;
+          
+          #correct-total {
+              color: green;
+              font-weight: bold;
             }
             
             #total-questions {
-             color: #ffffff;
+              color: #1e90ff;
               font-weight: bold;
             }

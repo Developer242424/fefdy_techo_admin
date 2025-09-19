@@ -25,7 +25,7 @@
     contentType: "application/json",
     data: JSON.stringify(data),
     success: function (res) {
-      if (Array.isArray(res)) { 
+      if (Array.isArray(res)) {
         gameData = res;   
         questionsLoaded = true;
         if (typeof callback === "function") {
@@ -49,8 +49,8 @@
 // Function to dynamically generate content based on the JSON data
     function derangedShuffle(original) {
       let shuffled;
-      let attempts = 0;
-      
+      let attempts = 0;    
+    
       do {
         shuffled = original.slice().sort(() => Math.random() - 0.5);
         attempts++;
@@ -74,7 +74,7 @@
   mainHeading.textContent = gameData[0].question;
 
   const matchingArea = document.getElementById("matching-area");
-  matchingArea.innerHTML = ""; 
+  matchingArea.innerHTML = ""; // Clear any previous content
 
   const leftItems = gameData.slice(1).map((item) => item.is_equal_one);
   const rightItems = derangedShuffle(
@@ -114,32 +114,33 @@
     `;
     row.appendChild(leftColumn);
 
+
     // Right Column
     const rightColumn = document.createElement("div");
     rightColumn.classList.add("col-6", "text-end");
     rightColumn.innerHTML = `
-    <div class="item right d-inline-block dummy" data-id="${getDotId(right)}">
-    <div class="item right d-inline-block image" data-id="${getDotId(right)}">
+    <div class="item right d-inline-block" data-id="${getDotId(right)}">
     <!-- Display text inside <p> tag with class item_right_text if text exists -->
     ${right.text ? `<p class="item_right_text">${right.text}</p>` : ""}
     
     ${
-      right.thumbnail   
+      right.thumbnail
         ? `<img src="/${right.thumbnail}" alt="${right.text}" />`
         : ""
-    }  <!-- Display image if thumbnail exists -->
-    <div class="dot-box">
+    }  <!-- Display image if thumbnail exists -->  
     <div class="dot right" data-id="${getDotId(
       right
-    )}"></div> </div>
-    <!-- Use getDotId() here -->
+    )}"></div>  <!-- Use getDotId() here -->
     <input type="hidden" value="${originalIndex}"/>
     </div>
     `;
-     
+    
+                        
     row.appendChild(rightColumn);
+    
         matchingArea.appendChild(row);
       }
+    
       enableDragAndDrop();
     }
 
@@ -177,7 +178,7 @@
     let hasSpokenAllMatched = false;
     let checkingAnswers = false;
 
-
+    // Create guidance steps from gameData instead of hardcoded array
     let guidanceSteps = [];
     
     function createGuidanceSteps() {
@@ -186,6 +187,7 @@
         label: item.instruction,
       }));
     
+      // Shuffle the guidance steps
       shuffle(guidanceSteps);
     }
     
@@ -254,7 +256,13 @@
       }, speed);
     }
     
-
+    // Mouse hover effect to increase font size
+    document.getElementById("mainHeading").addEventListener("mouseenter", () => {
+      const el = document.getElementById("mainHeading");
+      el.style.transition = "font-size 0.3s ease-in-out";
+      el.style.fontSize = "35px"; // Increased font size on hover
+    });
+    
     document.getElementById("mainHeading").addEventListener("mouseleave", () => {
       const el = document.getElementById("mainHeading");
       el.style.fontSize = ""; // Reset font size on mouse leave
@@ -280,50 +288,43 @@
     
       // Create guidance steps from gameData
       // createGuidanceSteps();
- 
     
       intro.play().catch(() => {
         document.body.addEventListener("click", () => intro.play(), { once: true });
       });
     
-intro.addEventListener("ended", () => {
-  speakText("Are you ready?");
-  setTimeout(() => {
-    document.getElementById("timer-section").classList.add("fade-in");
-
-    setTimeout(() => {
-      // ✅ Hide main heading once game starts
-      document.getElementById("mainHeading").style.display = "none";
-
-      // ✅ Show game area
-      document.getElementById("timer-column").classList.remove("d-none");
-      document.getElementById("check-btn-column").classList.remove("d-none");
-      document.getElementById("matching-area").classList.remove("d-none");
-
-      dragEnabled = true;
-      startTimer();
-      enableHoverSpeak();
-      setDefaultImages();
-      setTimeout(startGuidance, 500);
-      playBackgroundMusic();
-    }, 2000);
-  }, 2000);
-});
-
+      intro.addEventListener("ended", () => {
+        speakText("Are you ready?");
+        setTimeout(() => {
+          document.getElementById("timer-section").classList.add("fade-in");
+          setTimeout(() => {
+            document.getElementById("timer-column").classList.remove("d-none");
+            document.getElementById("check-btn-column").classList.remove("d-none");
+            document.getElementById("matching-area").classList.remove("d-none");
+            dragEnabled = true;
+            startTimer();
+            enableHoverSpeak();
+            setDefaultImages();
+            setTimeout(startGuidance, 500);
+            playBackgroundMusic();
+          }, 2000);
+        }, 2000);
+      });
+    
       document.getElementById("checkBtn").addEventListener("click", checkAnswers);
     });
     
     function enableHoverSpeak() {
       document.querySelectorAll(".item[data-id]").forEach((item) => {
-        item.addEventListener("mouseenter", () => { 
-          const label = item.textContent.trim().split("\n")[0];       
+        item.addEventListener("mouseenter", () => {
+          const label = item.textContent.trim().split("\n")[0];
           item.style.backgroundColor = "#d6eaff";
           stopTypingAndShowFullText("instruction-text");
           speakText(label);
-        });     
-        item.addEventListener("mouseleave", () => {   
-          const isRight = item.classList.contains("right");   
-          item.style.backgroundColor = isRight ? "#e0fff5" : "#fffbe0";   
+        });
+        item.addEventListener("mouseleave", () => {
+          const isRight = item.classList.contains("right");
+          item.style.backgroundColor = isRight ? "#e0fff5" : "#fffbe0";
         });
       });
     
@@ -338,14 +339,10 @@ intro.addEventListener("ended", () => {
           instructionBox.dataset.fulltext || instructionBox.textContent.trim();
         if (typingInProgress) {
           stopTypingAndShowFullText("instruction-text");
-        }else if (text) {
-    // Display the text immediately
-    const instructionEl = document.getElementById("instruction-text");
-    instructionEl.textContent = text; // No typing animation
-
-    // Speak the text
-    speakTextWithBackgroundControl(text);
-}
+        } else if (text) {
+          typeHeadingText(text, "instruction-text", 50);
+          speakTextWithBackgroundControl(text);
+        }
       });
     }
     
@@ -383,17 +380,21 @@ intro.addEventListener("ended", () => {
     
     function nextAnswer() {
       if (checkingAnswers) return;
+    
       if (currentStep < guidanceSteps.length) {
         setTimeout(startGuidance, 1000);
       } else if (!hasSpokenAllMatched) {
         const msg = "All items matched! Click 'Check Answers' to finish.";
         hasSpokenAllMatched = true;
+    
         const box = document.getElementById("instruction-text");
         box.style.opacity = 0;
+    
         setTimeout(() => {
           typeHeadingText(msg, "instruction-text", 50, () => speakText(msg));
           box.style.opacity = 1;
         }, 100);
+    
         document.getElementById("checkBtn").disabled = false;
       }
     }
@@ -407,7 +408,7 @@ intro.addEventListener("ended", () => {
       }, 1000);
     }
     
-    function startGuidance() { 
+    function startGuidance() {
       if (currentStep >= guidanceSteps.length) return;
       const step = guidanceSteps[currentStep];
       const box = document.getElementById("instruction-text");
@@ -420,10 +421,6 @@ intro.addEventListener("ended", () => {
       }, 100);
     }
     
-    
-    
-    
-
     function resizeCanvas() {
       const canvas = document.getElementById("canvas");
       canvas.width = window.innerWidth;
@@ -443,7 +440,7 @@ intro.addEventListener("ended", () => {
       };
     }
     
-  function enableDragAndDrop() {
+    function enableDragAndDrop() {
   let isDragging = false;
 
   function handleStart(e, dot) {
@@ -591,13 +588,13 @@ intro.addEventListener("ended", () => {
     
       if (tempLine) {
         drawLine(tempLine.start, tempLine.end, "black");
-      }    
+      }
     }
     
     function drawLine(start, end, color = "black") {
       if (!start || !end) return;
     
-      const dx = end.x - start.x;    
+      const dx = end.x - start.x;
       const canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
     
@@ -669,29 +666,31 @@ function checkAnswers() {
 
   // ⭐ Total questions = number of pairs
   const totalQuestions = Math.max(gameData.length - 1, 0);
-    
-    // ✅ Update scoreText with HTML instead of \n
-    document.getElementById("scoreText").innerHTML = `
-    <div class="score-item">⭐ Total Correct: <br><span class="score">${correctCount} / ${totalQuestions}</span></div>
-     
-   <div class="score-item">Total Time Taken : <span>${minutes}:${seconds}</span></div>
-    `;
-    
-      setTimeout(() => {
-        document.getElementById("resultPopup").style.display = "flex";
-        document.body.classList.add("modal-open");
-    
-        if (correctCount > 0) {
-          resultAudio.play().catch(() => {});
-          const percentage = Math.floor((correctCount / totalQuestions) * 100);
-          const particleCount = Math.max(Math.floor(percentage), 25);
-          triggerConfettiParticles(particleCount);
-        } else {
-          speakText("Oops! You need to learn more.");
-        }
-      }, 500);
-    }
 
+  // ✅ Update the one element "scoreText" with all lines
+  document.getElementById("scoreText").innerText =
+    `⭐ Total Correct: ${correctCount} / ${totalQuestions}\n` +
+    `✅ Correct Answers: ${correctCount}\n` +
+    `❌ Wrong Answers: ${wrongCount}\n` +
+    `⏳ Time Taken: ${minutes}:${seconds}`;
+
+  setTimeout(() => {
+    document.getElementById("resultPopup").style.display = "flex";
+    document.body.classList.add("modal-open");
+
+    if (correctCount > 0) {
+      resultAudio.play().catch(() => {});
+      const percentage = Math.floor((correctCount / totalQuestions) * 100);
+      const particleCount = Math.max(Math.floor(percentage), 25);
+      triggerConfettiParticles(particleCount);
+    } else {
+      speakText("Oops! You need to learn more.");
+    }
+  }, 500);
+}
+
+    
+    
     function triggerConfettiParticles(particleCount) {
       const confettiCanvas = document.getElementById("confetti-canvas");
       const myConfetti = confetti.create(confettiCanvas, {
@@ -777,7 +776,6 @@ function checkAnswers() {
         totalTime: secondsElapsed,
         questionIds,
       };
-      
       $.ajax({
         url: "/admin/activity/questions/history",
         method: "POST",
@@ -796,12 +794,12 @@ function checkAnswers() {
           if (xhr.responseJSON && xhr.responseJSON.message) {
             errorMessage = xhr.responseJSON.message;
           }
-          console.warn("⚠️", errorMessage);       
+          console.warn("⚠️", errorMessage);
         },
       });
     }
     
     
     
-   
+    
     

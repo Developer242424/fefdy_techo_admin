@@ -64,6 +64,7 @@ Tertiary Font: "Changa", Verdana, sans-serif;
 html, body {
   color: #383838;
   font-size: 18px;
+  background-color: #79f1f2;
   font-family: "Changa", Verdana, sans-serif;
   font-weight: 300;
   text-rendering: optimizeLegibility; }

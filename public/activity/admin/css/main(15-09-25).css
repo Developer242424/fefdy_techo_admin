@@ -399,7 +399,7 @@
               }
               
               .option-image {
-                  height: 100px;
+                  height: 200px;
               }
           }
           
@@ -444,15 +444,12 @@
                 cursor: pointer;
                 transition: all 0.3s ease;
                 box-shadow: var(--shadow);
-            }    
-          }
-          
-            #correct-total {
-                color: #ffffff;
-                font-weight: bold;
-            }
+            }     
             
-            #total-questions {
-             color: #ffffff;
-              font-weight: bold;
-            }
+            
+            
+            
+          
+               
+               
+          }

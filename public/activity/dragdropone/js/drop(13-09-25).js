@@ -110,24 +110,17 @@ function initializeGame() {
       img.style.cursor = "grab";
       img.classList.add("draggable-item");
 
-img.addEventListener("dragstart", (e) => {
-  e.dataTransfer.setData("text/plain", img.src);
-  e.dataTransfer.setData("category", img.dataset.category);
+      img.addEventListener("dragstart", (e) => {
+        e.dataTransfer.setData("text/plain", img.src);
+        e.dataTransfer.setData("category", img.dataset.category);
         const dragSound = document.getElementById("dragSound");
         if (dragSound) {
           dragSound.currentTime = 0;
           dragSound.play().catch(() => {});
         }
       });
-      
-      img.addEventListener("touchstart", (e) => {
-  const touch = e.touches[0];
-  img.dataset.dragging = "true";
-  img.dataset.startX = touch.clientX;
-  img.dataset.startY = touch.clientY;
-});
-     
-     img.addEventListener("dragend", checkEmpty);
+
+      img.addEventListener("dragend", checkEmpty);
 
       imageList.appendChild(img);
     });
@@ -335,7 +328,7 @@ img.addEventListener("dragstart", (e) => {
 
   // === Confetti scoring ===
   const scoreConfettiMap = [
-    { particles: 0, message: "Oops! You need to learn more." }, 
+    { particles: 0, message: "Oops! You need to learn more." },
     { particles: 2, message: "You can do better!" },
     { particles: 4, message: "Keep going!" },
     { particles: 6, message: "Good effort!" },
@@ -407,43 +400,6 @@ img.addEventListener("dragstart", (e) => {
       });
     });
   }
-  
-  
-  document.addEventListener("touchend", (e) => {
-  const dragging = document.querySelector("img[data-dragging='true']");
-  if (!dragging) return;
-
-  dragging.removeAttribute("data-dragging");
-  dragging.style.position = "";
-  dragging.style.left = "";
-  dragging.style.top = "";
-  dragging.style.zIndex = "";
-
-  const touch = e.changedTouches[0];
-  const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
-
-  if (dropTarget && dropTarget.classList.contains("drop-box")) {
-    const newImg = dragging.cloneNode(true);
-    newImg.style.position = "";
-    newImg.style.zIndex = "";
-    newImg.setAttribute("draggable", "true");
-
-    dropTarget.appendChild(newImg);
-    dragging.remove(); // remove original from source
-  }
-});
-
-document.addEventListener("touchmove", (e) => {
-  const dragging = document.querySelector("img[data-dragging='true']");
-  if (!dragging) return;
-
-  const touch = e.touches[0];
-  dragging.style.position = "fixed";
-  dragging.style.left = touch.clientX - 40 + "px"; // offset for finger
-  dragging.style.top = touch.clientY - 40 + "px";
-  dragging.style.zIndex = 9999;
-});
-
 
   // Complete Test function
   function completeTest() {
@@ -511,5 +467,3 @@ function restartGame() {
   };
   window.location.href = `/admin/drag-drop/home?sid=${sid}&tid=${tid}&lid=${lid}&stid=${stid}&qid=${qid}&ust=${ust}`;
 }
-
-
