@@ -1,8 +1,8 @@
 // Your JSON data structure
-  let gameData = [];
-  let questionsLoaded = false;
-  let questionIds = "";
-  function fetchQuestions(callback) {
+let gameData = [];
+let questionsLoaded = false;
+let questionIds = "";
+function fetchQuestions(callback) {
   const params = new URLSearchParams(window.location.search);
   const sid = params.get("sid");
   const tid = params.get("tid");
@@ -25,8 +25,8 @@
     contentType: "application/json",
     data: JSON.stringify(data),
     success: function (res) {
-      if (Array.isArray(res)) { 
-        gameData = res;   
+      if (Array.isArray(res)) {
+        gameData = res;
         questionsLoaded = true;
         if (typeof callback === "function") {
           callback();
@@ -44,37 +44,37 @@
       console.warn("⚠️", errorMessage);
     },
   });
-}     
+}
 
 // Function to dynamically generate content based on the JSON data
-    function derangedShuffle(original) {
-      let shuffled;
-      let attempts = 0;
-      
-      do {
-        shuffled = original.slice().sort(() => Math.random() - 0.5);
-        attempts++;
-      } while (
-        shuffled.some((item, i) => item.text === original[i].text) &&
-        attempts < 100
-      );
-      
-      return shuffled;
-    }
-    
-    // Utility function to get the dot ID (either text or thumbnail)
-    function getDotId(item) {
-      return item.text || item.thumbnail;
-    }
-    
+function derangedShuffle(original) {
+  let shuffled;
+  let attempts = 0;
+
+  do {
+    shuffled = original.slice().sort(() => Math.random() - 0.5);
+    attempts++;
+  } while (
+    shuffled.some((item, i) => item.text === original[i].text) &&
+    attempts < 100
+  );
+
+  return shuffled;
+}
+
+// Utility function to get the dot ID (either text or thumbnail)
+function getDotId(item) {
+  return item.text || item.thumbnail;
+}
+
 // Function to dynamically generate content based on the JSON data
-  function generateContent() {
+function generateContent() {
   const questionContainer = document.getElementById("question-container");
   const mainHeading = document.getElementById("mainHeading");
   mainHeading.textContent = gameData[0].question;
 
   const matchingArea = document.getElementById("matching-area");
-  matchingArea.innerHTML = ""; 
+  matchingArea.innerHTML = "";
 
   const leftItems = gameData.slice(1).map((item) => item.is_equal_one);
   const rightItems = derangedShuffle(
@@ -92,7 +92,7 @@
     const originalIndex = leftItems.findIndex(
       (item) => JSON.stringify(item) === JSON.stringify(right)
     );
-     
+
     // Left Column
     const leftColumn = document.createElement("div");
     leftColumn.classList.add("col-6");
@@ -124,326 +124,316 @@
     ${right.text ? `<p class="item_right_text">${right.text}</p>` : ""}
     
     ${
-      right.thumbnail   
+      right.thumbnail
         ? `<img src="/${right.thumbnail}" alt="${right.text}" />`
         : ""
     }  <!-- Display image if thumbnail exists -->
     <div class="dot-box">
-    <div class="dot right" data-id="${getDotId(
-      right
-    )}"></div> </div>
+    <div class="dot right" data-id="${getDotId(right)}"></div> </div>
     <!-- Use getDotId() here -->
     <input type="hidden" value="${originalIndex}"/>
     </div>
     `;
-     
+
     row.appendChild(rightColumn);
-        matchingArea.appendChild(row);
-      }
-      enableDragAndDrop();
-    }
+    matchingArea.appendChild(row);
+  }
+  enableDragAndDrop();
+}
 
+// Call the function to generate content
+window.onload = () => {
+  fetchQuestions(() => {
+    generateContent();
+    createGuidanceSteps();
+  });
+};
 
-    // Call the function to generate content
-    window.onload = () => {
-      fetchQuestions(() => {
-        generateContent();
-        createGuidanceSteps();
-      });
-    };
-    
-    const canvas = document.getElementById("canvas");
-    canvas.style.marginLeft = "22px";
-    canvas.style.marginTop = "10px";
-    
-    const ctx = canvas.getContext("2d");
-    
-    const dragAudio = document.getElementById("dragAudio");
-    const dropAudio = document.getElementById("dropAudio");
-    const correctAudio = document.getElementById("correctAudio");
-    const wrongAudio = document.getElementById("wrongAudio");
-    const resultAudio = document.getElementById("resultAudio");
-    const backgroundAudio = document.getElementById("backgorundAudio");
-    backgroundAudio.loop = true;
-    backgroundAudio.volume = 0.5;
-    
-    let startDot = null;
-    let tempLine = null;
-    let lines = [];
-    let secondsElapsed = 0;
-    let timerInterval;
-    let currentStep = 0;
-    let dragEnabled = false;
-    let hasSpokenAllMatched = false;
-    let checkingAnswers = false;
+const canvas = document.getElementById("canvas");
+canvas.style.marginLeft = "22px";
+canvas.style.marginTop = "10px";
 
+const ctx = canvas.getContext("2d");
 
-    let guidanceSteps = [];
-    
-    function createGuidanceSteps() {
-      guidanceSteps = gameData.slice(1).map((item) => ({
-        id: item.is_equal_one.text,
-        label: item.instruction,
-      }));
-    
-      shuffle(guidanceSteps);
-    }
-    
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-    }
-    
-    let typeHeadingInterval = null;
-    let typingInProgress = false;
-    
-    function playBackgroundMusic() {
-      backgroundAudio.play().catch(console.error);
-    }
-    
-    function controlBackgroundMusicVolume(level) {
-      backgroundAudio.volume = level;
-    }
-    
-    function speakTextWithBackgroundControl(text) {
-      if (!window.speechSynthesis) return;
-      speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "en-US";
-      controlBackgroundMusicVolume(0.2);
-      speechSynthesis.speak(utterance);
-      utterance.onend = () => controlBackgroundMusicVolume(1.0);
-    }
-    
-    function speakText(text) {
-      if (!window.speechSynthesis) return;
-      speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "en-US";
-      speechSynthesis.speak(utterance);
-    }
-    
-    // Modified typeHeadingText function
-    // Modified typeHeadingText function
-    function typeHeadingText(text, elementId, speed = 50, onComplete = null) {
-      const el = document.getElementById(elementId);
-      if (!el) return;
-    
-      // Ensure that the element is visible when starting the animation
-      el.style.visibility = "visible"; // Make sure it is visible
-    
+const dragAudio = document.getElementById("dragAudio");
+const dropAudio = document.getElementById("dropAudio");
+const correctAudio = document.getElementById("correctAudio");
+const wrongAudio = document.getElementById("wrongAudio");
+const resultAudio = document.getElementById("resultAudio");
+const backgroundAudio = document.getElementById("backgorundAudio");
+backgroundAudio.loop = true;
+backgroundAudio.volume = 0.5;
+
+let startDot = null;
+let tempLine = null;
+let lines = [];
+let secondsElapsed = 0;
+let timerInterval;
+let currentStep = 0;
+let dragEnabled = false;
+let hasSpokenAllMatched = false;
+let checkingAnswers = false;
+
+let guidanceSteps = [];
+
+function createGuidanceSteps() {
+  guidanceSteps = gameData.slice(1).map((item) => ({
+    id: item.is_equal_one.text,
+    label: item.instruction,
+  }));
+
+  shuffle(guidanceSteps);
+}
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+let typeHeadingInterval = null;
+let typingInProgress = false;
+
+function playBackgroundMusic() {
+  backgroundAudio.play().catch(console.error);
+}
+
+function controlBackgroundMusicVolume(level) {
+  backgroundAudio.volume = level;
+}
+
+function speakTextWithBackgroundControl(text) {
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "en-US";
+  controlBackgroundMusicVolume(0.2);
+  speechSynthesis.speak(utterance);
+  utterance.onend = () => controlBackgroundMusicVolume(1.0);
+}
+
+function speakText(text) {
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "en-US";
+  speechSynthesis.speak(utterance);
+}
+
+// Modified typeHeadingText function
+// Modified typeHeadingText function
+function typeHeadingText(text, elementId, speed = 50, onComplete = null) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+
+  // Ensure that the element is visible when starting the animation
+  el.style.visibility = "visible"; // Make sure it is visible
+
+  clearInterval(typeHeadingInterval);
+  typingInProgress = true;
+  el.dataset.fulltext = text;
+  el.textContent = ""; // Start fresh with no text
+  let i = 0;
+
+  // Start typing animation
+  typeHeadingInterval = setInterval(() => {
+    if (i < text.length) {
+      el.textContent += text.charAt(i++);
+    } else {
       clearInterval(typeHeadingInterval);
-      typingInProgress = true;
-      el.dataset.fulltext = text;
-      el.textContent = ""; // Start fresh with no text
-      let i = 0;
-    
-      // Start typing animation
-      typeHeadingInterval = setInterval(() => {
-        if (i < text.length) {
-          el.textContent += text.charAt(i++);
-        } else {
-          clearInterval(typeHeadingInterval);
-          el.style.borderRight = "none";
-          typingInProgress = false;
-          // Trigger onComplete callback after typing finishes
-          if (onComplete) setTimeout(onComplete, 300);
-        }
-      }, speed);
-    }
-    
-
-    document.getElementById("mainHeading").addEventListener("mouseleave", () => {
-      const el = document.getElementById("mainHeading");
-      el.style.fontSize = ""; // Reset font size on mouse leave
-    });
-    
-    function stopTypingAndShowFullText(elementId) {
-      const el = document.getElementById(elementId);
-      if (!el) return;
-    
-      clearInterval(typeHeadingInterval);
-      typingInProgress = false;
-    
-      const fullText = el.dataset.fulltext || "";
-      el.textContent = fullText;
       el.style.borderRight = "none";
+      typingInProgress = false;
+      // Trigger onComplete callback after typing finishes
+      if (onComplete) setTimeout(onComplete, 300);
     }
-    
-    window.addEventListener("load", () => {
-      const intro = document.getElementById("introAudio");
-      intro.muted = false;
-      document.getElementById("mainHeading").style.visibility = "hidden";
-      document.getElementById("timer-section").classList.remove("d-none");
-    
-      // Create guidance steps from gameData
-      // createGuidanceSteps();
- 
-    
-      intro.play().catch(() => {
-        document.body.addEventListener("click", () => intro.play(), { once: true });
-      });
-    
-intro.addEventListener("ended", () => {
-  speakText("Are you ready?");
-  setTimeout(() => {
-    document.getElementById("timer-section").classList.add("fade-in");
+  }, speed);
+}
 
-    setTimeout(() => {
-      // ✅ Hide main heading once game starts
-      document.getElementById("mainHeading").style.display = "none";
-
-      // ✅ Show game area
-      document.getElementById("timer-column").classList.remove("d-none");
-      document.getElementById("check-btn-column").classList.remove("d-none");
-      document.getElementById("matching-area").classList.remove("d-none");
-
-      dragEnabled = true;
-      startTimer();
-      enableHoverSpeak();
-      setDefaultImages();
-      setTimeout(startGuidance, 500);
-      playBackgroundMusic();
-    }, 2000);
-  }, 2000);
+document.getElementById("mainHeading").addEventListener("mouseleave", () => {
+  const el = document.getElementById("mainHeading");
+  el.style.fontSize = ""; // Reset font size on mouse leave
 });
 
-      document.getElementById("checkBtn").addEventListener("click", checkAnswers);
-    });
-    
-    function enableHoverSpeak() {
-      document.querySelectorAll(".item[data-id]").forEach((item) => {
-        item.addEventListener("mouseenter", () => { 
-          const label = item.textContent.trim().split("\n")[0];       
-          item.style.backgroundColor = "#d6eaff";
-          stopTypingAndShowFullText("instruction-text");
-          speakText(label);
-        });     
-        item.addEventListener("mouseleave", () => {   
-          const isRight = item.classList.contains("right");   
-          item.style.backgroundColor = isRight ? "#e0fff5" : "#fffbe0";   
-        });
-      });
-    
-      const mainHeading = document.getElementById("mainHeading");
-      mainHeading.addEventListener("mouseenter", () => {
-        const text = mainHeading.dataset.fulltext || mainHeading.textContent.trim();
-      });
-    
-      const instructionBox = document.getElementById("instruction-text");
-      instructionBox.addEventListener("mouseenter", () => {
-        const text =
-          instructionBox.dataset.fulltext || instructionBox.textContent.trim();
-        if (typingInProgress) {
-          stopTypingAndShowFullText("instruction-text");
-        }else if (text) {
-    // Display the text immediately
-    const instructionEl = document.getElementById("instruction-text");
-    instructionEl.textContent = text; // No typing animation
+function stopTypingAndShowFullText(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
 
-    // Speak the text
-    speakTextWithBackgroundControl(text);
+  clearInterval(typeHeadingInterval);
+  typingInProgress = false;
+
+  const fullText = el.dataset.fulltext || "";
+  el.textContent = fullText;
+  el.style.borderRight = "none";
 }
-      });
-    }
-    
-    function setDefaultImages() {
-      const boyImg = document.querySelector('img[alt="Left Side Image"]');
-      const girlImg = document.querySelector('img[alt="Right Side Image"]');
-      if (boyImg) boyImg.src = "/activity/matchup/images/boy-2.png";
-      if (girlImg) girlImg.src = "/activity/matchup/images/girl-2.png";
-    }
-    
-    function changeImages(isCorrect = false) {
-      const boyImage = document.querySelector('img[alt="Left Side Image"]');
-      const girlImage = document.querySelector('img[alt="Right Side Image"]');
-      if (!boyImage || !girlImage) return;
-    
-      const newBoyImage = isCorrect
-        ? "/activity/matchup/images/boy-4.png"
-        : "/activity/matchup/images/boy-3.png";
-      const newGirlImage = isCorrect
-        ? "/activity/matchup/images/girl-4.png"
-        : "/activity/matchup/images/girl-3.png";
-      const boyImg = new Image();
-      const girlImg = new Image();
-    
-      boyImg.onload = () => {
-        boyImage.src = boyImg.src;
-        girlImg.onload = () => {
-          girlImage.src = girlImg.src;
-          setTimeout(() => nextAnswer(), 1000);
-        };
-        girlImg.src = newGirlImage;
-      };
-      boyImg.src = newBoyImage;
-    }
-    
-    function nextAnswer() {
-      if (checkingAnswers) return;
-      if (currentStep < guidanceSteps.length) {
-        setTimeout(startGuidance, 1000);
-      } else if (!hasSpokenAllMatched) {
-        const msg = "All items matched! Click 'Check Answers' to finish.";
-        hasSpokenAllMatched = true;
-        const box = document.getElementById("instruction-text");
-        box.style.opacity = 0;
-        setTimeout(() => {
-          typeHeadingText(msg, "instruction-text", 50, () => speakText(msg));
-          box.style.opacity = 1;
-        }, 100);
-        document.getElementById("checkBtn").disabled = false;
-      }
-    }
-    
-    function startTimer() {
-      timerInterval = setInterval(() => {
-        secondsElapsed++;
-        const min = String(Math.floor(secondsElapsed / 60)).padStart(2, "0");
-        const sec = String(secondsElapsed % 60).padStart(2, "0");
-        document.getElementById("timer-count").textContent = ` ${min}:${sec}`;
-      }, 1000);
-    }
-    
-    function startGuidance() { 
-      if (currentStep >= guidanceSteps.length) return;
-      const step = guidanceSteps[currentStep];
-      const box = document.getElementById("instruction-text");
-      box.style.opacity = 0;
-      setTimeout(() => {
-        typeHeadingText(step.label, "instruction-text", 50, () => {
-          speakText(step.label);
-        });
-        box.style.opacity = 1;
-      }, 100);
-    }
-    
-    
-    
-    
 
-    function resizeCanvas() {
-      const canvas = document.getElementById("canvas");
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      drawLines(); // Redraw lines when resizing
+window.addEventListener("load", () => {
+  const intro = document.getElementById("introAudio");
+  intro.muted = false;
+  document.getElementById("mainHeading").style.visibility = "hidden";
+  document.getElementById("timer-section").classList.remove("d-none");
+
+  // Create guidance steps from gameData
+  // createGuidanceSteps();
+
+  intro.play().catch(() => {
+    document.body.addEventListener("click", () => intro.play(), { once: true });
+  });
+
+  intro.addEventListener("ended", () => {
+    speakText("Are you ready?");
+    setTimeout(() => {
+      document.getElementById("timer-section").classList.add("fade-in");
+
+      setTimeout(() => {
+        // ✅ Hide main heading once game starts
+        document.getElementById("mainHeading").style.display = "none";
+
+        // ✅ Show game area
+        document.getElementById("timer-column").classList.remove("d-none");
+        document.getElementById("check-btn-column").classList.remove("d-none");
+        document.getElementById("matching-area").classList.remove("d-none");
+
+        dragEnabled = true;
+        startTimer();
+        enableHoverSpeak();
+        setDefaultImages();
+        setTimeout(startGuidance, 500);
+        playBackgroundMusic();
+      }, 2000);
+    }, 2000);
+  });
+
+  document.getElementById("checkBtn").addEventListener("click", checkAnswers);
+});
+
+function enableHoverSpeak() {
+  document.querySelectorAll(".item[data-id]").forEach((item) => {
+    item.addEventListener("mouseenter", () => {
+      const label = item.textContent.trim().split("\n")[0];
+      item.style.backgroundColor = "#d6eaff";
+      stopTypingAndShowFullText("instruction-text");
+      speakText(label);
+    });
+    item.addEventListener("mouseleave", () => {
+      const isRight = item.classList.contains("right");
+      item.style.backgroundColor = isRight ? "#e0fff5" : "#fffbe0";
+    });
+  });
+
+  const mainHeading = document.getElementById("mainHeading");
+  mainHeading.addEventListener("mouseenter", () => {
+    const text = mainHeading.dataset.fulltext || mainHeading.textContent.trim();
+  });
+
+  const instructionBox = document.getElementById("instruction-text");
+  instructionBox.addEventListener("mouseenter", () => {
+    const text =
+      instructionBox.dataset.fulltext || instructionBox.textContent.trim();
+    if (typingInProgress) {
+      stopTypingAndShowFullText("instruction-text");
+    } else if (text) {
+      // Display the text immediately
+      const instructionEl = document.getElementById("instruction-text");
+      instructionEl.textContent = text; // No typing animation
+
+      // Speak the text
+      speakTextWithBackgroundControl(text);
     }
-    
-    window.addEventListener("resize", resizeCanvas);
-    window.addEventListener("scroll", drawLines); // Redraw lines on scroll
-    resizeCanvas(); // Initial call to set canvas size
-    
-    function getAbsolutePosition(dot) {
-      const rect = dot.getBoundingClientRect();
-      return {
-        x: rect.left + window.scrollX, // Account for horizontal scrolling
-        y: rect.top + window.scrollY, // Account for vertical scrolling
-      };
-    }
-    
-  function enableDragAndDrop() {
+  });
+}
+
+function setDefaultImages() {
+  const boyImg = document.querySelector('img[alt="Left Side Image"]');
+  const girlImg = document.querySelector('img[alt="Right Side Image"]');
+  if (boyImg) boyImg.src = "/activity/matchup/images/boy-2.png";
+  if (girlImg) girlImg.src = "/activity/matchup/images/girl-2.png";
+}
+
+function changeImages(isCorrect = false) {
+  const boyImage = document.querySelector('img[alt="Left Side Image"]');
+  const girlImage = document.querySelector('img[alt="Right Side Image"]');
+  if (!boyImage || !girlImage) return;
+
+  const newBoyImage = isCorrect
+    ? "/activity/matchup/images/boy-4.png"
+    : "/activity/matchup/images/boy-3.png";
+  const newGirlImage = isCorrect
+    ? "/activity/matchup/images/girl-4.png"
+    : "/activity/matchup/images/girl-3.png";
+  const boyImg = new Image();
+  const girlImg = new Image();
+
+  boyImg.onload = () => {
+    boyImage.src = boyImg.src;
+    girlImg.onload = () => {
+      girlImage.src = girlImg.src;
+      setTimeout(() => nextAnswer(), 1000);
+    };
+    girlImg.src = newGirlImage;
+  };
+  boyImg.src = newBoyImage;
+}
+
+function nextAnswer() {
+  if (checkingAnswers) return;
+  if (currentStep < guidanceSteps.length) {
+    setTimeout(startGuidance, 1000);
+  } else if (!hasSpokenAllMatched) {
+    const msg = "All items matched! Click 'Check Answers' to finish.";
+    hasSpokenAllMatched = true;
+    const box = document.getElementById("instruction-text");
+    box.style.opacity = 0;
+    setTimeout(() => {
+      typeHeadingText(msg, "instruction-text", 50, () => speakText(msg));
+      box.style.opacity = 1;
+    }, 100);
+    document.getElementById("checkBtn").disabled = false;
+  }
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    secondsElapsed++;
+    const min = String(Math.floor(secondsElapsed / 60)).padStart(2, "0");
+    const sec = String(secondsElapsed % 60).padStart(2, "0");
+    document.getElementById("timer-count").textContent = ` ${min}:${sec}`;
+  }, 1000);
+}
+
+function startGuidance() {
+  if (currentStep >= guidanceSteps.length) return;
+  const step = guidanceSteps[currentStep];
+  const box = document.getElementById("instruction-text");
+  box.style.opacity = 0;
+  setTimeout(() => {
+    typeHeadingText(step.label, "instruction-text", 50, () => {
+      speakText(step.label);
+    });
+    box.style.opacity = 1;
+  }, 100);
+}
+
+function resizeCanvas() {
+  const canvas = document.getElementById("canvas");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  drawLines(); // Redraw lines when resizing
+}
+
+window.addEventListener("resize", resizeCanvas);
+window.addEventListener("scroll", drawLines); // Redraw lines on scroll
+resizeCanvas(); // Initial call to set canvas size
+
+function getAbsolutePosition(dot) {
+  const rect = dot.getBoundingClientRect();
+  return {
+    x: rect.left + window.scrollX, // Account for horizontal scrolling
+    y: rect.top + window.scrollY, // Account for vertical scrolling
+  };
+}
+
+function enableDragAndDrop() {
   let isDragging = false;
 
   function handleStart(e, dot) {
@@ -524,6 +514,37 @@ intro.addEventListener("ended", () => {
       const currentInstruction =
         currentStep < guidanceSteps.length ? guidanceSteps[currentStep] : null;
 
+      const currentInstruction123 = $("#instruction-text").text();
+      // Find matching item in gameData (skip index 0 since it's metadata)
+      const gameItem123 = gameData
+        .slice(1)
+        .find((item) => item.instruction === currentInstruction.label);
+      //   console.log("Instruction text:", currentInstruction.label);
+      //   console.log("Matched gameItem:", gameItem123);
+      if (gameItem123) {
+        const left_item = startDot.id;
+        const right_item = matchedRightDot.id;
+        // console.log("User:", left_item, right_item);
+        let is_correct = -1;
+        if (
+          (left_item === gameItem123.is_equal_one.text ||
+            left_item === gameItem123.is_equal_one.thumbnail) &&
+          (right_item === gameItem123.is_equal_two.text ||
+            right_item === gameItem123.is_equal_two.thumbnail)
+        ) {
+          //   console.log("✅ Correct Match!");
+          is_correct = 0;
+        } else {
+          //   console.log("❌ Incorrect Match!");
+          is_correct = 1;
+        }
+        storeSeparateEntries(
+          currentInstruction.label,
+          $("#timer-count").text(),
+          is_correct
+        );
+      }
+
       lines.push({
         start: startDot.pos,
         end: matchedRightDot.pos,
@@ -571,57 +592,57 @@ intro.addEventListener("ended", () => {
   document.addEventListener("touchend", handleEnd, { passive: false });
 }
 
+function drawLines() {
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
 
-    function drawLines() {
-      const canvas = document.getElementById("canvas");
-      const ctx = canvas.getContext("2d");
-    
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-      // Map to ensure only one match per instruction is checked
-    const seenInstructions = new Set();
-    lines.forEach((line) => {
-      if (!line.instruction || seenInstructions.has(line.instruction.label)) return;
-      seenInstructions.add(line.instruction.label);
-    
-        const color =
-          line.correct === null ? "black" : line.correct ? "green" : "red";
-        drawLine(line.start, line.end, color);
-      });
-    
-      if (tempLine) {
-        drawLine(tempLine.start, tempLine.end, "black");
-      }    
-    }
-    
-    function drawLine(start, end, color = "black") {
-      if (!start || !end) return;
-    
-      const dx = end.x - start.x;    
-      const canvas = document.getElementById("canvas");
-      const ctx = canvas.getContext("2d");
-    
-      ctx.beginPath();
-      ctx.moveTo(start.x, start.y);
-      ctx.bezierCurveTo(
-        start.x + dx * 0.5,
-        start.y,
-        start.x + dx * 0.5,
-        end.y,
-        end.x,
-        end.y
-      );
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 6;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.stroke();
-    }
-    
-    // FIXED: Check answers based on the instruction each match was made for
-    let correctCount = 0;
-    let wrongCount = 0;
-    
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Map to ensure only one match per instruction is checked
+  const seenInstructions = new Set();
+  lines.forEach((line) => {
+    if (!line.instruction || seenInstructions.has(line.instruction.label))
+      return;
+    seenInstructions.add(line.instruction.label);
+
+    const color =
+      line.correct === null ? "black" : line.correct ? "green" : "red";
+    drawLine(line.start, line.end, color);
+  });
+
+  if (tempLine) {
+    drawLine(tempLine.start, tempLine.end, "black");
+  }
+}
+
+function drawLine(start, end, color = "black") {
+  if (!start || !end) return;
+
+  const dx = end.x - start.x;
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  ctx.beginPath();
+  ctx.moveTo(start.x, start.y);
+  ctx.bezierCurveTo(
+    start.x + dx * 0.5,
+    start.y,
+    start.x + dx * 0.5,
+    end.y,
+    end.x,
+    end.y
+  );
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 6;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.stroke();
+}
+
+// FIXED: Check answers based on the instruction each match was made for
+let correctCount = 0;
+let wrongCount = 0;
+
 function checkAnswers() {
   checkingAnswers = true;
   speechSynthesis.cancel();
@@ -636,7 +657,8 @@ function checkAnswers() {
     let isCorrect = false;
 
     // Only check one line per instruction
-    if (!line.instruction || seenInstructions.has(line.instruction.label)) return;
+    if (!line.instruction || seenInstructions.has(line.instruction.label))
+      return;
     seenInstructions.add(line.instruction.label);
 
     const gameItem = gameData
@@ -650,7 +672,7 @@ function checkAnswers() {
       const correctLeft = getDotId(gameItem.is_equal_one);
       const correctRight = getDotId(gameItem.is_equal_two);
 
-      isCorrect = (left === correctLeft && right === correctRight);
+      isCorrect = left === correctLeft && right === correctRight;
     }
 
     line.correct = isCorrect;
@@ -669,139 +691,186 @@ function checkAnswers() {
 
   // ⭐ Total questions = number of pairs
   const totalQuestions = Math.max(gameData.length - 1, 0);
-    
-    // ✅ Update scoreText with HTML instead of \n
-    document.getElementById("scoreText").innerHTML = `
+
+  // ✅ Update scoreText with HTML instead of \n
+  document.getElementById("scoreText").innerHTML = `
     <div class="score-item">⭐ Total Correct: <br><span class="score">${correctCount} / ${totalQuestions}</span></div>
      
    <div class="score-item">Total Time Taken : <span>${minutes}:${seconds}</span></div>
     `;
-    
-      setTimeout(() => {
-        document.getElementById("resultPopup").style.display = "flex";
-        document.body.classList.add("modal-open");
-    
-        if (correctCount > 0) {
-          resultAudio.play().catch(() => {});
-          const percentage = Math.floor((correctCount / totalQuestions) * 100);
-          const particleCount = Math.max(Math.floor(percentage), 25);
-          triggerConfettiParticles(particleCount);
-        } else {
-          speakText("Oops! You need to learn more.");
-        }
-      }, 500);
-    }
 
-    function triggerConfettiParticles(particleCount) {
-      const confettiCanvas = document.getElementById("confetti-canvas");
-      const myConfetti = confetti.create(confettiCanvas, {
-        resize: true,
-        useWorker: true,
-      });
-      const duration = 400;
-      const end = Date.now() + duration;
-    
-      (function frame() {
-        myConfetti({ particleCount, angle: 60, spread: 55, origin: { x: 0 } });
-        myConfetti({ particleCount, angle: 120, spread: 55, origin: { x: 1 } });
-        if (Date.now() < end) requestAnimationFrame(frame);
-      })();
+  setTimeout(() => {
+    document.getElementById("resultPopup").style.display = "flex";
+    document.body.classList.add("modal-open");
+
+    if (correctCount > 0) {
+      resultAudio.play().catch(() => {});
+      const percentage = Math.floor((correctCount / totalQuestions) * 100);
+      const particleCount = Math.max(Math.floor(percentage), 25);
+      triggerConfettiParticles(particleCount);
+    } else {
+      speakText("Oops! You need to learn more.");
     }
-    
-    function restartGame() {
-      checkingAnswers = false;
-      hasSpokenAllMatched = false;
-      lines = [];
-      tempLine = null;
-    
-      drawLines();
-    
-      document.querySelectorAll(".dot.left, .dot.right").forEach((dot) => {
-        dot.classList.remove("active", "active-match");
-      });
-    
-      clearInterval(timerInterval);
-      secondsElapsed = 0;
-      document.getElementById("timer-count").textContent = "00:00";
-      document.getElementById("resultPopup").style.display = "none";
-      document.body.classList.remove("modal-open");
-      enableHoverSpeak();
-      currentStep = 0;
-      hasSpokenAllMatched = false;
-    
-      // Recreate and shuffle guidance steps
-      // createGuidanceSteps();
-    
-      setDefaultImages();
-      startTimer();
-      setTimeout(startGuidance, 1000);
-    
-      // Redirect to index.html after the restart action
-      const params = new URLSearchParams(window.location.search);
-      const sid = params.get("sid");
-      const tid = params.get("tid");
-      const lid = params.get("lid");
-      const stid = params.get("stid");
-      const qid = params.get("qid");
-      const ust = params.get("ust");
-    
-      const data = {
-        sid,
-        tid,
-        lid,
-        stid,
-        qid,
-        ust,
-      };
-      window.location.href = `/admin/match?sid=${sid}&tid=${tid}&lid=${lid}&stid=${stid}&qid=${qid}&ust=${ust}`;
-    }
-    
-    function completeTest() {
-      const params = new URLSearchParams(window.location.search);
-      const sid = params.get("sid");
-      const tid = params.get("tid");
-      const lid = params.get("lid");
-      const stid = params.get("stid");
-      const qid = params.get("qid");
-      const ust = params.get("ust");
-    
-      const data = {
-        sid,
-        tid,
-        lid,
-        stid,
-        qid,
-        ust,
-        correctAnswers: correctCount,
-        wrongAnswers: wrongCount,
-        totalTime: secondsElapsed,
-        questionIds,
-      };
-      
-      $.ajax({
-        url: "/admin/activity/questions/history",
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(data),
-        success: function (res) {
-          if (res.status === 200) {
-            restartGame();
-            // location.reload();
-          } else {
-            console.warn("⚠️ Invalid question data received.");
-          }
-        },
-        error: function (xhr) {
-          let errorMessage = "An error occurred.";
-          if (xhr.responseJSON && xhr.responseJSON.message) {
-            errorMessage = xhr.responseJSON.message;
-          }
-          console.warn("⚠️", errorMessage);       
-        },
-      });
-    }
-    
-    
-    
-   
-    
+  }, 500);
+}
+
+function triggerConfettiParticles(particleCount) {
+  const confettiCanvas = document.getElementById("confetti-canvas");
+  const myConfetti = confetti.create(confettiCanvas, {
+    resize: true,
+    useWorker: true,
+  });
+  const duration = 400;
+  const end = Date.now() + duration;
+
+  (function frame() {
+    myConfetti({ particleCount, angle: 60, spread: 55, origin: { x: 0 } });
+    myConfetti({ particleCount, angle: 120, spread: 55, origin: { x: 1 } });
+    if (Date.now() < end) requestAnimationFrame(frame);
+  })();
+}
+
+function restartGame() {
+  checkingAnswers = false;
+  hasSpokenAllMatched = false;
+  lines = [];
+  tempLine = null;
+
+  drawLines();
+
+  document.querySelectorAll(".dot.left, .dot.right").forEach((dot) => {
+    dot.classList.remove("active", "active-match");
+  });
+
+  clearInterval(timerInterval);
+  secondsElapsed = 0;
+  document.getElementById("timer-count").textContent = "00:00";
+  document.getElementById("resultPopup").style.display = "none";
+  document.body.classList.remove("modal-open");
+  enableHoverSpeak();
+  currentStep = 0;
+  hasSpokenAllMatched = false;
+
+  // Recreate and shuffle guidance steps
+  // createGuidanceSteps();
+
+  setDefaultImages();
+  startTimer();
+  setTimeout(startGuidance, 1000);
+
+  // Redirect to index.html after the restart action
+  const params = new URLSearchParams(window.location.search);
+  const sid = params.get("sid");
+  const tid = params.get("tid");
+  const lid = params.get("lid");
+  const stid = params.get("stid");
+  const qid = params.get("qid");
+  const ust = params.get("ust");
+
+  const data = {
+    sid,
+    tid,
+    lid,
+    stid,
+    qid,
+    ust,
+  };
+  window.location.href = `/admin/match?sid=${sid}&tid=${tid}&lid=${lid}&stid=${stid}&qid=${qid}&ust=${ust}`;
+}
+
+function completeTest() {
+  const params = new URLSearchParams(window.location.search);
+  const sid = params.get("sid");
+  const tid = params.get("tid");
+  const lid = params.get("lid");
+  const stid = params.get("stid");
+  const qid = params.get("qid");
+  const ust = params.get("ust");
+
+  const data = {
+    sid,
+    tid,
+    lid,
+    stid,
+    qid,
+    ust,
+    correctAnswers: correctCount,
+    wrongAnswers: wrongCount,
+    totalTime: secondsElapsed,
+    questionIds,
+  };
+
+  $.ajax({
+    url: "/admin/activity/questions/history",
+    method: "POST",
+    contentType: "application/json",
+    data: JSON.stringify(data),
+    success: function (res) {
+      if (res.status === 200) {
+        restartGame();
+        // location.reload();
+      } else {
+        console.warn("⚠️ Invalid question data received.");
+      }
+    },
+    error: function (xhr) {
+      let errorMessage = "An error occurred.";
+      if (xhr.responseJSON && xhr.responseJSON.message) {
+        errorMessage = xhr.responseJSON.message;
+      }
+      console.warn("⚠️", errorMessage);
+    },
+  });
+}
+
+let previous_second = 0;
+function storeSeparateEntries(question, comp_time, is_correct) {
+  const [minutes, seconds] = comp_time.split(":").map(Number);
+  const compTimeInSeconds = minutes * 60 + seconds;
+  const diff = compTimeInSeconds - previous_second;
+  previous_second = compTimeInSeconds;
+
+  console.log(question, comp_time, compTimeInSeconds, diff, is_correct);
+    const params = new URLSearchParams(window.location.search);
+    const sid = params.get("sid");
+    const tid = params.get("tid");
+    const lid = params.get("lid");
+    const stid = params.get("stid");
+    const qid = params.get("qid");
+    const ust = params.get("ust");
+
+    const ref = {
+      sid,
+      tid,
+      lid,
+      stid,
+      qid,
+      ust,
+    };
+    const data = {
+      question,
+      comp_time: diff,
+      is_correct,
+      ust,
+    };
+    // console.log(data)
+    $.ajax({
+      url: "/admin/activity/questions/separate-entries",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(data),
+      success: function (res) {
+        if (res.status === 200) {
+        } else {
+          console.warn("⚠️ Invalid question data received.");
+        }
+      },
+      error: function (xhr) {
+        let errorMessage = "An error occurred.";
+        if (xhr.responseJSON && xhr.responseJSON.message) {
+          errorMessage = xhr.responseJSON.message;
+        }
+        console.warn("⚠️", errorMessage);
+      },
+    });
+}

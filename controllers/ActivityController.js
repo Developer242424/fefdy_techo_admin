@@ -10,6 +10,7 @@ const Category = require("../models/category");
 const QuestionType = require("../models/questiontype");
 const Questions = require("../models/questions");
 const TestHistory = require("../models/test_history");
+const AttendedTestQuestion = require("../models/attendedtestquestion");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { where, Sequelize, DATE, Op } = require("sequelize");
@@ -244,6 +245,34 @@ class ActivityController {
         console.error("Error fetching random questions:", error);
         return res.status(500).json({
           message: "Internal server error",
+          error,
+        });
+      }
+    });
+
+    this.storeSeparateEntries = asyncHandler(async (req, res) => {
+      try {
+        const { question, comp_time, is_correct, ust } = req.body;
+        // console.log(question, comp_time, is_correct, ust);
+        const user = await LoginUsers.findOne({
+          where: {
+            web_token: ust,
+          },
+        });
+        // console.log(user);
+        const obj = {
+          user_id: user.id,
+          question,
+          comp_time,
+          is_correct,
+        };
+        await AttendedTestQuestion.create(obj);
+        return res
+          .status(200)
+          .json({ status: 200, message: "Successfully added" });
+      } catch (error) {
+        return res.status(500).json({
+          message: `Internal server error - ${error}`,
           error,
         });
       }

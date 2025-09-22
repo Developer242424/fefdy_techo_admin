@@ -15,7 +15,8 @@ function handleQuestionHover(text) {
 }
 function typeQuestionText(text, el) {
   el.innerHTML = ""; // Clear the text initially
-  let index = 0;c
+  let index = 0;
+  c;
   const typeInterval = setInterval(() => {
     if (index < text.length) {
       el.innerHTML += text.charAt(index); // Append one letter at a time
@@ -41,7 +42,6 @@ function speakQuestionOrResult() {
     speakText(`The correct answer is ${correctAnswerText}`);
   }
 }
-
 
 let questions = [];
 let questionsLoaded = false;
@@ -133,7 +133,7 @@ function loadQuestion() {
     ((currentQuestion + 1) / questions.length) * 100
   }%`;
 
-const answerCount = question.correct.length;
+  const answerCount = question.correct.length;
 
   // Display question with "Answer Count"
   questionContainer.innerHTML = `
@@ -142,7 +142,7 @@ const answerCount = question.correct.length;
           <h2 id="question-text">${question.question}</h2>
           
       </div>
-      <img src="${publicURL+question.image}" 
+      <img src="${publicURL + question.image}" 
            alt="question image"   
            style="display:${question.image ? "block" : "none"}" 
            class="question-image">
@@ -151,9 +151,11 @@ const answerCount = question.correct.length;
           <i class="fa fa-volume-up"></i>
          
       </div>
-       <p class="answer-count">${answerCount} Answer${answerCount > 1 ? "s" : ""} </p>
+       <p class="answer-count">${answerCount} Answer${
+    answerCount > 1 ? "s" : ""
+  } </p>
   `;
-    
+
   // Add hover speech after element is created
   const qText = document.getElementById("question-text");
   if (qText) {
@@ -161,16 +163,15 @@ const answerCount = question.correct.length;
       speakText(qText.innerText);
     });
   }
-    
- const questionTextElement = document.getElementById("question-text");
+
+  const questionTextElement = document.getElementById("question-text");
   stopCurrentSpeech();
 
-  
- if (
+  if (
     userAnswers[currentQuestion] === null ||
     (currentQuestion === 0 && userAnswers[0].length === 0)
   ) {
-    speakQuestion(question.question); 
+    speakQuestion(question.question);
   } else {
     typeQuestionText(question.question, questionTextElement);
     speakText(question.question);
@@ -211,25 +212,24 @@ const answerCount = question.correct.length;
     answersContainer.appendChild(optionDiv);
   });
 
-  
   updateNavigationButtons();
   if (!timer) startTimer();
   startReminderTimer();
 }
 
-    function typeQuestionText(text, el, callback = null) {
-      el.innerHTML = ""; // Clear the text initially
-      let index = 0;
-      const typeInterval = setInterval(() => {
-        if (index < text.length) {
-          el.innerHTML += text.charAt(index);  
-          index++;
-        } else {
-          clearInterval(typeInterval);  
-          if (callback) callback();
-        }
-      }, 50); 
+function typeQuestionText(text, el, callback = null) {
+  el.innerHTML = ""; // Clear the text initially
+  let index = 0;
+  const typeInterval = setInterval(() => {
+    if (index < text.length) {
+      el.innerHTML += text.charAt(index);
+      index++;
+    } else {
+      clearInterval(typeInterval);
+      if (callback) callback();
     }
+  }, 50);
+}
 
 function navigate(direction) {
   stopCurrentSpeech();
@@ -241,7 +241,27 @@ function navigate(direction) {
     if (userAnswer.length > 0) {
       const selectedSet = new Set(userAnswer);
       const correctSet = new Set(question.correct);
-
+      const selectedArr = [...selectedSet];
+      const correctArr = [...correctSet];
+      const is_correct = selectedArr.map((item, index) =>
+        correctArr.includes(item)
+      );
+      let is_correct_fnl = -1;
+      if (is_correct.includes(false)) {
+        is_correct_fnl = 1;
+      } else {
+        is_correct_fnl = 0;
+      }
+      // console.log(selectedArr);
+      // console.log(correctArr);
+      // console.log(is_correct);
+      // console.log(is_correct_fnl);
+      // return;
+      storeSeparateEntries(
+        $("#question-text").text(),
+        $("#timer-count").text(),
+        is_correct_fnl
+      );
       markAnswerFeedback(
         selectedSet,
         correctSet,
@@ -263,8 +283,7 @@ function navigate(direction) {
     } else {
       alert("Please select an answer before moving next.");
     }
-  } 
-  else if (direction === "previous") {
+  } else if (direction === "previous") {
     if (currentQuestion > 0) {
       currentQuestion--;
       const question = questions[currentQuestion];
@@ -289,22 +308,22 @@ function navigate(direction) {
   }
 }
 
-    function handleAnswerSubmission(userAnswerArray) {
-    isTransitioning = true;
-    const correctSet = new Set(questions[currentQuestion].correct);
-    const selectedSet = new Set(userAnswerArray);
-    
-    const isFullyCorrect =
+function handleAnswerSubmission(userAnswerArray) {
+  isTransitioning = true;
+  const correctSet = new Set(questions[currentQuestion].correct);
+  const selectedSet = new Set(userAnswerArray);
+
+  const isFullyCorrect =
     selectedSet.size === correctSet.size &&
     [...selectedSet].every((i) => correctSet.has(i));
-    
-    if (isFullyCorrect) {
+
+  if (isFullyCorrect) {
     correctAnswers++;
-    } else {
+  } else {
     wrongAnswers++;
-    }
-    
-    markAnswerFeedback(selectedSet, correctSet, () => {
+  }
+
+  markAnswerFeedback(selectedSet, correctSet, () => {
     setTimeout(() => {
       isTransitioning = false;
       if (currentQuestion < questions.length - 1) {
@@ -317,8 +336,8 @@ function navigate(direction) {
         showResultModal();
       }
     }, 1000);
-    });
-    }
+  });
+}
 
 function updateNavigationButtons() {
   const nextBtn = document.getElementById("next-btn");
@@ -366,7 +385,6 @@ function showResultModal() {
   // 🎉 Fire multiple bursts of confetti
   fireMultipleConfetti();
 }
-
 
 function fireConfettiBasedOnScore(scoreCount) {
   const maxScore = questions.length;
@@ -419,26 +437,25 @@ function showResultModal() {
   let totalQuestions = questions.length;
 
   // 📝 Show result data
-//   document.getElementById("correct-count").textContent = correctAnswers;
-//   document.getElementById("wrong-count").textContent = wrongAnswers;
+  //   document.getElementById("correct-count").textContent = correctAnswers;
+  //   document.getElementById("wrong-count").textContent = wrongAnswers;
   document.getElementById("total-time").textContent = totalTime;
 
-// ⭐ Add total correct display with span tags
-document.getElementById("total-correct").innerHTML =
-`<div class="score">⭐ your score: <br> <div><div class="score-item animaction"> <span id="correct-total">${correctAnswers}</span> / <span id="total-questions">${totalQuestions}</span></div>`;
-  
+  // ⭐ Add total correct display with span tags
+  document.getElementById(
+    "total-correct"
+  ).innerHTML = `<div class="score">⭐ your score: <br> <div><div class="score-item animaction"> <span id="correct-total">${correctAnswers}</span> / <span id="total-questions">${totalQuestions}</span></div>`;
+
   // Show modal
   document.getElementById("result-modal").style.display = "block";
 
-  
-  if (correctAnswers > 0) { 
+  if (correctAnswers > 0) {
     new Audio("result.mp3").play();
   }
 
   // 🎉 Call confetti with correct score count
   fireConfettiBasedOnScore(correctAnswers);
 }
-
 
 function startAgain() {
   const params = new URLSearchParams(window.location.search);
@@ -448,7 +465,7 @@ function startAgain() {
   const stid = params.get("stid");
   const qid = params.get("qid");
   const ust = params.get("ust");
-  
+
   const data = {
     sid,
     tid,
@@ -457,50 +474,50 @@ function startAgain() {
     qid,
     ust,
   };
-  window.location.href = `/admin/chooseup?sid=${sid}&tid=${tid}&lid=${lid}&stid=${stid}&qid=${qid}&ust=${ust}`;
-  
-// Stop any ongoing confetti animation
-//   if (confettiAnimationId) {
-//     cancelAnimationFrame(confettiAnimationId);
-//     confettiAnimationId = null;
-//   }
+  window.location.href = `/admin/chooseup/home?sid=${sid}&tid=${tid}&lid=${lid}&stid=${stid}&qid=${qid}&ust=${ust}`;
 
-//   // Stop and reset speech
-//   stopCurrentSpeech();
+  // Stop any ongoing confetti animation
+  //   if (confettiAnimationId) {
+  //     cancelAnimationFrame(confettiAnimationId);
+  //     confettiAnimationId = null;
+  //   }
 
-//   // Reset game state
-//   currentQuestion = 0;
-//   correctAnswers = 0;
-//   wrongAnswers = 0;
-//   totalTime = 0;
-//   userAnswers = questions.map(() => []);
+  //   // Stop and reset speech
+  //   stopCurrentSpeech();
 
-//   // Reset timer
+  //   // Reset game state
+  //   currentQuestion = 0;
+  //   correctAnswers = 0;
+  //   wrongAnswers = 0;
+  //   totalTime = 0;
+  //   userAnswers = questions.map(() => []);
 
-//   function startTimer() {
-//     let timer = null;
-//     let totalTime = 0;
+  //   // Reset timer
 
-//     if (timer) clearInterval(timer);
-//     totalTime = 0;
-//     const timerEl = document.getElementById("timer-count");
-//     if (timerEl) timerEl.textContent = totalTime;
+  //   function startTimer() {
+  //     let timer = null;
+  //     let totalTime = 0;
 
-//     timer = setInterval(() => {
-//       totalTime++;
-//       if (timerEl) timerEl.textContent = totalTime;
-//     }, 1000);
-//   }
+  //     if (timer) clearInterval(timer);
+  //     totalTime = 0;
+  //     const timerEl = document.getElementById("timer-count");
+  //     if (timerEl) timerEl.textContent = totalTime;
 
-//   // Hide result modal and reload the first question
-//   closeResultModal();
-//   loadQuestion();
-//   startTimer(); // Restart timer on game restart
-//   startReminderTimer();
+  //     timer = setInterval(() => {
+  //       totalTime++;
+  //       if (timerEl) timerEl.textContent = totalTime;
+  //     }, 1000);
+  //   }
 
-//   // Resume background music if needed
-//   backgroundAudio.currentTime = 0;
-//   backgroundAudio.play();
+  //   // Hide result modal and reload the first question
+  //   closeResultModal();
+  //   loadQuestion();
+  //   startTimer(); // Restart timer on game restart
+  //   startReminderTimer();
+
+  //   // Resume background music if needed
+  //   backgroundAudio.currentTime = 0;
+  //   backgroundAudio.play();
 }
 
 function closeResultModal() {
@@ -529,58 +546,61 @@ function selectAnswer(selectedIndex) {
   const optionDivs = document.querySelectorAll(".answer-option");
   const optionDiv = optionDivs[selectedIndex];
 
-let correctClickedCount = 0; // reset this at the start of each question
+  let correctClickedCount = 0; // reset this at the start of each question
 
-if (!isTransitioning) {
-  isTransitioning = true;
+  if (!isTransitioning) {
+    isTransitioning = true;
 
-  // Wrong answer clicked
-  if (!correctSet.has(selectedIndex)) {
-    optionDiv.classList.add("incorrect");
-    optionDiv.innerHTML += '<div class="result-icon"><i class="fa fa-times colour-red"></i></div>';
+    // Wrong answer clicked
+    if (!correctSet.has(selectedIndex)) {
+      optionDiv.classList.add("incorrect");
+      optionDiv.innerHTML +=
+        '<div class="result-icon"><i class="fa fa-times colour-red"></i></div>';
 
-    // Show ALL correct answers immediately
-    question.correct.forEach((correctIndex) => {
-      const correctOptionDiv = optionDivs[correctIndex];
-      if (!correctOptionDiv.classList.contains("correct")) {
-        correctOptionDiv.classList.add("correct");
-        correctOptionDiv.innerHTML += '<div class="result-icon"><i class="fa fa-check colour-green"></i></div>';
-      }
-    });
+      // Show ALL correct answers immediately
+      question.correct.forEach((correctIndex) => {
+        const correctOptionDiv = optionDivs[correctIndex];
+        if (!correctOptionDiv.classList.contains("correct")) {
+          correctOptionDiv.classList.add("correct");
+          correctOptionDiv.innerHTML +=
+            '<div class="result-icon"><i class="fa fa-check colour-green"></i></div>';
+        }
+      });
 
-    wrongAudio.play();
+      wrongAudio.play();
 
-    wrongAudio.onended = () => {
-      const correctAnswerText = question.correct
-        .map((i) => question.options[i].text)
-        .join(" and ");
-      speakText(`The correct answer is ${correctAnswerText}`);
-    };
+      wrongAudio.onended = () => {
+        const correctAnswerText = question.correct
+          .map((i) => question.options[i].text)
+          .join(" and ");
+        speakText(`The correct answer is ${correctAnswerText}`);
+      };
 
-    wrongAnswers++;
-  } 
+      wrongAnswers++;
+    }
     // For correct answers
     else {
-    if (correctClickedCount === 0) {  
-      // ✅ Show only on the *first* correct click
-      optionDiv.classList.add("correct");
-      optionDiv.innerHTML += '<div class="result-icon"><i class="fa fa-check colour-green"></i></div>';
-    } else {
-      // Second correct click → no new symbol
-      optionDiv.classList.add("correct");
-    }
+      if (correctClickedCount === 0) {
+        // ✅ Show only on the *first* correct click
+        optionDiv.classList.add("correct");
+        optionDiv.innerHTML +=
+          '<div class="result-icon"><i class="fa fa-check colour-green"></i></div>';
+      } else {
+        // Second correct click → no new symbol
+        optionDiv.classList.add("correct");
+      }
 
-    correctClickedCount++;  
-    correctAudio.play();
-    correctAnswers++;
-  }
+      correctClickedCount++;
+      correctAudio.play();
+      correctAnswers++;
+    }
     setTimeout(() => {
-    isTransitioning = false;
-  }, 500);
-     
+      isTransitioning = false;
+    }, 500);
+
     optionDiv.classList.add("selected");
     optionDiv.style.pointerEvents = "none"; // Disable further clicks
-    
+
     // ✅ Enable Next button if all required answers are selected
     if (userAnswer.length === expectedCount) {
       markAnswerFeedback(selectedSet, correctSet, () => {
@@ -600,14 +620,13 @@ if (!isTransitioning) {
   }
 }
 
-
 const backgroundAudio = document.getElementById("backgroundAudio");
 const introAudio = document.getElementById("introAudio");
 
 const BACKGROUND_NORMAL_VOLUME = 0.3;
 const BACKGROUND_DUCK_VOLUME = 0.05;
 
-backgroundAudio.volume = BACKGROUND_NORMAL_VOLUME; 
+backgroundAudio.volume = BACKGROUND_NORMAL_VOLUME;
 
 function duckBackgroundAudio() {
   backgroundAudio.volume = BACKGROUND_DUCK_VOLUME;
@@ -626,8 +645,8 @@ function stopCurrentSpeech() {
 }
 
 function speakText(text, callback = null) {
-  stopCurrentSpeech(); 
-  duckBackgroundAudio(); 
+  stopCurrentSpeech();
+  duckBackgroundAudio();
 
   currentSpeech = new SpeechSynthesisUtterance(text);
   currentSpeech.lang = "en-US";
@@ -641,7 +660,7 @@ function speakText(text, callback = null) {
   window.speechSynthesis.speak(currentSpeech);
 }
 
- function speakQuestion(text) {
+function speakQuestion(text) {
   stopCurrentSpeech();
   duckBackgroundAudio();
 
@@ -661,9 +680,9 @@ function speakText(text, callback = null) {
   currentSpeech.lang = "en-US";
   currentSpeech.onend = () => {
     currentSpeech = null;
-    restoreBackgroundAudio(); 
+    restoreBackgroundAudio();
   };
-  window.speechSynthesis.speak(currentSpeech); 
+  window.speechSynthesis.speak(currentSpeech);
 }
 
 function playIntro() {
@@ -676,55 +695,53 @@ window.onload = () => {
     .play()
     .then(() => {
       console.log("🔊 intro.mp3 playing");
-      
     })
     .catch(() => {
       document.getElementById("clickPrompt").style.display = "block";
     });
 
-    introAudio.onended = () => {
+  introAudio.onended = () => {
     backgroundAudio.muted = false;
     backgroundAudio.volume = BACKGROUND_NORMAL_VOLUME;
     backgroundAudio.play().catch((err) => {
       console.warn("🔇 Background audio autoplay blocked", err);
     });
   };
-  
+
   fetchQuestions(() => {
     loadQuestion();
     startReminderTimer();
   });
 };
 
+function startQuiz() {
+  // hide prompt
+  document.getElementById("clickPrompt").style.display = "none";
 
-    function startQuiz() {
-      // hide prompt
-      document.getElementById("clickPrompt").style.display = "none";
-    
-      // now safe to play background music
-      backgroundAudio.muted = false;
-      backgroundAudio.volume = BACKGROUND_NORMAL_VOLUME;
-      backgroundAudio.play();
-    
-      loadQuestion();
-      startReminderTimer();
-      startTimer();
-    }
-    
-    function playEffectSound(src, onEndCallback = null) {
-      duckBackgroundAudio();
-      const sound = new Audio(src);
-      sound.play();
-      sound.onended = () => {
-        restoreBackgroundAudio();
-        if (onEndCallback) onEndCallback();
-      };
-    }
+  // now safe to play background music
+  backgroundAudio.muted = false;
+  backgroundAudio.volume = BACKGROUND_NORMAL_VOLUME;
+  backgroundAudio.play();
 
-    function markAnswerFeedback(selectedSet, correctSet, callback, speak = true) {
-    const answerOptions = document.querySelectorAll(".answer-option");
-    
-    answerOptions.forEach((opt, idx) => {
+  loadQuestion();
+  startReminderTimer();
+  startTimer();
+}
+
+function playEffectSound(src, onEndCallback = null) {
+  duckBackgroundAudio();
+  const sound = new Audio(src);
+  sound.play();
+  sound.onended = () => {
+    restoreBackgroundAudio();
+    if (onEndCallback) onEndCallback();
+  };
+}
+
+function markAnswerFeedback(selectedSet, correctSet, callback, speak = true) {
+  const answerOptions = document.querySelectorAll(".answer-option");
+
+  answerOptions.forEach((opt, idx) => {
     const isSelected = selectedSet.has(idx);
     const isCorrect = correctSet.has(idx);
     if (isSelected && isCorrect) {
@@ -741,7 +758,7 @@ window.onload = () => {
         '<div class="result-icon"><i class="fa fa-check colour-green"></i></div>';
     }
     opt.style.pointerEvents = "none";
-    });
+  });
 
   const correctText = [...correctSet]
     .map((i) => questions[currentQuestion].options[i].text)
@@ -754,9 +771,9 @@ window.onload = () => {
   } else {
     setTimeout(callback, 0);
   }
- }
- 
- function completeTest() {
+}
+
+function completeTest() {
   const params = new URLSearchParams(window.location.search);
   const sid = params.get("sid");
   const tid = params.get("tid");
@@ -764,7 +781,7 @@ window.onload = () => {
   const stid = params.get("stid");
   const qid = params.get("qid");
   const ust = params.get("ust");
-  
+
   const data = {
     sid,
     tid,
@@ -774,16 +791,16 @@ window.onload = () => {
     ust,
     correctAnswers,
     wrongAnswers,
-    totalTime, 
+    totalTime,
     questionIds,
-  };        
-  $.ajax({  
-    url: "/admin/activity/questions/history",                                                                   
-    method: "POST",  
+  };
+  $.ajax({
+    url: "/admin/activity/questions/history",
+    method: "POST",
     contentType: "application/json",
     data: JSON.stringify(data),
-    success: function (res) {  
-      if (res.status === 200) { 
+    success: function (res) {
+      if (res.status === 200) {
         startAgain();
         // location.reload();
       } else {
@@ -795,7 +812,61 @@ window.onload = () => {
       if (xhr.responseJSON && xhr.responseJSON.message) {
         errorMessage = xhr.responseJSON.message;
       }
-      console.warn("⚠️", errorMessage);  
+      console.warn("⚠️", errorMessage);
+    },
+  });
+}
+
+let previous_second = 0;
+function storeSeparateEntries(question, comp_time, is_correct) {
+  const diff = parseInt(comp_time) - previous_second;
+  previous_second = comp_time;
+
+  // console.log(question, diff, is_correct);
+  const params = new URLSearchParams(window.location.search);
+  const sid = params.get("sid");
+  const tid = params.get("tid");
+  const lid = params.get("lid");
+  const stid = params.get("stid");
+  const qid = params.get("qid");
+  const ust = params.get("ust");
+
+  const ref = {
+    sid,
+    tid,
+    lid,
+    stid,
+    qid,
+    ust,
+    correctAnswers,
+    wrongAnswers,
+    totalTime,
+    questionIds,
+  };
+  const data = {
+    question,
+    comp_time: diff,
+    is_correct,
+    ust
+  };
+  // console.log(data)
+  $.ajax({
+    url: "/admin/activity/questions/separate-entries",
+    method: "POST",
+    contentType: "application/json",
+    data: JSON.stringify(data),
+    success: function (res) {
+      if (res.status === 200) {
+      } else {
+        console.warn("⚠️ Invalid question data received.");
+      }
+    },
+    error: function (xhr) {
+      let errorMessage = "An error occurred.";
+      if (xhr.responseJSON && xhr.responseJSON.message) {
+        errorMessage = xhr.responseJSON.message;
+      }
+      console.warn("⚠️", errorMessage);
     },
   });
 }

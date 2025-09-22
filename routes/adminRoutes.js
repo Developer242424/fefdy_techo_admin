@@ -56,6 +56,7 @@ router.post(
   "/activity/questions/drag-drop/get",
   ActivityController.getQuestionsDragDropOne
 );
+router.post("/activity/questions/separate-entries", ActivityController.storeSeparateEntries);
 
 // Public routes (excluded from auth check)
 router.get("/login", AuthController.loginindex);
