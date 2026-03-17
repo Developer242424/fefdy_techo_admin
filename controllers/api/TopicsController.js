@@ -31,7 +31,7 @@ class TopicsController {
   constructor() {
     this.data = asyncHandler(async (req, res) => {
       try {
-        const { subject } = req.body;
+        const { subject, level } = req.body;
         const user = req.session.user;
 
         if (!subject) {
@@ -39,26 +39,25 @@ class TopicsController {
             .status(400)
             .json({ status: 400, message: "Subject is required" });
         }
+        if (!level) {
+          return res
+            .status(400)
+            .json({ status: 400, message: "Level is required" });
+        }
 
         const topics = await Topics.findAll({
-          where: { subject, is_deleted: null },
+          where: { subject, level, is_deleted: null },
           order: [["sort_order", "ASC"]],
         });
 
         const data = await Promise.all(
           topics.map(async (value) => {
-            const completedLevels = await this.LevelsCompletionsCount(
-              user,
-              value.id
-            );
             return {
               id: value.id,
               subject: value.subject,
               title: value.title,
               description: value.description,
               thumbnail: value.thumbnail,
-              levels: value.levels,
-              comp_levels: completedLevels,
             };
           })
         );

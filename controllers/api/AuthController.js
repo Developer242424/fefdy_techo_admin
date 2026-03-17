@@ -68,21 +68,6 @@ class AuthController {
           user.web_token = token;
           await user.save();
 
-        //   let subjectIds = [];
-        //   try {
-        //     subjectIds = user.subject ? JSON.parse(user.subject) : [];
-        //   } catch (e) {
-        //     subjectIds = [];
-        //   }
-
-        //   const subjects = await Subjects.findAll({
-        //     where: {
-        //       id: {
-        //         [Op.in]: subjectIds,
-        //       },
-        //     },
-        //   });
-
           const ret_user = await LoginUsers.findOne({
             attributes: [
               "id",
@@ -94,7 +79,6 @@ class AuthController {
               "standard",
               "section",
               "profile_image",
-              "level",
             ],
             where: { username: username, is_deleted: null },
           });
@@ -116,7 +100,6 @@ class AuthController {
             mobile: ret_user.mobile,
             dob: ret_user.dob,
             section: ret_user.section,
-            level: ret_user.level,
             profile_image: ret_user.profile_image,
           };
 

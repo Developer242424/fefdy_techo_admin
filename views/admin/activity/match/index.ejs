@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Can you find the right match?</title>
+  <link href="/css/match.css" rel="stylesheet" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Alata&family=Fredoka:wght@300..700&family=Londrina+Solid:wght@100;300;400;900&family=Quicksand:wght@300..700&family=REM:ital,wght@0,100..900;1,100..900&family=Russo+One&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+    integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+  <div class="iframe-scale-wrapper">
+    <div class="match-container" id="match-container" style="display: none">
+      <div class="match-up">
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div class="timer-div">
+          <div class="timer-container">
+            <span id="timer">00:00</span>
+          </div>
+        </div>
+      </div>
+      <div class="match-down">
+        <div class="question-match"></div>
+        <div class="match-options"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="success-modal" id="success-modal" style="display: none">
+    <div class="modal">
+      <div class="content">
+        <div class="title">Congratulations!</div>
+
+        <div class="score-circle">
+          <div class="label">Score</div>
+          <div class="value" id="score-display">2</div>
+        </div>
+
+        <div class="info">
+          Time Taken
+          <span id="time-display">30 Seconds</span>
+        </div>
+
+        <div class="buttons">
+          <button class="btn btn-replay" id="replay-btn">Replay</button>
+          <button class="btn btn-next" onclick="completeTest()">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start Modal -->
+  <div class="start-modal" id="start-modal">
+    <div class="start-content">
+      <button class="start-button" onclick="startGame()">Start!</button>
+    </div>
+  </div>
+  <script src="/js/match.js"></script>
+</body>
+
+</html>

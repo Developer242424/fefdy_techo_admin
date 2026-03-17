@@ -4,17 +4,19 @@ const DashboardController = require("../controllers/DashboardController");
 const HandlerController = require("../controllers/HandlerController");
 const { isAuthenticated } = require("../middleware/AuthHandler");
 const SubjectsController = require("../controllers/SubjectsController");
+const LevelListController = require("../controllers/LevelListController");
 const TopicsController = require("../controllers/TopicsController");
-const LevelController = require("../controllers/LevelController");
 const CategoryController = require("../controllers/CategoryController");
 const SubtopicController = require("../controllers/SubtopicController");
 const OrganisationController = require("../controllers/OrganisationController");
 const UsersListController = require("../controllers/UsersListController");
 const IndividualUsersListController = require("../controllers/IndividualUsersListController");
 const UsersImprtNExportController = require("../controllers/UsersImprtNExportController");
+const QuestionCategoryController = require("../controllers/QuestionCategoryController");
 const QuestionsController = require("../controllers/QuestionsController");
 const ActivityController = require("../controllers/ActivityController");
 const SentReportController = require("../controllers/SentReportController");
+const ImageController = require("../controllers/ImageController");
 
 const router = express.Router();
 
@@ -24,6 +26,61 @@ router.get("/", (req, res) => {
   res.end();
 });
 
+// new routes
+router.get("/choose", (req, res) => {
+  res.render("admin/activity/choose/index", { layout: false });
+});
+router.get("/matchup", (req, res) => {
+  res.render("admin/activity/match/index", { layout: false });
+});
+router.get("/conditional-match", (req, res) => {
+  res.render("admin/activity/conditionalMatch/index", { layout: false });
+});
+router.get("/drag-and-drop", (req, res) => {
+  res.render("admin/activity/draganddrop/index", { layout: false });
+});
+router.get("/parts-drag", (req, res) => {
+  res.render("admin/activity/partsdrag/index", { layout: false });
+});
+router.get("/identify", (req, res) => {
+  res.render("admin/activity/identify/index", { layout: false });
+});
+router.get("/dragndrop", (req, res) => {
+  res.render("admin/activity/dragndrop/index", { layout: false });
+});
+
+router.post("/activity/questions/get", ActivityController.getQuestions);
+router.post(
+  "/activity/questions/match/get",
+  ActivityController.getQuestionsMatchup
+);
+router.post(
+  "/activity/questions/conditional-match/get",
+  ActivityController.getQuestionsConditionalMatchup
+);
+router.post(
+  "/activity/questions/drag-drop/get",
+  ActivityController.getQuestionsDragDropOne
+);
+router.post(
+  "/activity/questions/parts-drag/get",
+  ActivityController.getQuestionsPartsDragDropOne
+);
+router.post(
+  "/activity/questions/identify/get",
+  ActivityController.getQuestionsForIdentify
+);
+router.post(
+  "/activity/questions/dragndrop/get",
+  ActivityController.getQuestionsForDragndrop
+);
+
+router.post("/activity/questions/history", ActivityController.entryHistory);
+router.post(
+  "/activity/questions/separate-entries",
+  ActivityController.storeSeparateEntries
+);
+
 router.get("/chooseup", (req, res) => {
   res.render("admin/activity/index", { layout: false });
 });
@@ -31,8 +88,6 @@ router.get("/chooseup", (req, res) => {
 router.get("/chooseup/home", (req, res) => {
   res.render("admin/activity/home", { layout: false });
 });
-router.post("/activity/questions/get", ActivityController.getQuestions);
-router.post("/activity/questions/history", ActivityController.entryHistory);
 
 router.get("/match", (req, res) => {
   res.render("admin/activity/matchup/index", { layout: false });
@@ -41,10 +96,6 @@ router.get("/match", (req, res) => {
 router.get("/match/home", (req, res) => {
   res.render("admin/activity/matchup/home", { layout: false });
 });
-router.post(
-  "/activity/questions/match/get",
-  ActivityController.getQuestionsMatchup
-);
 
 router.get("/drag-drop", (req, res) => {
   res.render("admin/activity/dragdropone/index", { layout: false });
@@ -52,11 +103,6 @@ router.get("/drag-drop", (req, res) => {
 router.get("/drag-drop/home", (req, res) => {
   res.render("admin/activity/dragdropone/new-game", { layout: false });
 });
-router.post(
-  "/activity/questions/drag-drop/get",
-  ActivityController.getQuestionsDragDropOne
-);
-router.post("/activity/questions/separate-entries", ActivityController.storeSeparateEntries);
 
 // Public routes (excluded from auth check)
 router.get("/login", AuthController.loginindex);
@@ -65,6 +111,7 @@ router.get("/logout", AuthController.logout);
 
 router.get("/sent-report/sent-mail/whole", SentReportController.sentMailWhole);
 
+router.post("/image-upload", ImageController.getImage);
 // Now protect the rest
 router.use(isAuthenticated);
 
@@ -79,6 +126,7 @@ router.post(
 );
 
 router.post("/get-subjects-for-drop", HandlerController.getSubjectForDrop);
+router.post("/get-levels-for-drop", HandlerController.getLevelForDrop);
 router.post(
   "/get-topics-by-subjects-for-drop",
   HandlerController.getTopicBySubjectForDrop
@@ -88,10 +136,6 @@ router.post(
   HandlerController.getLevelCountForDrop
 );
 
-router.post(
-  "/get-levels-by-topic-for-drop",
-  HandlerController.getLevelsByTopicForDrop
-);
 router.post("/get-standards-for-drop", HandlerController.getStandardsForDrop);
 router.post(
   "/get-organisations-for-drop",
@@ -103,7 +147,7 @@ router.post(
 );
 router.post(
   "/get-subtopic-by-level-for-drop",
-  HandlerController.getSubTopicByLevelForDrop
+  HandlerController.getSubTopicByTopicForDrop
 );
 
 router.get("/subjects", SubjectsController.index);
@@ -113,19 +157,24 @@ router.post("/subjects/destroy", SubjectsController.destroy);
 router.post("/subjects/data", SubjectsController.data);
 router.post("/subjects/update", SubjectsController.update);
 
+router.get("/levelslist", LevelListController.index);
+router.post("/levelslist/create", LevelListController.create);
+router.post("/levelslist/list", LevelListController.list);
+router.post("/levelslist/data", LevelListController.data);
+router.post("/levelslist/update", LevelListController.update);
+router.post("/levelslist/destroy", LevelListController.destroy);
+
 router.get("/topics", TopicsController.index);
 router.post("/topics/create", TopicsController.create);
 router.post("/topics/list", TopicsController.list);
 router.post("/topics/destroy", TopicsController.destroy);
 router.post("/topics/data", TopicsController.data);
 router.post("/topics/update", TopicsController.update);
-
-router.get("/levels", LevelController.index);
-router.post("/levels/create", LevelController.create);
-router.post("/levels/list", LevelController.list);
-router.post("/levels/destroy", LevelController.destroy);
-router.post("/levels/data", LevelController.data);
-router.post("/levels/update", LevelController.update);
+router.post(
+  "/topics/get-audio-messages-data",
+  TopicsController.getAudioMessagesData
+);
+router.post("/topics/add-audio-messages", TopicsController.audioMessagesUpdate);
 
 router.get("/category", CategoryController.index);
 router.post("/category/create", CategoryController.create);
@@ -185,6 +234,13 @@ router.post(
   "/questions-list/remove-image/drag-one",
   QuestionsController.removeImageDragOne
 );
+
+router.get("/questions-category", QuestionCategoryController.index);
+router.post("/questions-category/list", QuestionCategoryController.list);
+router.post("/questions-category/create", QuestionCategoryController.create);
+router.post("/questions-category/data", QuestionCategoryController.data);
+router.post("/questions-category/update", QuestionCategoryController.update);
+router.post("/questions-category/destroy", QuestionCategoryController.destroy);
 
 router.get("/sent-report", SentReportController.index);
 router.post("/sent-report/sent-mail", SentReportController.sentMail);

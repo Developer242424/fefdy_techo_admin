@@ -1,26 +1,11 @@
 const asyncHandler = require("express-async-handler");
 const { check, validationResult } = require("express-validator");
-const multer = require("multer");
-const User = require("../models/user");
-const Subjects = require("../models/subjects");
-const Topics = require("../models/topics");
-const Level = require("../models/level");
-const Category = require("../models/category");
-const QuestionType = require("../models/questiontype");
 const Questions = require("../models/questions");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { where, Sequelize, DATE } = require("sequelize");
-const { render } = require("ejs");
 require("dotenv").config();
-const session = require("express-session");
 const getDynamicUploader = require("../middleware/upload");
-const moment = require("moment");
-const { fn } = require("sequelize");
 const path = require("path");
 const fs = require("fs");
-const { title } = require("process");
-const { data } = require("./SubtopicController");
+const QuestionType = require("../models/questiontype");
 
 class QuestionsController {
   constructor() {
@@ -91,8 +76,8 @@ class QuestionsController {
           for (const value of correctData) {
             const obj = {
               subject,
+              level: level,
               topic,
-              level_id: level,
               sub_topic,
               question_type,
               data: value,
@@ -122,6 +107,63 @@ class QuestionsController {
             status: 200,
             message: "Questions created successfully",
           });
+        } else if (question_type === 4 || question_type === "4") {
+          await this.#BuildStructureMatchOfConditions(
+            { subject, topic, level, sub_topic, question_type, array },
+            req.files
+          );
+          return res.status(200).json({
+            status: 200,
+            message: "Questions created successfully",
+          });
+        } else if (question_type === 5 || question_type === "5") {
+          // console.log("requests", req.body);
+          // console.log("array", JSON.stringify(array));
+          const obj = {
+            subject,
+            level: level,
+            topic,
+            sub_topic,
+            question_type,
+            data: array,
+          };
+          await Questions.create(obj);
+          return res.status(200).json({
+            status: 200,
+            message: "Questions created successfully",
+          });
+        } else if (question_type === 6 || question_type === "6") {
+          // console.log("requests", req.body);
+          // console.log("array", JSON.stringify(array));
+          const obj = {
+            subject,
+            level: level,
+            topic,
+            sub_topic,
+            question_type,
+            data: array,
+          };
+          await Questions.create(obj);
+          return res.status(200).json({
+            status: 200,
+            message: "Questions created successfully",
+          });
+        } else if (question_type === 7 || question_type === "7") {
+          // console.log("requests", req.body);
+          // console.log("array", JSON.stringify(array));
+          const obj = {
+            subject,
+            level: level,
+            topic,
+            sub_topic,
+            question_type,
+            data: array,
+          };
+          await Questions.create(obj);
+          return res.status(200).json({
+            status: 200,
+            message: "Questions created successfully",
+          });
         }
 
         return res.status(200).json({
@@ -140,8 +182,8 @@ class QuestionsController {
         };
 
         if (subject) whereClause.subject = subject;
+        if (level) whereClause.level = level;
         if (topic) whereClause.topic = topic;
-        if (level) whereClause.level_id = level;
         if (sub_topic) whereClause.sub_topic = sub_topic;
         if (question_type) whereClause.question_type = question_type;
 
@@ -170,11 +212,42 @@ class QuestionsController {
             ) {
               question_text = value.data?.[0]?.question || "";
               question_thumbnail = "";
+            } else if (
+              value.question_type === 4 ||
+              value.question_type === "4"
+            ) {
+              question_text = value.data?.[0]?.question || "";
+              question_thumbnail = "";
+            } else if (
+              value.question_type === 5 ||
+              value.question_type === "5"
+            ) {
+              question_text = value.data?.[0]?.question?.text || "";
+              question_thumbnail = "";
+            } else if (
+              value.question_type === 6 ||
+              value.question_type === "6"
+            ) {
+              question_text = value.data?.[0]?.question?.text || "";
+              question_thumbnail = "";
+            } else if (
+              value.question_type === 7 ||
+              value.question_type === "7"
+            ) {
+              question_text = value.data?.[0]?.question?.text || "";
+              question_thumbnail = "";
             }
 
+            const ques_type = await QuestionType.findOne({
+              where: {
+                id: value.question_type
+              }
+            })
+            
             return {
               id: value.id,
               question_text,
+              question_type: ques_type.title,
               question_thumbnail: question_thumbnail
                 ? `<img src="../${question_thumbnail}" alt="Thumbnail" style="width: 50px;">`
                 : "-",
@@ -269,12 +342,14 @@ class QuestionsController {
 
           const updatedOptions = {};
           for (const key in option) {
-            const text = option[key].text;
+            const primary_text = option[key].primary_text;
+            const secondary_text = option[key].secondary_text;
             const isAnswer = !!option[key].is_answer;
             const thumbField = `option[${key}][thumbnail]`;
             const oldThumb = oldData?.option?.[key]?.thumbnail;
             updatedOptions[key] = {
-              text,
+              primary_text,
+              secondary_text,
               is_answer: isAnswer,
               thumbnail: replaceImage(thumbField, oldThumb),
             };
@@ -328,7 +403,7 @@ class QuestionsController {
             }
 
             const thumbField = `array[${index}][images][]`;
-            console.log("thumbField...", thumbField);
+            // console.log("thumbField...", thumbField);
 
             files.forEach((file) => {
               if (file.fieldname === thumbField) {
@@ -363,6 +438,30 @@ class QuestionsController {
           // console.log("mergedArray...", mergedArray);
 
           newData = mergedArray;
+        } else if (question_type == 4 || question_type === "4") {
+          let array = req.body.array;
+          // console.log("array", array);
+
+          if (typeof array === "string") array = JSON.parse(array);
+
+          const newArray = [];
+
+          for (let i = 0; i < array.length; i++) {
+            const item = array[i];
+            const newItem = { ...item };
+
+            for (const key of ["is_equal_one", "is_equal_two"]) {
+              if (item[key]) {
+                const thumbField = `array[${i}][${key}][thumbnail]`;
+                const oldThumb = oldData?.[i]?.[key]?.thumbnail;
+                newItem[key].thumbnail = replaceImage(thumbField, oldThumb);
+              }
+            }
+
+            newArray.push(newItem);
+          }
+
+          newData = newArray;
         } else {
           return res.status(200).json({
             status: 400,
@@ -515,8 +614,8 @@ class QuestionsController {
 
     const obj = {
       subject: requests.subject,
+      level: requests.level,
       topic: requests.topic,
-      level_id: requests.level,
       sub_topic: requests.sub_topic,
       question_type: requests.question_type,
       data: array,
@@ -555,12 +654,48 @@ class QuestionsController {
     // console.log("Final structured array:", result);
     const obj = {
       subject: requests.subject,
+      level: requests.level,
       topic: requests.topic,
-      level_id: requests.level,
       sub_topic: requests.sub_topic,
       question_type: requests.question_type,
       data: result,
     };
+
+    await Questions.create(obj);
+  }
+
+  async #BuildStructureMatchOfConditions(requests, files) {
+    const array = requests.array;
+
+    const fileMap = {};
+    files.forEach((file) => {
+      fileMap[file.fieldname] = `uploads/questions/${path.basename(file.path)}`;
+    });
+
+    array.forEach((question, qIndex) => {
+      if (qIndex !== 0) {
+        const optionKeys = ["is_equal_one", "is_equal_two"];
+
+        optionKeys.forEach((optKey) => {
+          const optionThumbKey = `array[${qIndex}][${optKey}][thumbnail]`;
+
+          if (fileMap[optionThumbKey]) {
+            if (!question[optKey]) question[optKey] = {};
+            question[optKey].thumbnail = fileMap[optionThumbKey];
+          }
+        });
+      }
+    });
+
+    const obj = {
+      subject: requests.subject,
+      level: requests.level,
+      topic: requests.topic,
+      sub_topic: requests.sub_topic,
+      question_type: requests.question_type,
+      data: array,
+    };
+    // console.log("obj", obj);
 
     await Questions.create(obj);
   }

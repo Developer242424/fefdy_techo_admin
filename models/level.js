@@ -1,65 +1,35 @@
 "use strict";
 const { Model, DataTypes } = require("sequelize");
-const sequelize = require("../config/database"); // adjust the path if needed
-
+const sequelize = require("../config/database");
 class Level extends Model {
+  /**
+   * Helper method for defining associations.
+   * This method is not a part of Sequelize lifecycle.
+   * The `models/index` file will call this method automatically.
+   */
   static associate(models) {
     // define association here
   }
 }
-
 Level.init(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    subject: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    topic: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    level: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    title: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    thumbnail: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    sort_order: { type: DataTypes.INTEGER, allowNull: true },
+    level: { type: DataTypes.STRING, allowNull: true },
+    game_templates: { type: DataTypes.JSON, allowNull: true },
     entered_at: {
       type: DataTypes.DATE,
       allowNull: true,
+      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
     },
-    edited_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-    is_deleted: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
+    edited_at: { type: DataTypes.DATE, allowNull: true },
+    is_deleted: { type: DataTypes.DATE, allowNull: true },
   },
   {
     sequelize,
-    modelName: "Level",
-    tableName: "levels",
-    timestamps: false,
+    modelName: "level",
+    tableName: "level",
     paranoid: true,
     deletedAt: "is_deleted",
+    timestamps: false,
   }
 );
 

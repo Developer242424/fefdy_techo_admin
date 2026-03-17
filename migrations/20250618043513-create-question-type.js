@@ -13,6 +13,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      title: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      description: {
+        type: Sequelize.TEXT("long"),
+        allowNull: true,
+      },
       thumbnail: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -23,6 +31,18 @@ module.exports = {
       },
       question_limit: {
         type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      max_time: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      max_attempts: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      structure_type: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
       entered_at: {

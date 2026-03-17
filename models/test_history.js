@@ -16,8 +16,8 @@ TestHistory.init(
   {
     user_id: { type: DataTypes.INTEGER, allowNull: true },
     subject: { type: DataTypes.INTEGER, allowNull: true },
+    level: { type: DataTypes.INTEGER, allowNull: true },
     topic: { type: DataTypes.INTEGER, allowNull: true },
-    level_id: { type: DataTypes.INTEGER, allowNull: true },
     sub_topic: { type: DataTypes.INTEGER, allowNull: true },
     question_type: { type: DataTypes.INTEGER, allowNull: true },
     question_ids: { type: DataTypes.JSON, allowNull: true },

@@ -4,7 +4,6 @@ const multer = require("multer");
 const User = require("../models/user");
 const Subjects = require("../models/subjects");
 const Topics = require("../models/topics");
-const Level = require("../models/level");
 const Category = require("../models/category");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -49,7 +48,7 @@ class CategoryController {
           return res.status(200).json({ status: 401, errors: errors.array() });
         }
         try {
-          const { title, type } = req.body;
+          const { title, description, type } = req.body;
           const file = req.file;
           if (!file) {
             return res
@@ -58,6 +57,7 @@ class CategoryController {
           }
           const insert = await Category.create({
             title: title,
+            description: description,
             type: type,
             thumbnail: `uploads/category/${file.filename}`,
           });
@@ -170,7 +170,7 @@ class CategoryController {
           return res.status(200).json({ status: 401, errors: errors.array() });
         }
         try {
-          const { edit_title, edit_type, edit_id } = req.body;
+          const { edit_title, edit_description, edit_type, edit_id } = req.body;
           const file = req.file;
           const category = await Category.findOne({ where: { id: edit_id } });
           if (!category) {
@@ -191,7 +191,9 @@ class CategoryController {
             });
             category.thumbnail = `uploads/category/${file.filename}`;
           }
-          (category.title = edit_title), (category.type = edit_type);
+          (category.title = edit_title),
+            (category.description = edit_description),
+            (category.type = edit_type);
           await category.save();
           return res.status(200).json({
             status: 200,

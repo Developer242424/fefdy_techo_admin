@@ -4,7 +4,6 @@ const multer = require("multer");
 const User = require("../models/user");
 const Subjects = require("../models/subjects");
 const Topics = require("../models/topics");
-const Level = require("../models/level");
 const Subtopic = require("../models/subtopic");
 const CategoryData = require("../models/categorydata");
 const Organisation = require("../models/organisation");

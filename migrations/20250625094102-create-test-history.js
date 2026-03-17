@@ -17,11 +17,11 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
-      topic: {
+      level: {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
-      level_id: {
+      topic: {
         type: Sequelize.INTEGER,
         allowNull: true,
       },

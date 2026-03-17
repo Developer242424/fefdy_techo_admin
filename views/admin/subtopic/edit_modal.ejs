@@ -32,21 +32,21 @@
                 </div>
                 <div class="col-sm-4">
                     <div class="form-group">
+                        <label for="edit_level">Level</label>
+                        <select name="edit_level" id="edit_level" class="form-control">
+                            <option value="">Select Level</option>
+                        </select>
+                        <p class="validate_error text-danger" id="edit_level_error"></p>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
                         <label for="edit_topic">Topic</label>
                         <select name="edit_topic" id="edit_topic" class="form-control">
                             <option value="">Select Topic</option>
 
                         </select>
                         <p class="validate_error text-danger" id="edit_topic_error"></p>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-                    <div class="form-group">
-                        <label for="edit_level">Level</label>
-                        <select name="edit_level" id="edit_level" class="form-control">
-                            <option value="">Select Level</option>
-                        </select>
-                        <p class="validate_error text-danger" id="edit_level_error"></p>
                     </div>
                 </div>
             </div>
@@ -117,6 +117,38 @@
 
 
             <!-- PDF Input -->
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="edit_learning_outcomes">Learning Outcomes</label>
+
+                    <div id="outcomes_wrapper_edit">
+
+                        <!-- First row in edit modal -->
+                        <div class="input-group mb-2 outcome-item">
+                            <input type="text" class="form-control" name="edit_learning_outcomes[]"
+                                placeholder="Type learning outcomes...">
+                            <button type="button" class="btn btn-primary" onclick="addOutcomeEdit()">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <p class="validate_error text-danger" id="edit_learning_outcomes_error"></p>
+                </div>
+            </div>
+            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+                <div id="limitToastEdit" class="toast align-items-center text-bg-danger border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            You can add only up to 5 learning outcomes.
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                            data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            </div>
 
 
 

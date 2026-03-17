@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drag it to the right spot!</title>
+
+  <link rel="stylesheet" href="/css/dragndrop.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Alata&family=Fredoka:wght@300..700&family=Londrina+Solid:wght@100;300;400;900&family=Quicksand:wght@300..700&family=REM:ital,wght@0,100..900;1,100..900&family=Russo+One&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+    integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+  <div class="iframe-scale-wrapper">
+    <div class="dd-container" id="dd-container">
+      <div class="dd-up">
+        <div class="timer-div">
+          <div class="timer-container">
+            <span id="timer">00:00</span>
+          </div>
+        </div>
+
+      </div>
+      <div class="dd-down">
+        <div class="dd-container" id="dd-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <!-- Success Modal -->
+  <div class="success-modal" id="success-modal">
+    <div class="modal-wrap">
+      <div class="score-modal">
+        <!-- Decorative blobs -->
+        <div class="blob yellow"></div>
+        <div class="blob pink"></div>
+        <div class="blob blue"></div>
+        <div class="blob green"></div>
+
+        <!-- Stars -->
+        <div class="stars">
+          <div class="star"></div>
+          <div class="star"></div>
+          <div class="star"></div>
+          <div class="star"></div>
+        </div>
+
+        <div class="modal-title">Great Job</div>
+        <div class="score-card">
+          Score: <span class="score-number" id="score-display"></span>
+        </div>
+
+        <div class="time-text" id="time-display">
+          Time Taken: 30 Seconds
+        </div>
+
+        <div class="button-row">
+          <button class="btn-replay" id="replay-btn">Replay</button>
+          <button class="btn-next" id="next-btn" onclick="completeTest()">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start Modal -->
+  <div class="start-modal" id="start-modal">
+    <div class="start-content">
+      <button class="start-button" onclick="startGame()">Start!</button>
+    </div>
+  </div>
+
+  <!-- Question Intro Modal -->
+  <div id="question-modal">
+    <div class="question-modal-content">
+      <h2 id="qm-number">Question 1 of 5</h2>
+      <p id="qm-text">Loading...</p>
+    </div>
+  </div>
+
+
+  <iframe id="dd-question-frame" class="dd-question-frame" style="display:none;"></iframe>
+
+  <script src="/js/dragndrop.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+</body>
+
+</html>

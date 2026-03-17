@@ -11,11 +11,13 @@ class OrgDetails extends Model {
 OrgDetails.init(
   {
     org_id: { type: DataTypes.INTEGER, allowNull: true },
+    user_id: { type: DataTypes.INTEGER, allowNull: true },
     subject: { type: DataTypes.INTEGER, allowNull: true },
     standard: { type: DataTypes.INTEGER, allowNull: true },
     section: { type: DataTypes.STRING, allowNull: true },
-    levels: { type: DataTypes.INTEGER, allowNull: true },
+    level: { type: DataTypes.JSON, allowNull: true },
     stu_count: { type: DataTypes.INTEGER, allowNull: true },
+    user_type: { type: DataTypes.STRING, allowNull: true },
     entered_at: { type: DataTypes.DATE, allowNull: true },
     edited_at: { type: DataTypes.DATE, allowNull: true },
     is_deleted: { type: DataTypes.DATE, allowNull: true },

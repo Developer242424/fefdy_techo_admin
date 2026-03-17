@@ -12,6 +12,10 @@ Category.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    description: {
+      type: DataTypes.TEXT('long'),
+      allowNull: true,
+    },
     type: {
       type: DataTypes.STRING,
       allowNull: true,

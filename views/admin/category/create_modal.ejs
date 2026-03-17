@@ -30,6 +30,14 @@
                     </div>
                     <div class="col-sm-12">
                         <div class="form-group">
+                            <label for="description">Description</label>
+                            <!-- <input class="form-control" type="text" name="description" id="description" placeholder="Category Description"> -->
+                            <textarea class="form-control summernote" type="text" name="description" id="description" placeholder="Category Description"></textarea>
+                            <p class="validate_error text-danger" id="description_error"></p>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group">
                             <label for="type">Type</label>
                             <select name="type" id="type" class="form-control">
                                 <option value="">Select Type</option>

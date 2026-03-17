@@ -1,21 +1,14 @@
 const asyncHandler = require("express-async-handler");
 const { check, validationResult } = require("express-validator");
-const multer = require("multer");
-const User = require("../models/user");
 const Subjects = require("../models/subjects");
+const Level = require("../models/level");
 const Topics = require("../models/topics");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { where, Sequelize, DATE } = require("sequelize");
-const { render } = require("ejs");
+const QuestionType = require("../models/questiontype");
+const Category = require("../models/category");
 require("dotenv").config();
-const session = require("express-session");
 const getDynamicUploader = require("../middleware/upload");
-const moment = require("moment");
-const { fn } = require("sequelize");
 const path = require("path");
 const fs = require("fs");
-const { title } = require("process");
 
 class TopicsController {
   constructor() {
@@ -52,6 +45,12 @@ class TopicsController {
         .bail()
         .isNumeric()
         .withMessage("Subject is need to be numeric"),
+      check("level")
+        .notEmpty()
+        .withMessage("Level is required")
+        .bail()
+        .isNumeric()
+        .withMessage("Level is need to be numeric"),
       check("title")
         .notEmpty()
         .withMessage("Title is required")
@@ -64,12 +63,6 @@ class TopicsController {
         .bail()
         .isLength({ min: 3 })
         .withMessage("Description must be at least 3 characters long"),
-      check("levels")
-        .notEmpty()
-        .withMessage("Levels is required")
-        .bail()
-        .isNumeric()
-        .withMessage("Levels is need to be numeric"),
       check("sort_order")
         .notEmpty()
         .withMessage("Sort Order is required")
@@ -84,7 +77,8 @@ class TopicsController {
         }
 
         try {
-          const { subject, title, description, levels, sort_order } = req.body;
+          const { subject, level, title, description, levels, sort_order } =
+            req.body;
           const file = req.file;
 
           if (!file) {
@@ -95,9 +89,9 @@ class TopicsController {
 
           const insert = await Topics.create({
             subject: subject,
+            level: level,
             title: title,
             description: description,
-            levels: levels,
             sort_order: sort_order,
             thumbnail: `uploads/topics/${file.filename}`,
           });
@@ -130,17 +124,23 @@ class TopicsController {
               where: { id: value.subject },
               attributes: ["subject"],
             });
+            const level = await Level.findOne({
+              where: { id: value.level },
+              attributes: ["level"],
+            });
 
             return {
               id: value.id,
               title: value.title,
               subject: value.subject,
+              level: value.level,
               subject_name: subject ? subject.subject : "",
+              level_name: level ? level.level : "",
               description: value.description,
-              levels: value.levels ? value.levels : "-",
               thumbnail: `<img src="../${value.thumbnail}" alt="Thumbnail" style="width: 50px;">`,
               action: `
                   <button class='btn btn-primary btn-sm' onclick="OpenEditModal(${value.id})">Edit</button>
+                  <button class='btn btn-primary btn-sm' onclick="OpenAudioMessagesModal(${value.id})"><span><i class="ti ti-code-plus px-1"></i><span>Messages</span></span></button>
                   <button class='btn btn-danger btn-sm' onclick="DeleteData(${value.id})">Delete</button>
                 `,
             };
@@ -220,6 +220,12 @@ class TopicsController {
         .bail()
         .isNumeric()
         .withMessage("Subject is need to be numeric"),
+      check("edit_level")
+        .notEmpty()
+        .withMessage("Level is required")
+        .bail()
+        .isNumeric()
+        .withMessage("Level is need to be numeric"),
       check("edit_title")
         .notEmpty()
         .withMessage("Title is required")
@@ -232,12 +238,6 @@ class TopicsController {
         .bail()
         .isLength({ min: 3 })
         .withMessage("Description must be at least 3 characters long"),
-      check("edit_levels")
-        .notEmpty()
-        .withMessage("Levels is required")
-        .bail()
-        .isNumeric()
-        .withMessage("Levels is need to be numeric"),
       check("edit_sort_order")
         .notEmpty()
         .withMessage("Sort Order is required")
@@ -254,10 +254,10 @@ class TopicsController {
         try {
           const {
             edit_subject,
+            edit_level,
             edit_title,
             edit_description,
             edit_id,
-            edit_levels,
             edit_sort_order,
           } = req.body;
           const file = req.file;
@@ -281,10 +281,10 @@ class TopicsController {
           }
 
           (topic.subject = edit_subject),
+            (topic.level = edit_level),
             (topic.title = edit_title),
             (topic.description = edit_description),
-            (topic.levels = edit_levels),
-          (topic.sort_order = edit_sort_order);
+            (topic.sort_order = edit_sort_order);
 
           await topic.save();
 
@@ -293,6 +293,183 @@ class TopicsController {
             message: "Topic is updated successfully",
           });
         } catch (error) {
+          return res.status(200).json({
+            status: 500,
+            message: "Internal server error - " + error.message,
+            error,
+          });
+        }
+      }),
+    ];
+
+    this.getAudioMessagesData = asyncHandler(async (req, res) => {
+      try {
+        const { topic } = req.body;
+        if (!topic) {
+          return res.status(200).json({
+            status: 400,
+            message: "Topic ID is required",
+          });
+        }
+        const topicData = await Topics.findOne({ where: { id: topic } });
+        if (!topicData) {
+          return res.status(200).json({
+            status: 400,
+            message: "Topic not found",
+          });
+        }
+        if (topicData.audio_messages) {
+          return res.status(200).json({
+            status: 200,
+            type: "update",
+            data: topicData.audio_messages,
+          });
+        } else {
+          const categories = await Category.findAll({
+            where: {
+              is_deleted: null,
+            },
+          });
+          const question_type = await QuestionType.findAll({
+            where: {
+              is_deleted: null,
+            },
+          });
+          return res
+            .status(200)
+            .json({ status: 200, type: "fresh", categories, question_type });
+        }
+      } catch (error) {
+        return res.status(200).json({
+          status: 500,
+          message: "Internal server error - " + error.message,
+          error,
+        });
+      }
+    });
+
+    this.audioMessagesUpdate = [
+      // 1️⃣ Handle file uploads (multer dynamic uploader)
+      (req, res, next) => {
+        const upload = getDynamicUploader("topics_messages").any();
+        upload(req, res, function (err) {
+          if (err) {
+            return res.status(200).json({
+              status: 400,
+              message: err.message || "File upload error",
+            });
+          }
+          next();
+        });
+      },
+
+      // 2️⃣ Process and save
+      asyncHandler(async (req, res) => {
+        try {
+          const files = req.files || [];
+          const { audio_messages_data, topic_id } = req.body;
+
+          if (!topic_id) {
+            return res.status(200).json({
+              status: 400,
+              message: "Topic ID is required",
+            });
+          }
+
+          // 🔹 Parse JSON safely
+          let parsedData;
+          try {
+            parsedData =
+              typeof audio_messages_data === "string"
+                ? JSON.parse(audio_messages_data)
+                : audio_messages_data;
+          } catch (e) {
+            parsedData = { categories: [], question_type: [] };
+          }
+
+          // 🔹 Get the existing topic and its current audio JSON (if any)
+          const topic = await Topics.findOne({ where: { id: topic_id } });
+          if (!topic) {
+            return res.status(200).json({
+              status: 400,
+              message: "Topic not found",
+            });
+          }
+
+          const existingAudioData = topic.audio_messages || {
+            categories: [],
+            question_type: [],
+          };
+
+          // 🔹 Build a lookup for uploaded files (multer style)
+          const fileMap = {};
+          for (const f of files) {
+            fileMap[f.fieldname] = f.filename;
+          }
+
+          // 🟢 Final result JSON to store
+          const result = { categories: [], question_type: [] };
+
+          // ========== 🟢 Update Categories ==========
+          if (Array.isArray(parsedData.categories)) {
+            parsedData.categories.forEach((cat, index) => {
+              const introKey = `audio_messages_data[categories][${index}][intro_audio]`;
+              const compKey = `audio_messages_data[categories][${index}][completion_audio]`;
+
+              // find existing data if present
+              const existingCat =
+                existingAudioData.categories?.find((c) => c.id == cat.id) || {};
+
+              result.categories.push({
+                id: cat.id,
+                name: cat.name,
+                intro_audio: fileMap[introKey]
+                  ? `uploads/topics_messages/${fileMap[introKey]}`
+                  : existingCat.intro_audio || "",
+                completion_audio: fileMap[compKey]
+                  ? `uploads/topics_messages/${fileMap[compKey]}`
+                  : existingCat.completion_audio || "",
+              });
+            });
+          }
+
+          // ========== 🔵 Update Question Types ==========
+          if (Array.isArray(parsedData.question_type)) {
+            parsedData.question_type.forEach((qt, index) => {
+              const introKey = `audio_messages_data[question_type][${index}][intro_audio]`;
+              const compKey = `audio_messages_data[question_type][${index}][completion_audio]`;
+
+              const existingQT =
+                existingAudioData.question_type?.find((q) => q.id == qt.id) ||
+                {};
+
+              result.question_type.push({
+                id: qt.id,
+                name: qt.name,
+                intro_audio: fileMap[introKey]
+                  ? `uploads/topics_messages/${fileMap[introKey]}`
+                  : existingQT.intro_audio || "",
+                completion_audio: fileMap[compKey]
+                  ? `uploads/topics_messages/${fileMap[compKey]}`
+                  : existingQT.completion_audio || "",
+              });
+            });
+          }
+
+          // 🧩 Update the DB — column is already JSON type
+          await Topics.update(
+            { audio_messages: result },
+            { where: { id: topic_id } }
+          );
+
+          // ✅ Success response
+          return res.status(200).json({
+            status: 200,
+            message: "Audio messages updated successfully",
+            data: result,
+          });
+        } catch (error) {
+          console.error("❌ Audio message update error:", error);
           return res.status(200).json({
             status: 500,
             message: "Internal server error - " + error.message,

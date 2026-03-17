@@ -61,32 +61,6 @@
                         <p class="validate_error text-danger" id="edit_individual_password_error"></p>
                     </div>
                 </div>
-
-                <div class="col-sm-3">
-                    <div class="form-group">
-                        <label for="edit_individual_subject">Subject</label>
-                        <select name="edit_individual_subject[]" id="edit_individual_subject" multiple
-                            class="form-control">
-                            <option value="">Select Subject</option>
-                        </select>
-                        <p class="validate_error text-danger" id="edit_individual_subject_error"></p>
-                    </div>
-                </div>
-
-                <div class="col-sm-3">
-                    <div class="form-group">
-                        <label for="edit_individual_level">Levels</label>
-                        <select name="edit_individual_level" id="edit_individual_level" class="form-control">
-                            <option value="">Select level</option>
-                            <% for (let i=1; i <=lvlftopic.levels; i++) { %>
-                                <option value="<%= i %>">
-                                    <%= i %>
-                                </option>
-                                <% } %>
-                        </select>
-                        <p class="validate_error text-danger" id="edit_individual_level_error"></p>
-                    </div>
-                </div>
                 <div class="col-sm-3">
                     <div class="form-group">
                         <label for="edit_individual_profile_image">Profile pictures</label>
@@ -107,6 +81,35 @@
                     </div>
                 </div>
             </div>
+            <div id="edit_rowContainer">
+                    <div class="row form-row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="edit_individual_subject">Subject</label>
+                                <select name="edit_org_details[0][subject]" id="edit_individual_subject"
+                                    class="form-control">
+                                </select>
+                                <p class="validate_error text-danger" id="edit_individual_subject_error"></p>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="edit_individual_level">Levels</label>
+                                <select name="edit_org_details[0][level][]" id="edit_individual_level" class="form-control" multiple>
+                                </select>
+                                <p class="validate_error text-danger" id="edit_individual_level_error"></p>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-1 d-flex align-items-end">
+                            <div class="form-group">
+                                <button type="button" class="btn btn-danger" data-remove-btn="">-</button>
+                                <button type="button" class="btn btn-success" data-add-btn="">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
         </div>
         <div class="modal-footer">

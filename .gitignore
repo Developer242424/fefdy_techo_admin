@@ -5,3 +5,6 @@
 /git-filter-repo
 config.js
 /config/*
+/.well-known
+/cgi-bin
+/config/*

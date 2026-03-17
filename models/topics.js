@@ -8,10 +8,11 @@ Topics.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     subject: { type: DataTypes.INTEGER, allowNull: true },
+    level: { type: DataTypes.INTEGER, allowNull: true },
     title: { type: DataTypes.STRING, allowNull: true },
     description: { type: DataTypes.TEXT, allowNull: true },
     thumbnail: { type: DataTypes.STRING, allowNull: true },
-    levels: { type: DataTypes.INTEGER, allowNull: true },
+    audio_messages: { type: DataTypes.JSON, allowNull: true },
     sort_order: { type: DataTypes.INTEGER, allowNull: true },
     entered_at: { type: DataTypes.DATE, allowNull: true },
     edited_at: { type: DataTypes.DATE, allowNull: true },

@@ -64,30 +64,6 @@
 
                 <div class="col-sm-3">
                     <div class="form-group">
-                        <label for="individual_subject">Subject</label>
-                        <select name="individual_subject[]" id="individual_subject" multiple class="form-control">
-                            <option value="">Select Subject</option>
-                        </select>
-                        <p class="validate_error text-danger" id="individual_subject_error"></p>
-                    </div>
-                </div>
-
-                <div class="col-sm-3">
-                    <div class="form-group">
-                        <label for="individual_level">Levels</label>
-                        <select name="individual_level" id="individual_level" class="form-control">
-                            <option value="">Select level</option>
-                            <% for (let i=1; i <=lvlftopic.levels; i++) { %>
-                                <option value="<%= i %>">
-                                    <%= i %>
-                                </option>
-                                <% } %>
-                        </select>
-                        <p class="validate_error text-danger" id="individual_level_error"></p>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="form-group">
                         <label for="individual_profile_image">Profile pictures</label>
                         <input type="file" accept=".jpg,.jpeg,.png,.webp" class="form-control"
                             name="individual_profile_image" id="individual_profile_image">
@@ -103,6 +79,35 @@
                         <p class="validate_error text-danger" id="individual_dob_error"></p>
                     </div>
                 </div>
+                <div id="rowContainer">
+                    <div class="row form-row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="individual_subject">Subject</label>
+                                <select name="org_details[0][subject]" id="individual_subject"
+                                    class="form-control">
+                                </select>
+                                <p class="validate_error text-danger" id="individual_subject_error"></p>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="individual_level">Levels</label>
+                                <select name="org_details[0][level][]" id="individual_level" class="form-control" multiple>
+                                </select>
+                                <p class="validate_error text-danger" id="individual_level_error"></p>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-1 d-flex align-items-end">
+                            <div class="form-group">
+                                <button type="button" class="btn btn-danger" data-remove-btn="">-</button>
+                                <button type="button" class="btn btn-success" data-add-btn="">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
 
             </div>
@@ -112,7 +117,7 @@
                     <button class="submit form-submit-button" id="individual_create_btn" type="submit">Submit</button>
                 </div>
             </div>
-
+            
 
         </div>
     </form>

@@ -21,7 +21,7 @@ const getDynamicUploader = (folder) => {
   const upload = multer({
     storage,
     fileFilter: (req, file, cb) => {
-      const filetypes = /jpeg|jpg|png|webp|pdf|csv|xlsx|svg|gif/;
+      const filetypes = /jpeg|jpg|png|webp|pdf|csv|xlsx|svg|gif|m4a|mp3|wav/;
       const extname = filetypes.test(
         path.extname(file.originalname).toLowerCase()
       );

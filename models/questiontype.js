@@ -16,9 +16,17 @@ class QuestionType extends Model {
 QuestionType.init(
   {
     type: { type: DataTypes.STRING, allowNull: true },
+    title: { type: DataTypes.STRING, allowNull: true },
+    description: {
+      type: DataTypes.TEXT("long"),
+      allowNull: true,
+    },
     thumbnail: { type: DataTypes.STRING, allowNull: true },
     template: { type: DataTypes.STRING, allowNull: true },
     question_limit: { type: DataTypes.INTEGER, allowNull: true },
+    max_time: { type: DataTypes.INTEGER, allowNull: true },
+    max_attempts: { type: DataTypes.INTEGER, allowNull: true },
+    structure_type: { type: DataTypes.STRING, allowNull: true },
     entered_at: {
       type: DataTypes.DATE,
       allowNull: true,

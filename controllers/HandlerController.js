@@ -1,26 +1,13 @@
 const asyncHandler = require("express-async-handler");
 const { check, validationResult } = require("express-validator");
-const multer = require("multer");
-const User = require("../models/user");
 const Subjects = require("../models/subjects");
-const Topics = require("../models/topics");
 const Level = require("../models/level");
+const Topics = require("../models/topics");
 const Subtopic = require("../models/subtopic");
 const Standards = require("../models/standards");
 const Organisation = require("../models/organisation");
 const QuestionType = require("../models/questiontype");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { where, Sequelize, DATE } = require("sequelize");
-const { render } = require("ejs");
 require("dotenv").config();
-const session = require("express-session");
-const getDynamicUploader = require("../middleware/upload");
-const moment = require("moment");
-const { fn } = require("sequelize");
-const path = require("path");
-const fs = require("fs");
-const { title } = require("process");
 
 class HandlerController {
   constructor() {
@@ -34,12 +21,23 @@ class HandlerController {
       return res.status(200).json({ status: 200, data });
     });
 
+    this.getLevelForDrop = asyncHandler(async (req, res) => {
+      const data = await Level.findAll({
+        where: {
+          is_deleted: null,
+        },
+        order: [["id", "ASC"]],
+      });
+      return res.status(200).json({ status: 200, data });
+    });
+
     this.getTopicBySubjectForDrop = asyncHandler(async (req, res) => {
-      const { id } = req.body;
+      const { id, level } = req.body;
       const data = await Topics.findAll({
         where: {
           is_deleted: null,
           subject: id,
+          level: level,
         },
         order: [["id", "ASC"]],
       });
@@ -77,24 +75,12 @@ class HandlerController {
       }
     });
 
-    this.getLevelsByTopicForDrop = asyncHandler(async (req, res) => {
-      const { id } = req.body;
-      const data = await Level.findAll({
-        where: {
-          is_deleted: null,
-          topic: id,
-        },
-        order: [["id", "ASC"]],
-      });
-      return res.status(200).json({ status: 200, data });
-    });
-
-    this.getSubTopicByLevelForDrop = asyncHandler(async (req, res) => {
+    this.getSubTopicByTopicForDrop = asyncHandler(async (req, res) => {
       const { id } = req.body;
       const data = await Subtopic.findAll({
         where: {
           is_deleted: null,
-          level_id: id,
+          topic: id,
         },
         order: [["id", "ASC"]],
       });

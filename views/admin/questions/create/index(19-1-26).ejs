@@ -1,0 +1,1373 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Alata&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Jersey+25&display=swap');
+
+  :root {
+    --bg-app: #1e1e1e;
+    --bg-panel: #2c2c2c;
+    --bg-hover: #383838;
+    --bg-active: #0d99ff;
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3b3;
+    --border-color: #444444;
+    --input-bg: #1e1e1e;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+  }
+
+  /* LEFT TOOLBAR */
+  .toolbar {
+    width: 240px;
+    background: var(--bg-panel);
+    border-right: 1px solid #000;
+    padding: 16px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-sizing: border-box;
+  }
+
+  .toolbar-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .tool-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-sm);
+    text-align: left;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+  }
+
+  .tool-btn:hover {
+    background: var(--bg-hover);
+  }
+
+  .tool-btn svg {
+    opacity: 0.8;
+  }
+
+  /* MIDDLE TEMPLATE AREA */
+  .canvas-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .canvas {
+    width: 80%;
+    height: 100%;
+    background: #c8ff80;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .question-space {
+    height: 80px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
+
+  #editor_questionText {
+    font-family: "Alata", sans-serif;
+    font-size: 32px;
+    color: #000000;
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    text-align: center;
+  }
+
+  #editor_questionText::placeholder {
+    color: rgba(0, 0, 0, 0.3);
+  }
+
+  .content-row {
+    flex: 1;
+    display: flex;
+    gap: 18pc;
+  }
+
+  .image-box {
+    width: 40%;
+    background: white;
+    border-radius: 20px;
+    position: relative;
+    overflow: visible;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    height: 80%;
+  }
+
+  .answer-box {
+    flex: 1;
+    border-radius: 10px;
+    position: relative;
+    overflow: visible;
+  }
+
+  /* DROPZONE STYLES */
+  .dropzone {
+    width: 80px;
+    height: 40px;
+    border: 2px solid #000;
+    border-radius: 6px;
+    background: #fff;
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  }
+
+  .dropzone:active {
+    cursor: grabbing;
+  }
+
+  /* LINE STYLES */
+  .line {
+    width: 80px;
+    height: 2px;
+    background: #000;
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+  }
+
+  .line:active {
+    cursor: grabbing;
+  }
+
+  /* ANSWER ELEMENT STYLES */
+  .answer-element {
+    padding: 10px 15px;
+    background: #8e583d;
+    border-radius: 6px;
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+    color: white;
+    font-size: 20px;
+    font-family: "Fredoka One", sans-serif;
+  }
+
+  .answer-element:active {
+    cursor: grabbing;
+  }
+
+  /* RIGHT PROPERTIES PANEL */
+  .properties {
+    width: 280px;
+    background: var(--bg-panel);
+    border-left: 1px solid #000;
+    padding: 0;
+    box-sizing: border-box;
+    color: var(--text-primary);
+    overflow-y: auto;
+    height: 77vh;
+  }
+
+  .prop-section {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .prop-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .prop-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .prop-field label {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .prop-field input {
+    background: var(--input-bg);
+    border: 1px solid transparent;
+    color: var(--text-primary);
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-family: "Inter", sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .prop-field input:focus {
+    border-color: var(--bg-active);
+    background: #222;
+  }
+
+  .prop-field input:hover {
+    border-color: #555;
+  }
+
+  .prop-field input.error {
+    border-color: #ff4d4d;
+  }
+
+  .error-message {
+    font-size: 10px;
+    color: #ff4d4d;
+  }
+
+  .delete-btn {
+    background: transparent;
+    border: 1px solid #ff4d4d;
+    color: #ff4d4d;
+    width: 100%;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .delete-btn:hover {
+    background: rgba(255, 77, 77, 0.1);
+  }
+
+  .hidden-fields {
+    display: none;
+  }
+
+  .hidden-fields.show {
+    display: block;
+  }
+
+
+
+  /* identify editor */
+
+
+  .top-navbar {
+    height: 56px;
+    background: linear-gradient(to bottom, #1a1a1a, #161616);
+    border-bottom: 1px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 24px;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+  }
+
+  .top-navbar-actions {
+    display: flex;
+    gap: 12px;
+    margin-left: auto;
+  }
+
+  .top-navbar-actions div {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+  }
+
+  .top-navbar-actions div:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.5);
+  }
+
+  .app-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .sidebar-left {
+    background: linear-gradient(to bottom, #1a1a1a, #151515);
+    border-right: 1px solid #2a2a2a;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 0;
+    overflow-y: auto;
+  }
+
+  .sidebar-left::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .sidebar-left::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .sidebar-left::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 4px;
+  }
+
+  .sidebar-section {
+    border-bottom: 1px solid #2a2a2a;
+    padding: 16px 12px;
+  }
+
+  .sidebar-section:last-child {
+    border-bottom: none;
+  }
+
+  .sidebar-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #888;
+    padding: 0 8px 12px;
+    letter-spacing: 1px;
+  }
+
+  .toolbar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 0 8px;
+  }
+
+  .toolbar div {
+    padding: 10px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: 1px solid #333;
+    cursor: pointer;
+    background: #222;
+    color: #e5e5e5;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    user-select: none;
+  }
+
+  .toolbar div:hover {
+    background: #2d2d2d;
+    border-color: #404040;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  .toolbar div:active {
+    transform: scale(0.98);
+  }
+
+  .properties-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .property-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .property-input-group label {
+    font-size: 11px;
+    color: #aaa;
+    font-weight: 500;
+  }
+
+  .property-input-group input[type="number"],
+  .property-input-group input[type="text"],
+  .property-input-group input[type="color"] {
+    padding: 8px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: 1px solid #333;
+    background: #202020;
+    color: #e5e5e5;
+    transition: all 0.15s;
+  }
+
+  .property-input-group input:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: #252525;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+
+  .checkbox-row {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #ccc;
+  }
+
+  .checkbox-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #6366f1;
+  }
+
+  .no-selection {
+    text-align: center;
+    color: #666;
+    font-size: 12px;
+    padding: 20px;
+  }
+
+  .main-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .question-space-id {
+    font-family: 'Jersey 25', sans-serif;
+    padding: 16px 40px;
+    background: transparent;
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    position: absolute;
+    flex-shrink: 0;
+    z-index: 2;
+    bottom: 34pc;
+  }
+
+  input#editor_questionText-id {
+    border: none;
+    font-size: 26px;
+    background: #fff;
+    color: #C60055;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .canvas-wrapper-id {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    padding: 40px;
+    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+  }
+
+  #canvas-id {
+    width: 900px;
+    height: 540px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .canvas-item {
+    position: absolute !important;
+    border-radius: 4px;
+    box-shadow: none;
+    transition: box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10 !important;
+  }
+
+  .canvas-item.selected {
+    box-shadow:
+      0 0 0 2px #fff,
+      0 0 0 3px #6366f1,
+      0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+
+  .canvas-item .content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 4px;
+    text-align: center;
+  }
+
+  .canvas-item .content.text {
+    cursor: text;
+    user-select: text;
+  }
+
+  .canvas-item .content img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .resize-handle {
+    width: 8px;
+    height: 8px;
+    background: #6366f1;
+    border-radius: 999px;
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    cursor: se-resize;
+    box-shadow: 0 0 0 2px #fff, 0 0 4px rgba(99, 102, 241, 0.5);
+  }
+
+  .dragging,
+  .dragging * {
+    user-select: none !important;
+  }
+
+  .action-link {
+    padding: 8px 16px;
+    background: #2d3748;
+    border: none;
+    border-radius: 6px;
+    color: #f0f0f0;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 8px;
+    user-select: none;
+    font-weight: 500;
+  }
+
+  .action-link:hover {
+    background: #3a4556;
+  }
+
+  .action-link:active {
+    transform: scale(0.98);
+  }
+
+  .delete-link {
+    background: #c53030;
+    grid-column: 1 / -1;
+  }
+
+  .delete-link:hover {
+    background: #d63030;
+  }
+
+  .bg-button {
+    grid-column: 1 / -1;
+  }
+
+  .forward-back-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .forward-back-grid div {
+    padding: 8px;
+  }
+</style>
+
+<% if (typeof title !=='undefined' ) { %>
+  <h1>
+    <%= title %>
+  </h1>
+  <% } else { %>
+    <h1>Fefdy</h1>
+    <% } %>
+
+      <div class="col-sm-12">
+        <form id="questions_create_form" method="post" enctype="multipart/form-data" class="row">
+          <div class="card">
+            <div class="card-body">
+              <div class="container">
+                <div class="row">
+                  <div class="col-sm-4">
+                    <div class="form-group">
+                      <label for="subject">Subject</label>
+                      <select name="subject" id="subject" class="form-control">
+                        <option value="">Select Subject</option>
+                      </select>
+                      <p class="validate_error text-danger" id="subject_error"></p>
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="form-group">
+                      <label for="level">Level</label>
+                      <select name="level" id="level" class="form-control">
+                        <option value="">Select Level</option>
+                      </select>
+                      <p class="validate_error text-danger" id="level_error"></p>
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="form-group">
+                      <label for="topic">Topic</label>
+                      <select name="topic" id="topic" class="form-control">
+                        <option value="">Select Topic</option>
+                      </select>
+                      <p class="validate_error text-danger" id="topic_error"></p>
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="form-group">
+                      <label for="sub_topic">Sub Topic</label>
+                      <select name="sub_topic" class="form-control" id="sub_topic">
+                        <option value="">Select Sub Topic</option>
+                      </select>
+                      <p class="validate_error text-danger" id="sub_topic_error"></p>
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="form-group">
+                      <label for="question_type">Question Type</label>
+                      <select name="question_type" class="form-control" id="question_type">
+                        <option value="">Select Question Type</option>
+                      </select>
+                      <p class="validate_error text-danger" id="question_type_error"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="questionCardContainer"></div>
+        </form>
+      </div>
+
+      <!--   choose the following  -->
+      <script type="text/template" id="questionCardTemplate">
+  <div class="card question-card mt-3">
+    <div class="card-body">
+      <div class="container">
+        <div class="">
+              <div class="col-sm-11">
+                <div class="row">
+                  <div class="col-sm-9">
+                    <div class="form-group">
+                      <label>Question</label>
+                      <textarea name="array[][question][text]" class="form-control" rows="4"></textarea>
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label>Thumbnail</label><br>
+                      <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                              <i class="material-icons">image</i>
+                              <img class="thumbnail-preview-img" style="display:none;">
+                              <input type="file" name ="array[][question][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                            </div>
+
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row option-row">
+                  <!-- Option 1 -->
+                  <div class="col-sm-3">
+                    <div class="row option-card">
+                      <div class="">
+                        <div class="form-group">
+                          <label>
+                            <input type="checkbox" name="array[][option][option_a][is_answer]" />
+                            Option A
+                          </label>
+
+                          <label for="primary-text">Primary Text</label>
+                          <textarea name="array[][option][option_a][primary_text]" class="form-control" rows="1"></textarea>
+
+                          <label for="secondary-text">Secondary Text</label>
+                          <textarea name="array[][option][option_a][secondary_text]" class="form-control" rows="3"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="">
+                        <div class="form-group">
+                          <label>Thumbnail</label><br>
+                          <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                            <i class="material-icons">image</i><br>
+                            <small>Click to upload</small>
+                            <img class="thumbnail-preview-img" style="display:none;">
+                            <input type="file" name="array[][option][option_a][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Option 2 -->
+                  <div class="col-sm-3">
+                    <div class="row option-card">
+                      <div class="">
+                        <div class="form-group">
+                          <label>
+                            <input type="checkbox" name="array[][option][option_b][is_answer]" />
+                            Option B
+                          </label>
+
+                          <label for="primary-text">Primary Text</label>
+                          <textarea name="array[][option][option_b][primary_text]" class="form-control" rows="1"></textarea>
+
+                          <label for="secondary-text">Secondary Text</label>
+                          <textarea name="array[][option][option_b][secondary_text]" class="form-control" rows="3"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="">
+                        <div class="form-group">
+                          <label>Thumbnail</label><br>
+                          <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                            <i class="material-icons">image</i><br>
+                            <small>Click to upload</small>
+                           <img class="thumbnail-preview-img" style="display:none;">
+                            <input type="file" name="array[][option][option_b][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Option 3 -->
+                  <div class="col-sm-3">
+                    <div class="row option-card">
+                      <div class="">
+                        <div class="form-group">
+                          <label>
+                            <input type="checkbox" name="array[][option][option_c][is_answer]" />
+                            Option C
+                          </label>
+
+                          <label for="primary-text">Primary Text</label>
+                          <textarea name="array[][option][option_c][primary_text]" class="form-control" rows="1"></textarea>
+
+                          <label for="secondary-text">Secondary Text</label>
+                          <textarea name="array[][option][option_c][secondary_text]" class="form-control" rows="3"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="">
+                        <div class="form-group">
+                          <label>Thumbnail</label><br>
+                          <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                            <i class="material-icons">image</i><br>
+                            <small>Click to upload</small>
+                            <img class="thumbnail-preview-img" style="display:none;">
+                            <input type="file" name="array[][option][option_c][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Option 4 -->
+                  <div class="col-sm-3">
+                    <div class="row option-card">
+                      <div class="">
+                        <div class="form-group">
+                          <label>
+                            <input type="checkbox" name="array[][option][option_d][is_answer]" />
+                            Option D
+                          </label>
+
+                          <label for="primary-text">Primary Text</label>
+                          <textarea name="array[][option][option_d][primary_text]" class="form-control" rows="1"></textarea>
+
+                          <label for="secondary-text">Secondary Text</label>
+                          <textarea name="array[][option][option_d][secondary_text]" class="form-control" rows="3"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="">
+                        <div class="form-group">
+                          <label>Thumbnail</label><br>
+                          <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                            <i class="material-icons">image</i><br>
+                            <small>Click to upload</small>
+                            <img class="thumbnail-preview-img" style="display:none;">
+                            <input type="file" name="array[][option][option_d][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Add/Delete buttons -->
+              <div class="d-flex flex-row justify-content-between align-items-center" style="height: 100%;">
+                <div><i class="material-icons delte delete-icon" style="cursor: pointer;">delete</i></div>
+                <div><i class="material-icons add add-icon" style="cursor: pointer;">add</i></div>
+                <!-- <div style="flex-grow: 1;"></div> -->
+
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+      <!--   match the following  -->
+      <script type="text/template" id="matchquestionCardTemplate">
+  <!-- Question Block -->
+      <div class="card question-card mt-3">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label>Question</label>
+                <textarea name="array[][question]" class="form-control" rows="1"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </script>
+      <!-- First Instruction + Options Block -->
+      <script type="text/template" id="matchInstructionCardTemplate">
+  <div class="card question-card match-instruction-card mt-3">
+    <div class="card-body">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+              <div class="col-sm-12">
+                <div class="row">
+                  <div class="col-sm-11">
+                    <div class="form-group">
+                      <label>Instruction</label>
+                      <textarea name="array[][instruction]" class="form-control" rows="1"></textarea>
+                    </div>
+                    <div class="row">
+                      <!-- Option 1 -->
+                      <div class="col-sm-6">
+                        <div class="row border-1">
+                          <div class="">
+                            <div class="form-group">
+                              <label>Label</label>
+                              <textarea name="array[][is_euqal_one][text]" class="form-control" rows="4"></textarea>
+                            </div>
+                          </div>
+                          <div class="col-sm-4">
+                            <div class="form-group">
+                              <label>Thumbnail</label><br>
+                              <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="material-icons">image</i>
+                                <img class="thumbnail-preview-img" style="display:none;">
+                                <input type="file" name="array[][is_euqal_one][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Option 2 -->
+                      <div class="col-sm-6">
+                        <div class="row border-1">
+                          <div class="">
+                            <div class="form-group">
+                              <label>Label</label>
+                              <textarea name="array[][is_euqal_two][text]" class="form-control" rows="4"></textarea>
+                            </div>
+                          </div>
+                          <div class="col-sm-4">
+                            <div class="form-group">
+                              <label>Thumbnail</label><br>
+                              <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="material-icons">image</i>
+                                <img class="thumbnail-preview-img" style="display:none;">
+                                <input type="file" name="array[][is_euqal_two][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Add/Delete Icons -->
+                  <div class="col-sm-1 d-flex flex-column justify-content-between align-items-center" style="height: 100%;">
+                    <i class="material-icons delete-icon delte" style="cursor: pointer;">delete</i>
+                    <div style="flex-grow: 1;"></div>
+                    <i class="material-icons add-icon add" style="cursor: pointer;">add</i>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+      <script type="text/template" id="InsmatchquestionCardTemplate">
+  <!-- Question Block -->
+      <div class="card question-card mt-3">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label>Question</label>
+                <textarea name="array[][question]" class="form-control" rows="1"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </script>
+      <!-- Instruction match -->
+      <script type="text/template" id="instructionMatchQuestionCardTemplate">
+  <div class="card question-card match-instruction-card mt-3">
+    <div class="card-body">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+              <div class="col-sm-12">
+                <div class="row">
+                  <div class="col-sm-11">
+                    <div class="form-group">
+                      <label>Instruction</label>
+                      <textarea name="array[][instruction]" class="form-control" rows="1"></textarea>
+                    </div>
+                    <div class="form-group">
+                      <label>Second Instruction</label>
+                      <textarea name="array[][inner_instruction]" class="form-control" rows="1"></textarea>
+                    </div>
+                    <div class="row">
+                      <!-- Option 1 -->
+                      <div class="col-sm-6">
+                        <div class="row border-1">
+                          <div class="">
+                            <div class="form-group">
+                              <label>Label</label>
+                              <textarea name="array[][is_equal_one][text]" class="form-control" rows="4"></textarea>
+                            </div>
+                          </div>
+                          <div class="col-sm-4">
+                            <div class="form-group">
+                              <label>Thumbnail</label><br>
+                              <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="material-icons">image</i>
+                                <img class="thumbnail-preview-img" style="display:none;">
+                                <input type="file" name="array[][is_equal_one][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Option 2 -->
+                      <div class="col-sm-6">
+                        <div class="row border-1">
+                          <div class="">
+                            <div class="form-group">
+                              <label>Label</label>
+                              <textarea name="array[][is_equal_two][text]" class="form-control" rows="4"></textarea>
+                            </div>
+                          </div>
+                          <div class="col-sm-4">
+                            <div class="form-group">
+                              <label>Thumbnail</label><br>
+                              <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="material-icons">image</i>
+                                <img class="thumbnail-preview-img" style="display:none;">
+                                <input type="file" name="array[][is_equal_two][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Add/Delete Icons -->
+                  <div class="col-sm-1 d-flex flex-column justify-content-between align-items-center" style="height: 100%;">
+                    <i class="material-icons delete-icon delte" style="cursor: pointer;">delete</i>
+                    <div style="flex-grow: 1;"></div>
+                    <i class="material-icons add-icon add" style="cursor: pointer;">add</i>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+      <!--  drag and drop the following  -->
+
+      <script type="text/template" id="dragquestionCardTemplate">
+  <div class="card question-card mt-3">
+    <div class="card-body">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label>Question</label>
+                  <textarea name="array[0][question][text]" class="form-control" rows="4"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <!-- Option A -->
+              <div class="col-sm-6">
+                <div class="row border-1 p-2 drag">
+                  <div class="">
+                    <div class="form-group">
+                      <label for="option_a">Option A</label>
+                      <input class="form-control" type="text" id="option_a_text_0" name="array[0][options][option_a][text]" />
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="form-group mt-4">
+                      <label for="thumbnail-upload-a" class="custom-file-label">📷 Choose Images</label>
+                      <input
+                        type="file"
+                        id="thumbnail-upload-a"
+                        name="array[0][options][option_a][images][]"
+                        class="thumbnail-input"
+                        multiple
+                        accept="image/*"
+                        onchange="previewThumbnail1(this, 'preview-container_option-a')"
+                        style="display: none;">
+                      <!-- Preview container -->
+                      <div id="preview-container_option-a" class="d-flex flex-wrap mt-2"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Option B -->
+              <div class="col-sm-6">
+                <div class="row border-2 p-2 drag">
+                  <div class="">
+                    <div class="form-group">
+                      <label for="option_b">Option B</label>
+                      <input class="form-control" type="text" id="option_b_text_0" name="array[0][options][option_b][text]" />
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="form-group mt-4">
+                      <label for="thumbnail-upload-b" class="custom-file-label">📷 Choose Images</label>
+                      <input
+                        type="file"
+                        id="thumbnail-upload-b"
+                        name="array[0][options][option_b][images][]"
+                        class="thumbnail-input"
+                        multiple
+                        accept="image/*"
+                        onchange="previewThumbnail1(this, 'preview-container_option-b')"
+                        style="display: none;">
+                      <div id="preview-container_option-b" class="d-flex flex-wrap mt-2"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div><!-- /.row -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+      <!--  labelling the parts  -->
+
+      <script type="text/template" id="labelquestionCardTemplate">
+      <div class="card question-card mt-3">
+        <div class="card-body">
+          <div class="container">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label>Question</label>
+                      <textarea name="array[0][question][text]" onkeyup="appendEditorText(this.value)" class="form-control" rows="1"></textarea>
+                      <input type="hidden" name="array[0][html][data]" id="editor_html_val">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                      <div class="toolbar">
+      <div class="toolbar-header">Tools</div>
+      <a href="javascript:void(0);" class="tool-btn" id="imgBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          Image
+      </a>
+      <input type="file" id="imgInput" accept="image/*" style="display:none;" />
+      <a class="tool-btn" id="dropzoneBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <path d="M8 12h8"></path>
+          </svg>
+          Drop Zone
+      </a>
+      <a class="tool-btn" id="lineBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="19" x2="19" y2="5"></line>
+          </svg>
+          Line
+      </a>
+      <div style="flex:1"></div>
+      <a class="tool-btn" id="exportBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Export
+      </a>
+  </div>
+
+  <!-- MIDDLE TEMPLATE AREA -->
+  <div class="canvas-wrapper" id="editor_html">
+      <div class="canvas">
+          <div class="question-space">
+              <input type="text" id="editor_questionText" placeholder="Enter your question here..." readonly/>
+          </div>
+
+          <div class="content-row">
+              <div class="image-box" id="imageBox">
+                  <img id="previewImg" src=""
+                      style="width:100%; height:100%; object-fit:contain; border-radius:20px; display:none;" />
+              </div>
+              <div class="answer-box" id="answerBox"></div>
+          </div>
+
+      </div>
+  </div>
+
+  <!-- RIGHT PROPERTIES PANEL -->
+  <div class="properties">
+      <div class="prop-section">
+          <div class="prop-title">Design</div>
+          <div class="prop-field">
+              <label>Width</label>
+              <input type="number" id="styleWidth" placeholder="Auto" />
+          </div>
+          <div class="prop-field">
+              <label>Height</label>
+              <input type="number" id="styleHeight" placeholder="Auto" />
+          </div>
+          <div class="prop-field">
+              <label>Fill</label>
+              <div style="display:flex; align-items:center; gap:8px;">
+                  <input type="color" id="styleColor"
+                      style="width:24px; height:24px; border:none; padding:0; background:none;" />
+                  <span style="font-size:11px; color:#888;">Hex</span>
+              </div>
+          </div>
+          <div class="prop-field" id="borderField">
+              <label>Border</label>
+              <div style="display:flex; align-items:center; gap:8px;">
+                  <input type="color" id="styleBorder"
+                      style="width:24px; height:24px; border:none; padding:0; background:none;" />
+              </div>
+          </div>
+          <div class="prop-field" id="thicknessField" style="display:none;">
+              <label>Thickness</label>
+              <input type="number" id="styleThickness" placeholder="2px" />
+          </div>
+      </div>
+
+      <!-- DROPZONE SPECIFIC FIELDS -->
+      <div class="prop-section" id="dropzoneFields">
+          <div class="prop-title">Data</div>
+          <div class="prop-field">
+              <label>ID (Unique)</label>
+              <input type="text" id="dropzoneName" placeholder="e.g., ear" />
+              <div class="error-message" id="nameError"></div>
+          </div>
+      </div>
+
+      <div class="prop-section" id="valueFields">
+          <div class="prop-field">
+              <label>Label Text</label>
+              <input type="text" id="dropzoneValue" placeholder="e.g., Ear" />
+          </div>
+      </div>
+
+      <div class="prop-section">
+          <a class="tool-btn delete-btn" id="deleteBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              Delete
+          </a>
+      </div>
+  </div>
+                </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+</script>
+
+      <!--  identifying the object  -->
+
+      <script type="text/template" id="identifyquestionCardTemplate">
+  <div class="card question-card mt-3">
+    <div class="card-body">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label>Question</label>
+                  <textarea name="array[0][question][text]" onkeyup="appendIdentifyEditorText(this.value)" class="form-control" rows="1"></textarea>
+                  <input type="hidden" name="array[0][html][data]" id="identify_editor_html_val">
+                </div>
+                <div class="row">
+                      <div class="app-container">
+                          <aside class="sidebar-left">
+                              <div class="sidebar-section">
+                                  <span class="sidebar-section-title">Tools</span>
+                                  <div class="toolbar">
+                                      <div id="addTextBtn">Text</div>
+                                      <div id="addImageBtn">Image</div>
+                                      <div id="deleteBtn" class="delete-link">Delete</div>
+                                      <div id="setCanvasBgBtn" class="bg-button">Background</div>
+                                  </div>
+                              </div>
+
+                              <div class="sidebar-section">
+                                  <span class="sidebar-section-title">Canvas</span>
+                                  <div class="properties-grid">
+                                      <div class="property-input-group">
+                                          <label>BG Color</label>
+                                          <input type="color" id="canvasBgColor" value="#ffffff" />
+                                      </div>
+                                  </div>
+                                  <div id="clearBgBtn" class="action-link">Clear BG Image</div>
+                              </div>
+
+                              <div class="sidebar-section">
+                                  <span class="sidebar-section-title">Selected Object</span>
+                                  <div id="noSelection" class="no-selection">Click an object to edit</div>
+                                  <div id="propertiesPanel" style="display:none;">
+                                      <div class="properties-grid">
+                                          <div class="property-input-group">
+                                              <label>X</label>
+                                              <input type="number" id="propX" />
+                                          </div>
+                                          <div class="property-input-group">
+                                              <label>Y</label>
+                                              <input type="number" id="propY" />
+                                          </div>
+                                          <div class="property-input-group">
+                                              <label>Width</label>
+                                              <input type="number" id="propWidth" />
+                                          </div>
+                                          <div class="property-input-group">
+                                              <label>Height</label>
+                                              <input type="number" id="propHeight" />
+                                          </div>
+                                          <div class="property-input-group">
+                                              <label>Rotation</label>
+                                              <input type="number" id="propRotation" value="0" />
+                                          </div>
+                                          <div class="property-input-group">
+                                              <label>Font Size</label>
+                                              <input type="number" id="propFontSize" value="24" />
+                                          </div>
+                                          <div class="property-input-group">
+                                              <label>Fill</label>
+                                              <input type="color" id="propBgColor" value="#fbbf24" />
+                                          </div>
+                                          <div class="property-input-group">
+                                              <label>Text Color</label>
+                                              <input type="color" id="propTextColor" value="#111827" />
+                                          </div>
+                                      </div>
+                                      <div class="checkbox-row">
+                                          <input type="checkbox" id="propIsAnswer" />
+                                          <label for="propIsAnswer">Is answer</label>
+                                      </div>
+                                      <div class="forward-back-grid">
+                                          <div id="bringForwardBtn" class="action-link">↑ Forward</div>
+                                          <div id="sendBackBtn" class="action-link">↓ Back</div>
+                                      </div>
+                                  </div>
+                                  <div id="exportHtmlBtn" class="action-link">Export</div>
+                              </div>
+                          </aside>
+
+                          <main class="main-area">
+                              <div class="canvas-wrapper-id">
+                                <div class="question-space-id">
+                                    <input type="text" id="editor_questionText-id" placeholder="Enter your question here..." readonly/>
+                                </div>
+                                  <div id="canvas-id"></div>
+                              </div>
+                          </main>
+                      </div>
+
+                      <input type="file" id="imageFileInput" accept="image/*" style="display:none;" />
+                      <input type="file" id="canvasBgFileInput" accept="image/*" style="display:none;" />
+                </div> 
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+      </script>

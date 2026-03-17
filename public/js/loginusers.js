@@ -6,10 +6,10 @@ $(function () {
     select: document.querySelector(".section-dropdown"),
   });
 
-  getSubjectForDropMultiple("individual_subject");
-  new SlimSelect({
-    select: "#individual_level",
-  });
+  getSubjectForDrop("individual_subject");
+  getLevelForDrop("individual_level");
+  getSubjectForDrop("edit_individual_subject");
+  getLevelForDrop("edit_individual_level");
 
   $("#users_create_form").submit(function (e) {
     e.preventDefault();
@@ -350,28 +350,9 @@ async function IndividualOpenEditModal(id) {
       success: async function (res) {
         if (res.status === 200) {
           const data = res.data;
+          const data1 = res.data1;
 
-          const selectSubject = await getSubjectForDropMultiple(
-            "edit_individual_subject",
-            JSON.parse(data.subject)
-          );
-
-          setTimeout(() => {
-            const sectionSelectElement = document.querySelector(
-              "#edit_individual_level"
-            );
-            if (sectionSelectElement) {
-              if (sectionSelectElement.slim) {
-                sectionSelectElement.slim.destroy();
-              }
-
-              const editSectionSelect = new SlimSelect({
-                select: "#edit_individual_level",
-              });
-              editSectionSelect.setSelected(data.level);
-            }
-          }, 0);
-
+          // Populate form fields
           $("#edit_individual_id").val(data.id);
           $("#edit_individual_name").val(data.name);
           $("#edit_individual_phone").val(data.mobile);
@@ -385,6 +366,57 @@ async function IndividualOpenEditModal(id) {
             .closest(".form-group")
             .find("a")
             .attr("href", `../${data.profile_image}`);
+
+          if (data1.length > 0) {
+            $("#edit_rowContainer").html("");
+          }
+          var editOrgIndex = 0;
+          for (const value of data1) {
+            html = `<div class="row form-row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <select name="edit_org_details[${editOrgIndex}][subject]" class="form-control edit_subject-dropdown">
+                                <option value="">Select Subject</option>
+                            </select>
+                            <p class="validate_error text-danger"></p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Level</label>
+                            <select name="edit_org_details[${editOrgIndex}][level][]" class="form-control edit_level-dropdown" multiple>
+                                <option value="">Select Level</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-1 d-flex align-items-end">
+                        <div class="form-group">
+                            <button type="button" class="btn btn-danger" data-remove-btn="">-</button>
+                            <button type="button" class="btn btn-success" data-add-btn="">+</button>
+                        </div>
+                    </div>
+                </div>`;
+            const newRow = $(html);
+            $("#edit_rowContainer").append(newRow);
+            const subjectSelect = newRow.find(".edit_subject-dropdown")[0];
+            getSubjectForDropByClass(subjectSelect, value.subject);
+
+            const levelSelect = newRow.find(".edit_level-dropdown")[0];
+            const levelSlim = getLevelForDropByClass(
+              levelSelect,
+              Array.isArray(value.level) ? value.level : JSON.parse(value.level)
+            );
+            if (value.levels) {
+              getLevelForDropByClass(
+                levelSelect,
+                Array.isArray(value.level)
+                  ? value.level
+                  : JSON.parse(value.level)
+              );
+            }
+            editOrgIndex++;
+          }
 
           OpenModal("individual_edit_modal");
         } else if (res.status === 401) {
@@ -403,3 +435,125 @@ async function IndividualOpenEditModal(id) {
     ToastAlert("error", err);
   }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  const container = document.getElementById("rowContainer");
+  let rowIndex = 0; // track indexes for dynamic names
+
+  container.addEventListener("click", function (e) {
+    if (e.target.matches("[data-add-btn]")) {
+      const tempDiv = document.createElement("div");
+
+      tempDiv.innerHTML = `<div class="row form-row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Subject</label>
+                    <select name="org_details[${
+                      rowIndex + 1
+                    }][subject]" class="form-control subject-dropdown">
+                    </select>
+                    <p class="validate_error text-danger"></p>
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Levels</label>
+                    <select name="org_details[${
+                      rowIndex + 1
+                    }][level][]" class="form-control level-dropdown" multiple>
+                    </select>
+                    <p class="validate_error text-danger"></p>
+                </div>
+            </div>
+
+            <div class="col-sm-1 d-flex align-items-end">
+                <div class="form-group">
+                    <button type="button" class="btn btn-danger" data-remove-btn>-</button>
+                    <button type="button" class="btn btn-success" data-add-btn>+</button>
+                </div>
+            </div>
+        </div>`;
+
+      rowIndex++;
+      const newRow = tempDiv.firstElementChild;
+      container.appendChild(newRow);
+
+      const subjectSelect = newRow.querySelector(".subject-dropdown");
+      const levelSelect = newRow.querySelector(".level-dropdown");
+
+      getSubjectForDropByClass(subjectSelect);
+      getLevelForDropByClass(levelSelect);
+    }
+
+    if (e.target.matches("[data-remove-btn]")) {
+      const rows = container.querySelectorAll(".form-row");
+      if (rows.length > 1) {
+        e.target.closest(".form-row").remove();
+      } else {
+        ToastAlert("warning", "At least one row is required.");
+      }
+    }
+  });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const container = document.getElementById("edit_rowContainer");
+  let rowIndex = 0; // track indexes for dynamic names
+
+  container.addEventListener("click", function (e) {
+    if (e.target.matches("[data-add-btn]")) {
+      const tempDiv = document.createElement("div");
+
+      tempDiv.innerHTML = `<div class="row form-row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Subject</label>
+                    <select name="edit_org_details[${
+                      rowIndex + 1
+                    }][subject]" class="form-control subject-dropdown">
+                    </select>
+                    <p class="validate_error text-danger"></p>
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Levels</label>
+                    <select name="edit_org_details[${
+                      rowIndex + 1
+                    }][level][]" class="form-control level-dropdown" multiple>
+                    </select>
+                    <p class="validate_error text-danger"></p>
+                </div>
+            </div>
+
+            <div class="col-sm-1 d-flex align-items-end">
+                <div class="form-group">
+                    <button type="button" class="btn btn-danger" data-remove-btn>-</button>
+                    <button type="button" class="btn btn-success" data-add-btn>+</button>
+                </div>
+            </div>
+        </div>`;
+
+      rowIndex++;
+      const newRow = tempDiv.firstElementChild;
+      container.appendChild(newRow);
+
+      const subjectSelect = newRow.querySelector(".subject-dropdown");
+      const levelSelect = newRow.querySelector(".level-dropdown");
+
+      getSubjectForDropByClass(subjectSelect);
+      getLevelForDropByClass(levelSelect);
+    }
+
+    if (e.target.matches("[data-remove-btn]")) {
+      const rows = container.querySelectorAll(".form-row");
+      if (rows.length > 1) {
+        e.target.closest(".form-row").remove();
+      } else {
+        ToastAlert("warning", "At least one row is required.");
+      }
+    }
+  });
+});

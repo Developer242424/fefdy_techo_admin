@@ -13,6 +13,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      user_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       subject: {
         type: Sequelize.INTEGER,
         allowNull: true,
@@ -25,12 +29,16 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      levels: {
-        type: Sequelize.INTEGER,
+      level: {
+        type: Sequelize.JSON,
         allowNull: true,
       },
       stu_count: {
         type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      user_type: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
       entered_at: {

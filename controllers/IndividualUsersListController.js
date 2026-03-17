@@ -4,7 +4,6 @@ const multer = require("multer");
 const User = require("../models/user");
 const Subjects = require("../models/subjects");
 const Topics = require("../models/topics");
-const Level = require("../models/level");
 const Subtopic = require("../models/subtopic");
 const CategoryData = require("../models/categorydata");
 const Organisation = require("../models/organisation");
@@ -74,8 +73,6 @@ class IndividualUsersListController {
         .withMessage("Password is required")
         .isLength({ min: 6 })
         .withMessage("Password must be at least 6 characters"),
-      check("individual_subject").notEmpty().withMessage("Subject is required"),
-      check("individual_level").notEmpty().withMessage("Level is required"),
 
       asyncHandler(async (req, res) => {
         const errors = validationResult(req);
@@ -90,8 +87,7 @@ class IndividualUsersListController {
           individual_dob,
           individual_username,
           individual_password,
-          individual_subject,
-          individual_level,
+          org_details,
         } = req.body;
 
         const file = req.file;
@@ -121,6 +117,11 @@ class IndividualUsersListController {
             message: "Invalid date of birth format.",
           });
         }
+        const uniqueSubjects = [
+          ...new Set(org_details.map((item) => item.subject)),
+        ];
+        // console.log(org_details);
+        // return;
         const insert = await LoginUsers.create({
           name: individual_name,
           email: individual_email,
@@ -129,10 +130,30 @@ class IndividualUsersListController {
           username: individual_username,
           password: await bcrypt.hash(individual_password, 10),
           profile_image: `uploads/user_profile/${file.filename}`,
-          subject: JSON.stringify(individual_subject),
-          level: individual_level,
+          subject: JSON.stringify(uniqueSubjects),
           type: "individual",
         });
+        for (const value of org_details) {
+          const check = await OrgDetails.findOne({
+            where: {
+              user_id: insert.id,
+              subject: value.subject,
+              user_type: "individual",
+            },
+          });
+
+          //   console.log(insert.id);
+          //   console.log(check);
+
+          if (!check) {
+            await OrgDetails.create({
+              user_id: insert.id,
+              subject: value.subject,
+              level: value.level,
+              user_type: "individual",
+            });
+          }
+        }
 
         return res.status(200).json({
           status: 200,
@@ -178,12 +199,6 @@ class IndividualUsersListController {
         .trim()
         .notEmpty()
         .withMessage("Username is required"),
-      check("edit_individual_subject")
-        .notEmpty()
-        .withMessage("Subject is required"),
-      check("edit_individual_level")
-        .notEmpty()
-        .withMessage("Level is required"),
 
       asyncHandler(async (req, res) => {
         const errors = validationResult(req);
@@ -198,9 +213,8 @@ class IndividualUsersListController {
           edit_individual_dob,
           edit_individual_username,
           edit_individual_password,
-          edit_individual_subject,
-          edit_individual_level,
           edit_individual_id,
+          edit_org_details,
         } = req.body;
 
         const file = req.file;
@@ -233,14 +247,15 @@ class IndividualUsersListController {
             message: "Invalid date of birth format.",
           });
         }
-
+        const uniqueSubjects = [
+          ...new Set(edit_org_details.map((item) => item.subject)),
+        ];
         users.name = edit_individual_name;
         users.email = edit_individual_email;
         users.mobile = edit_individual_phone;
         users.dob = parsedDob.format("YYYY-MM-DD");
         users.username = edit_individual_username;
-        users.subject = JSON.stringify(edit_individual_subject);
-        users.level = edit_individual_level;
+        users.subject = JSON.stringify([]);
 
         if (
           edit_individual_password &&
@@ -250,6 +265,47 @@ class IndividualUsersListController {
         }
 
         await users.save();
+
+        await OrgDetails.update(
+          { is_deleted: new Date() },
+          {
+            where: { user_id: edit_individual_id, user_type: "individual" },
+          }
+        );
+        // console.log(edit_org_details.length);
+        for (const value of edit_org_details) {
+          if (value) {
+            const check = await OrgDetails.findOne({
+              where: {
+                user_id: edit_individual_id,
+                subject: value.subject,
+                user_type: "individual",
+                is_deleted: null,
+              },
+            });
+
+            if (!check) {
+              const createOrgDet = await OrgDetails.create({
+                user_id: edit_individual_id,
+                subject: value.subject,
+                level: value.level,
+                user_type: "individual",
+              });
+              if (createOrgDet) {
+                LoginUsers.update(
+                  {
+                    subject: JSON.stringify(uniqueSubjects),
+                  },
+                  {
+                    where: {
+                      id: edit_individual_id,
+                    },
+                  }
+                );
+              }
+            }
+          }
+        }
 
         return res.status(200).json({
           status: 200,

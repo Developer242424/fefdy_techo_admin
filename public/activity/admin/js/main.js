@@ -1,5 +1,5 @@
 let confettiAnimationId = null;
-let publicURL = "https://admin.fefdybraingym.com/public/";
+let publicURL = "https://demoadmin.fefdybraingym.com/public/";
 function handleQuestionHover(text) {
   if (isTransitioning) return; // Only block if in answer-feedback phase
   const questionEl = document.getElementById("question-text");
@@ -801,7 +801,7 @@ function completeTest() {
     data: JSON.stringify(data),
     success: function (res) {
       if (res.status === 200) {
-        startAgain();
+        window.location.href = `/admin/chooseup?sid=${sid}&tid=${tid}&lid=${lid}&stid=${stid}&qid=${qid}&ust=${ust}`;
         // location.reload();
       } else {
         console.warn("⚠️ Invalid question data received.");
@@ -847,7 +847,7 @@ function storeSeparateEntries(question, comp_time, is_correct) {
     question,
     comp_time: diff,
     is_correct,
-    ust
+    ust,
   };
   // console.log(data)
   $.ajax({

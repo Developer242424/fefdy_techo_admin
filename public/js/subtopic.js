@@ -9,17 +9,34 @@ $(function () {
   });
 
   getSubjectForDrop("subject");
+  getLevelForDrop("level");
   $("#subject").on("change", function () {
-    getTopicBySubjectForDrop("topic", $(this).val());
+    getTopicBySubjectNLevelForDrop("topic", $(this).val(), $("#level").val());
   });
-  $("#topic").on("change", function () {
-    getLevelsByTopicForDrop("level", $(this).val());
+  $("#level").on("change", function () {
+    getTopicBySubjectNLevelForDrop(
+      "topic",
+      $("#subject").val(),
+      $("#level").val()
+    );
   });
 
   let isInitialEditLoad = true;
   $("#edit_subject").on("change", function () {
-    if (isInitialEditLoad) return;
-    getTopicBySubjectForDrop("edit_topic", $(this).val());
+    // if (isInitialEditLoad) return;
+    getTopicBySubjectNLevelForDrop(
+      "edit_topic",
+      $(this).val(),
+      $("#edit_level").val()
+    );
+  });
+  $("#edit_level").on("change", function () {
+    // if (isInitialEditLoad) return;
+    getTopicBySubjectNLevelForDrop(
+      "edit_topic",
+      $("#edit_subject").val(),
+      $(this).val()
+    );
   });
 
   $("#edit_topic").on("change", function () {
@@ -225,16 +242,13 @@ async function OpenEditModal(id) {
             data.subject
           );
 
-          const selectTopic = await getTopicBySubjectForDrop(
+          const selectLevel = await getLevelForDrop("edit_level", data.level);
+
+          const selectTopic = await getTopicBySubjectNLevelForDrop(
             "edit_topic",
             data.subject,
+            data.level,
             data.topic
-          );
-
-          const selectLevel = await getLevelsByTopicForDrop(
-            "edit_level",
-            data.topic,
-            data.level_id
           );
 
           $("#edit_id").val(data.id);
@@ -262,6 +276,26 @@ async function OpenEditModal(id) {
           });
 
           slimSelectInstances["edit_category"].setSelected(cat_ids.map(String));
+
+          const learning_outcomes = data.learning_outcomes;
+          if (learning_outcomes && learning_outcomes.length > 0) {
+            $("#outcomes_wrapper_edit").empty();
+            let html = ``;
+            learning_outcomes.forEach((outcome, idx) => {
+              html += `<div class="input-group mb-2 outcome-item">
+              <input type="text" class="form-control" value="${outcome}" name="edit_learning_outcomes[]" placeholder="Type learning outcomes...">
+              <button type="button" class="btn btn-${
+                idx === 0 ? `primary` : `danger`
+              }" onclick="${
+                idx === 0 ? `addOutcomeEdit()` : `removeOutcomeEdit(this)`
+              }">${
+                idx === 0
+                  ? `<i class="fa fa-plus"></i>`
+                  : `<i class="fa fa-trash"></i>`
+              }</button></div>`;
+            });
+            $("#outcomes_wrapper_edit").html(html);
+          }
 
           OpenModal("subtopic_edit_modal");
         } else if (res.status === 401) {
@@ -320,4 +354,87 @@ function DeleteData(id) {
       });
     }
   });
+}
+let maxOutcomes = 5;
+
+function showLimitToast() {
+  const toastEl = document.getElementById("limitToast");
+  const toast = new bootstrap.Toast(toastEl);
+  toast.show();
+}
+
+function showLimitToastEdit() {
+  const toastEl = document.getElementById("limitToastEdit");
+  const toast = new bootstrap.Toast(toastEl);
+  toast.show();
+}
+
+function addOutcome() {
+  const wrapper = document.getElementById("outcomes_wrapper");
+  const count = wrapper.querySelectorAll(".outcome-item").length;
+
+  if (count >= maxOutcomes) {
+    showLimitToast();
+    return;
+  }
+
+  const div = document.createElement("div");
+  div.classList.add("input-group", "mb-2", "outcome-item");
+
+  div.innerHTML = `
+    <input 
+        type="text" 
+        class="form-control"
+        name="learning_outcomes[]"
+        placeholder="Type learning outcomes..."
+    >
+    <button 
+        type="button" 
+        class="btn btn-danger"
+        onclick="removeOutcome(this)"
+    >
+        <i class="fa fa-trash"></i>
+    </button>
+  `;
+
+  wrapper.appendChild(div);
+}
+
+function removeOutcome(btn) {
+  btn.closest(".outcome-item").remove();
+}
+
+function addOutcomeEdit() {
+  const wrapper = document.getElementById("outcomes_wrapper_edit");
+  const count = wrapper.querySelectorAll(".outcome-item").length;
+
+  if (count >= maxOutcomes) {
+    showLimitToastEdit();
+    return;
+  }
+
+  const div = document.createElement("div");
+  div.classList.add("input-group", "mb-2", "outcome-item");
+
+  div.innerHTML = `
+    <input 
+        type="text"
+        class="form-control"
+        name="edit_learning_outcomes[]"
+        placeholder="Type learning outcomes..."
+    >
+    <button 
+        type="button"
+        class="btn btn-danger"
+        onclick="removeOutcomeEdit(this)"
+    >
+        <i class="fa fa-trash"></i>
+    </button>
+  `;
+
+  wrapper.appendChild(div);
+}
+
+function removeOutcomeEdit(btn) {
+  btn.closest(".outcome-item").remove();
 }

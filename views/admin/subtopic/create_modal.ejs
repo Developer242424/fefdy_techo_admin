@@ -32,21 +32,21 @@
                 </div>
                 <div class="col-sm-4">
                     <div class="form-group">
+                        <label for="level">Level</label>
+                        <select name="level" id="level" class="form-control">
+                            <option value="">Select Level</option>
+                        </select>
+                        <p class="validate_error text-danger" id="level_error"></p>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
                         <label for="topic">Topic</label>
                         <select name="topic" id="topic" class="form-control">
                             <option value="">Select Topic</option>
 
                         </select>
                         <p class="validate_error text-danger" id="topic_error"></p>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-                    <div class="form-group">
-                        <label for="level">Level</label>
-                        <select name="level" id="level" class="form-control">
-                            <option value="">Select Level</option>
-                        </select>
-                        <p class="validate_error text-danger" id="level_error"></p>
                     </div>
                 </div>
             </div>
@@ -111,6 +111,41 @@
                     <p class="validate_error text-danger" id="description_error"></p>
                 </div>
             </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="learning_outcomes">Learning Outcomes</label>
+
+                    <div id="outcomes_wrapper">
+
+                        <div class="input-group mb-2 outcome-item">
+                            <input type="text" class="form-control" name="learning_outcomes[]"
+                                placeholder="Type learning outcomes...">
+                            <button type="button" class="btn btn-primary" onclick="addOutcome()">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <p class="validate_error text-danger" id="learning_outcomes_error"></p>
+                </div>
+            </div>
+            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+                <div id="limitToast" class="toast align-items-center text-bg-danger border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            You can add only up to 5 learning outcomes.
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                            data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            </div>
+
+
+
+
 
 
             <!-- PDF Input -->

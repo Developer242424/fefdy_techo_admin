@@ -4,7 +4,6 @@ const multer = require("multer");
 const User = require("../models/user");
 const Subjects = require("../models/subjects");
 const Topics = require("../models/topics");
-const Level = require("../models/level");
 const Subtopic = require("../models/subtopic");
 const CategoryData = require("../models/categorydata");
 const Organisation = require("../models/organisation");
@@ -30,26 +29,12 @@ const sequelize = require("../config/database");
 class UsersListController {
   constructor() {
     this.index = asyncHandler(async (req, res) => {
-      const query =
-        "SELECT * FROM topics WHERE levels = (SELECT MAX(levels) FROM topics)";
-      let lvlftopic = null;
-
-      try {
-        const result = await sequelize.query(query, {
-          type: sequelize.QueryTypes.SELECT,
-        });
-        lvlftopic = result[0] || { levels: 0 };
-      } catch (err) {
-        console.error("Query error:", err);
-      }
-
       return res.render("admin/layout", {
         title: "UsersList",
         content: "../admin/userslist/index",
         url: req.originalUrl,
         baseurl: "/admin",
         homeurl: "/admin/dashboard",
-        lvlftopic,
       });
     });
 
@@ -137,7 +122,6 @@ class UsersListController {
             },
           });
 
-          const level = org_det?.levels ?? null;
           const users = await LoginUsers.findOne({
             where: {
               username: username,
@@ -169,7 +153,6 @@ class UsersListController {
             section,
             profile_image: `uploads/user_profile/${file.filename}`,
             subject: arr_sub,
-            level: level,
             type: "student",
           });
 
@@ -271,7 +254,14 @@ class UsersListController {
             .json({ status: 400, message: "User ID is required" });
         }
         const data = await LoginUsers.findOne({ where: { id } });
-        return res.status(200).json({ status: 200, data });
+        const data1 = await OrgDetails.findAll({
+          where: {
+            user_id: id,
+            is_deleted: null,
+            user_type: "individual",
+          },
+        });
+        return res.status(200).json({ status: 200, data, data1 });
       } catch (error) {
         console.error("Get error:", error);
         return res.status(200).json({
@@ -385,7 +375,6 @@ class UsersListController {
             standard: edit_standard,
             section: edit_section,
             subject: arr_sub,
-            level,
           };
 
           if (file) {
@@ -429,6 +418,10 @@ class UsersListController {
         }
 
         await LoginUsers.update({ is_deleted: new Date() }, { where: { id } });
+        await OrgDetails.update(
+          { is_deleted: new Date() },
+          { where: { user_id: id, user_type: "individual" } }
+        );
         return res.status(200).json({
           status: 200,
           message: "User deleted successfully",

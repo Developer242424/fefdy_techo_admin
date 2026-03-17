@@ -85,10 +85,11 @@
           qid,
           ust,
         };
-        window.open(
-          `/admin/drag-drop/home?sid=${sid}&tid=${tid}&lid=${lid}&stid=${stid}&qid=${qid}&ust=${ust}`,
-          "_blank"
-        );
+        window.location.href = `/admin/drag-drop/home?sid=${sid}&tid=${tid}&lid=${lid}&stid=${stid}&qid=${qid}&ust=${ust}`;
+        // window.open(
+        //   `/admin/drag-drop/home?sid=${sid}&tid=${tid}&lid=${lid}&stid=${stid}&qid=${qid}&ust=${ust}`,
+        //   "_blank"
+        // );
       }
     </script>
   </body>

@@ -2,14 +2,17 @@ const express = require("express");
 const request = require("request");
 const { isAuthenticated } = require("../middleware/ApiHandler");
 const AuthController = require("../controllers/api/AuthController");
-const SubjectsController = require("../controllers/api/SubjectsController");
-const TopicsController = require("../controllers/api/TopicsController");
-const LevelController = require("../controllers/api/LevelController");
-const SubtopicController = require("../controllers/api/SubtopicController");
-const WatchHistoryController = require("../controllers/api/WatchHistoryController");
 const ProfileController = require("../controllers/api/ProfileController");
+const SubjectsController = require("../controllers/api/SubjectsController");
+const LevelsController = require("../controllers/api/LevelsController");
+const TopicsController = require("../controllers/api/TopicsController");
+const SubtopicController = require("../controllers/api/SubtopicController"); // not confirmed
+const WatchHistoryController = require("../controllers/api/WatchHistoryController"); // not confirmed
+const ReadHistoryController = require("../controllers/api/ReadHistoryController"); // not confirmed
+
 const CertificateController = require("../controllers/api/CertificateController");
 const ReportsController = require("../controllers/api/ReportsController");
+const OverallReportController = require("../controllers/api/OverallReportController");
 const QuestionsController = require("../controllers/api/QuestionsController");
 const OpenAiTokensController = require("../controllers/api/OpenAiTokensController");
 
@@ -27,19 +30,33 @@ router.post("/update-profile", ProfileController.update);
 router.use(isAuthenticated);
 
 router.post("/logout", AuthController.logout);
+router.post("/myprofile", ProfileController.data);
 router.post("/subjects", SubjectsController.data);
+router.post("/levels", LevelsController.data);
 router.post("/topics", TopicsController.data);
-router.post("/levels", LevelController.data);
 router.post("/subtopics", SubtopicController.data);
+
+router.post("/entrytoken", OpenAiTokensController.entryTokens);
+router.post(
+  "/entrytoken-translator",
+  OpenAiTokensController.entryTokensTranslator
+);
+router.post("/audio-converter", OpenAiTokensController.convertAudio);
+router.post("/read-history", ReadHistoryController.index);
 router.post("/subtopicdata", SubtopicController.subtopicData);
 router.post("/history-entry", WatchHistoryController.entry);
-router.post("/myprofile", ProfileController.data);
-router.post("/certificate", CertificateController.cerificateContent);
-router.post("/wholereports", ReportsController.wholeReports);
-router.post("/questiontypes", QuestionsController.QuestionTypeList);
-router.post("/entrytoken", OpenAiTokensController.entryTokens);
-router.post("/entrytoken-translator", OpenAiTokensController.entryTokensTranslator);
-router.post("/audio-converter", OpenAiTokensController.convertAudio);
+
+router.post("/reports", ReportsController.Reports);
+router.post("/reportsbylevel", ReportsController.ReportsByLevel);
+router.post("/reportsasmarks", ReportsController.ReportsAsMarks);
+router.post(
+  "/overallreportbysubject",
+  OverallReportController.OverAllReportBySubject
+);
+router.post("/certificate", CertificateController.cerificateContent); // Not Confirmed
+
+// router.post("/questiontypes", QuestionsController.QuestionTypeList);
+// router.post("/wholereports", ReportsController.wholeReports);
 
 router.get("/pdf", (req, res) => {
   const pdfUrl = req.query.url;

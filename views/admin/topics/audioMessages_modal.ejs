@@ -1,0 +1,180 @@
+<div class="modal" id="audio_messages_modal">
+  <div class="modal-header">
+    <h3>Add Audio Messages</h3>
+    <button type="button" class="close">
+      <svg
+        width="34"
+        height="34"
+        viewBox="0 0 34 34"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g clip-path="url(#clip0_7_7)">
+          <path
+            d="M25.5 8.5L8.5 25.5"
+            stroke="#DADADA"
+            stroke-width="2.125"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M9 9L26 26"
+            stroke="#DADADA"
+            stroke-width="2.125"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </g>
+        <defs>
+          <clipPath id="clip0_7_7">
+            <rect width="34" height="34" fill="white" />
+          </clipPath>
+        </defs>
+      </svg>
+    </button>
+  </div>
+
+  <form
+    id="audio_messages_form"
+    class="modal-body"
+    method="post"
+    enctype="multipart/form-data"
+  >
+    <div class="container" id="message_form_container">
+      <div class="row">
+        <div class="container">
+          <!-- ===== CATEGORIES ===== -->
+          <div class="col-sm-12 mb-3">
+            <h5 class="text-success">Categories</h5>
+          </div>
+
+          <!-- Category 1 -->
+          <div class="row mb-3 align-items-end">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Category 1 – Intro Audio</label>
+                <input
+                  type="file"
+                  accept=".mp3,.wav,.ogg,.m4a"
+                  class="form-control"
+                  name="audio_messages_data[categories][0][intro_audio]"
+                />
+                <input type="hidden" name="audio_messages_data[categories][0][id]" value="1" />
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Category 1 – Completion Audio</label>
+                <input
+                  type="file"
+                  accept=".mp3,.wav,.ogg,.m4a"
+                  class="form-control"
+                  name="audio_messages_data[categories][0][completion_audio]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Category 2 -->
+          <div class="row mb-3 align-items-end">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Category 2 – Intro Audio</label>
+                <input
+                  type="file"
+                  accept=".mp3,.wav,.ogg,.m4a"
+                  class="form-control"
+                  name="audio_messages_data[categories][1][intro_audio]"
+                />
+                <input type="hidden" name="audio_messages_data[categories][1][id]" value="2" />
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Category 2 – Completion Audio</label>
+                <input
+                  type="file"
+                  accept=".mp3,.wav,.ogg,.m4a"
+                  class="form-control"
+                  name="audio_messages_data[categories][1][completion_audio]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== QUESTION TYPES ===== -->
+          <div class="col-sm-12 mt-4 mb-3">
+            <h5 class="text-info">Question Types</h5>
+          </div>
+
+          <!-- Question Type 1 -->
+          <div class="row mb-3 align-items-end">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Question Type 1 – Intro Audio</label>
+                <input
+                  type="file"
+                  accept=".mp3,.wav,.ogg,.m4a"
+                  class="form-control"
+                  name="audio_messages_data[question_type][0][intro_audio]"
+                />
+                <input type="hidden" name="audio_messages_data[question_type][0][id]" value="1" />
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Question Type 1 – Completion Audio</label>
+                <input
+                  type="file"
+                  accept=".mp3,.wav,.ogg,.m4a"
+                  class="form-control"
+                  name="audio_messages_data[question_type][0][completion_audio]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Question Type 2 -->
+          <div class="row mb-3 align-items-end">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Question Type 2 – Intro Audio</label>
+                <input
+                  type="file"
+                  accept=".mp3,.wav,.ogg,.m4a"
+                  class="form-control"
+                  name="audio_messages_data[question_type][1][intro_audio]"
+                />
+                <input type="hidden" name="audio_messages_data[question_type][1][id]" value="2" />
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Question Type 2 – Completion Audio</label>
+                <input
+                  type="file"
+                  accept=".mp3,.wav,.ogg,.m4a"
+                  class="form-control"
+                  name="audio_messages_data[question_type][1][completion_audio]"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="options">
+        <button class="cancel" type="button">Cancel</button>
+        <button
+          class="submit form-submit-button"
+          id="audio_messages_btn"
+          type="submit"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+    <input type="hidden" name="topic_id" id="topic_id" />
+  </form>
+</div>

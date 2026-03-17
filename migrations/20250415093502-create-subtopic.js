@@ -13,11 +13,11 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
-      topic: {
+      level: {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
-      level_id: {
+      topic: {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
@@ -41,9 +41,13 @@ module.exports = {
         type: Sequelize.JSON,
         allowNull: true,
       },
+      learning_outcomes: {
+        type: Sequelize.JSON,
+        allowNull: true,
+      },
       sort_order: {
         allowNull: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       entered_at: {
         type: Sequelize.DATE,

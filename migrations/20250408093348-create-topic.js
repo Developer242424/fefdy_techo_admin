@@ -1,15 +1,19 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('topics', {
+    await queryInterface.createTable("topics", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       subject: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      level: {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
@@ -25,32 +29,32 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      levels: {
+      audio_messages: {
+        type: Sequelize.JSON,
         allowNull: true,
-        type: Sequelize.INTEGER
       },
       sort_order: {
         allowNull: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       entered_at: {
         type: Sequelize.DATE,
         allowNull: true,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       edited_at: {
         type: Sequelize.DATE,
         allowNull: true,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-        onUpdate: Sequelize.literal('CURRENT_TIMESTAMP')
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        onUpdate: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       is_deleted: {
-        type:Sequelize.DATE,
-        allowNull: true
-      }
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('topics');
-  }
+    await queryInterface.dropTable("topics");
+  },
 };

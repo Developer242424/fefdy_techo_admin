@@ -1,0 +1,922 @@
+<style>
+  :root {
+    --bg-app: #1e1e1e;
+    --bg-panel: #2c2c2c;
+    --bg-hover: #383838;
+    --bg-active: #0d99ff;
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3b3;
+    --border-color: #444444;
+    --input-bg: #1e1e1e;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+  }
+
+  /* LEFT TOOLBAR */
+  .toolbar {
+    width: 240px;
+    background: var(--bg-panel);
+    border-right: 1px solid #000;
+    padding: 16px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-sizing: border-box;
+  }
+
+  .toolbar-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .tool-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-sm);
+    text-align: left;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+  }
+
+  .tool-btn:hover {
+    background: var(--bg-hover);
+  }
+
+  .tool-btn svg {
+    opacity: 0.8;
+  }
+
+  /* MIDDLE TEMPLATE AREA */
+  .canvas-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .canvas {
+    width: 80%;
+    height: 100%;
+    background: #c8ff80;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .question-space {
+    background: rgba(255, 255, 255, 0.2);
+    height: 80px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
+
+  #editor_questionText {
+    font-family: "Alata", sans-serif;
+    font-size: 24px;
+    color: #000000;
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    text-align: center;
+  }
+
+  #editor_questionText::placeholder {
+    color: rgba(0, 0, 0, 0.3);
+  }
+
+  .content-row {
+    flex: 1;
+    display: flex;
+    gap: 18pc;
+  }
+
+  .image-box {
+    width: 40%;
+    background: white;
+    border-radius: 20px;
+    position: relative;
+    overflow: visible;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  }
+
+  .answer-box {
+    flex: 1;
+    border-radius: 10px;
+    position: relative;
+    overflow: visible;
+  }
+
+  /* DROPZONE STYLES */
+  .dropzone {
+    width: 80px;
+    height: 40px;
+    border: 2px solid #000;
+    border-radius: 6px;
+    background: #fff;
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  }
+
+  .dropzone:active {
+    cursor: grabbing;
+  }
+
+  /* LINE STYLES */
+  .line {
+    width: 80px;
+    height: 2px;
+    background: #000;
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+  }
+
+  .line:active {
+    cursor: grabbing;
+  }
+
+  /* ANSWER ELEMENT STYLES */
+  .answer-element {
+    padding: 10px 15px;
+    background: #8e583d;
+    border-radius: 6px;
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+    color: white;
+    font-size: 20px;
+    font-family: "Fredoka One", sans-serif;
+  }
+
+  .answer-element:active {
+    cursor: grabbing;
+  }
+
+  /* RIGHT PROPERTIES PANEL */
+  .properties {
+    width: 280px;
+    background: var(--bg-panel);
+    border-left: 1px solid #000;
+    padding: 0;
+    box-sizing: border-box;
+    color: var(--text-primary);
+    overflow-y: auto;
+  }
+
+  .prop-section {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .prop-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .prop-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .prop-field label {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .prop-field input {
+    background: var(--input-bg);
+    border: 1px solid transparent;
+    color: var(--text-primary);
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-family: "Inter", sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .prop-field input:focus {
+    border-color: var(--bg-active);
+    background: #222;
+  }
+
+  .prop-field input:hover {
+    border-color: #555;
+  }
+
+  .prop-field input.error {
+    border-color: #ff4d4d;
+  }
+
+  .error-message {
+    font-size: 10px;
+    color: #ff4d4d;
+  }
+
+  .delete-btn {
+    background: transparent;
+    border: 1px solid #ff4d4d;
+    color: #ff4d4d;
+    width: 100%;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .delete-btn:hover {
+    background: rgba(255, 77, 77, 0.1);
+  }
+
+  .hidden-fields {
+    display: none;
+  }
+
+  .hidden-fields.show {
+    display: block;
+  }
+</style>
+
+<% if (typeof title !=='undefined' ) { %>
+<h1><%= title %></h1>
+<% } else { %>
+<h1>Fefdy</h1>
+<% } %>
+
+<div class="col-sm-12">
+  <form
+    id="questions_create_form"
+    method="post"
+    enctype="multipart/form-data"
+    class="row"
+  >
+    <div class="card">
+      <div class="card-body">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label for="subject">Subject</label>
+                <select name="subject" id="subject" class="form-control">
+                  <option value="">Select Subject</option>
+                </select>
+                <p class="validate_error text-danger" id="subject_error"></p>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label for="level">Level</label>
+                <select name="level" id="level" class="form-control">
+                  <option value="">Select Level</option>
+                </select>
+                <p class="validate_error text-danger" id="level_error"></p>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label for="topic">Topic</label>
+                <select name="topic" id="topic" class="form-control">
+                  <option value="">Select Topic</option>
+                </select>
+                <p class="validate_error text-danger" id="topic_error"></p>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label for="sub_topic">Sub Topic</label>
+                <select name="sub_topic" class="form-control" id="sub_topic">
+                  <option value="">Select Sub Topic</option>
+                </select>
+                <p class="validate_error text-danger" id="sub_topic_error"></p>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label for="question_type">Question Type</label>
+                <select
+                  name="question_type"
+                  class="form-control"
+                  id="question_type"
+                >
+                  <option value="">Select Question Type</option>
+                </select>
+                <p
+                  class="validate_error text-danger"
+                  id="question_type_error"
+                ></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="questionCardContainer"></div>
+  </form>
+</div>
+
+<!--   choose the following  -->
+<script type="text/template" id="questionCardTemplate">
+  <div class="card question-card mt-3">
+    <div class="card-body">
+      <div class="container">
+        <div class="">
+              <div class="col-sm-11">
+                <div class="row">
+                  <div class="col-sm-9">
+                    <div class="form-group">
+                      <label>Question</label>
+                      <textarea name="array[][question][text]" class="form-control" rows="4"></textarea>
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label>Thumbnail</label><br>
+                      <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                              <i class="material-icons">image</i>
+                              <img class="thumbnail-preview-img" style="display:none;">
+                              <input type="file" name ="array[][question][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                            </div>
+
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row option-row">
+                  <!-- Option 1 -->
+                  <div class="col-sm-3">
+                    <div class="row option-card">
+                      <div class="">
+                        <div class="form-group">
+                          <label>
+                            <input type="checkbox" name="array[][option][option_a][is_answer]" />
+                            Option A
+                          </label>
+
+                          <label for="primary-text">Primary Text</label>
+                          <textarea name="array[][option][option_a][primary_text]" class="form-control" rows="1"></textarea>
+
+                          <label for="secondary-text">Secondary Text</label>
+                          <textarea name="array[][option][option_a][secondary_text]" class="form-control" rows="3"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="">
+                        <div class="form-group">
+                          <label>Thumbnail</label><br>
+                          <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                            <i class="material-icons">image</i><br>
+                            <small>Click to upload</small>
+                            <img class="thumbnail-preview-img" style="display:none;">
+                            <input type="file" name="array[][option][option_a][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Option 2 -->
+                  <div class="col-sm-3">
+                    <div class="row option-card">
+                      <div class="">
+                        <div class="form-group">
+                          <label>
+                            <input type="checkbox" name="array[][option][option_b][is_answer]" />
+                            Option B
+                          </label>
+
+                          <label for="primary-text">Primary Text</label>
+                          <textarea name="array[][option][option_b][primary_text]" class="form-control" rows="1"></textarea>
+
+                          <label for="secondary-text">Secondary Text</label>
+                          <textarea name="array[][option][option_b][secondary_text]" class="form-control" rows="3"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="">
+                        <div class="form-group">
+                          <label>Thumbnail</label><br>
+                          <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                            <i class="material-icons">image</i><br>
+                            <small>Click to upload</small>
+                           <img class="thumbnail-preview-img" style="display:none;">
+                            <input type="file" name="array[][option][option_b][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Option 3 -->
+                  <div class="col-sm-3">
+                    <div class="row option-card">
+                      <div class="">
+                        <div class="form-group">
+                          <label>
+                            <input type="checkbox" name="array[][option][option_c][is_answer]" />
+                            Option C
+                          </label>
+
+                          <label for="primary-text">Primary Text</label>
+                          <textarea name="array[][option][option_c][primary_text]" class="form-control" rows="1"></textarea>
+
+                          <label for="secondary-text">Secondary Text</label>
+                          <textarea name="array[][option][option_c][secondary_text]" class="form-control" rows="3"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="">
+                        <div class="form-group">
+                          <label>Thumbnail</label><br>
+                          <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                            <i class="material-icons">image</i><br>
+                            <small>Click to upload</small>
+                            <img class="thumbnail-preview-img" style="display:none;">
+                            <input type="file" name="array[][option][option_c][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Option 4 -->
+                  <div class="col-sm-3">
+                    <div class="row option-card">
+                      <div class="">
+                        <div class="form-group">
+                          <label>
+                            <input type="checkbox" name="array[][option][option_d][is_answer]" />
+                            Option D
+                          </label>
+
+                          <label for="primary-text">Primary Text</label>
+                          <textarea name="array[][option][option_d][primary_text]" class="form-control" rows="1"></textarea>
+
+                          <label for="secondary-text">Secondary Text</label>
+                          <textarea name="array[][option][option_d][secondary_text]" class="form-control" rows="3"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="">
+                        <div class="form-group">
+                          <label>Thumbnail</label><br>
+                          <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                            <i class="material-icons">image</i><br>
+                            <small>Click to upload</small>
+                            <img class="thumbnail-preview-img" style="display:none;">
+                            <input type="file" name="array[][option][option_d][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Add/Delete buttons -->
+              <div class="d-flex flex-row justify-content-between align-items-center" style="height: 100%;">
+                <div><i class="material-icons delte delete-icon" style="cursor: pointer;">delete</i></div>
+                <div><i class="material-icons add add-icon" style="cursor: pointer;">add</i></div>
+                <!-- <div style="flex-grow: 1;"></div> -->
+
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<!--   match the following  -->
+<script type="text/template" id="matchquestionCardTemplate">
+  <!-- Question Block -->
+      <div class="card question-card mt-3">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label>Question</label>
+                <textarea name="array[][question]" class="form-control" rows="1"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+</script>
+<!-- First Instruction + Options Block -->
+<script type="text/template" id="matchInstructionCardTemplate">
+  <div class="card question-card match-instruction-card mt-3">
+    <div class="card-body">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+              <div class="col-sm-12">
+                <div class="row">
+                  <div class="col-sm-11">
+                    <div class="form-group">
+                      <label>Instruction</label>
+                      <textarea name="array[][instruction]" class="form-control" rows="1"></textarea>
+                    </div>
+                    <div class="row">
+                      <!-- Option 1 -->
+                      <div class="col-sm-6">
+                        <div class="row border-1">
+                          <div class="">
+                            <div class="form-group">
+                              <label>Label</label>
+                              <textarea name="array[][is_euqal_one][text]" class="form-control" rows="4"></textarea>
+                            </div>
+                          </div>
+                          <div class="col-sm-4">
+                            <div class="form-group">
+                              <label>Thumbnail</label><br>
+                              <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="material-icons">image</i>
+                                <img class="thumbnail-preview-img" style="display:none;">
+                                <input type="file" name="array[][is_euqal_one][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Option 2 -->
+                      <div class="col-sm-6">
+                        <div class="row border-1">
+                          <div class="">
+                            <div class="form-group">
+                              <label>Label</label>
+                              <textarea name="array[][is_euqal_two][text]" class="form-control" rows="4"></textarea>
+                            </div>
+                          </div>
+                          <div class="col-sm-4">
+                            <div class="form-group">
+                              <label>Thumbnail</label><br>
+                              <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="material-icons">image</i>
+                                <img class="thumbnail-preview-img" style="display:none;">
+                                <input type="file" name="array[][is_euqal_two][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Add/Delete Icons -->
+                  <div class="col-sm-1 d-flex flex-column justify-content-between align-items-center" style="height: 100%;">
+                    <i class="material-icons delete-icon delte" style="cursor: pointer;">delete</i>
+                    <div style="flex-grow: 1;"></div>
+                    <i class="material-icons add-icon add" style="cursor: pointer;">add</i>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/template" id="InsmatchquestionCardTemplate">
+  <!-- Question Block -->
+      <div class="card question-card mt-3">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label>Question</label>
+                <textarea name="array[][question]" class="form-control" rows="1"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+</script>
+<!-- Instruction match -->
+<script type="text/template" id="instructionMatchQuestionCardTemplate">
+  <div class="card question-card match-instruction-card mt-3">
+    <div class="card-body">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+              <div class="col-sm-12">
+                <div class="row">
+                  <div class="col-sm-11">
+                    <div class="form-group">
+                      <label>Instruction</label>
+                      <textarea name="array[][instruction]" class="form-control" rows="1"></textarea>
+                    </div>
+                    <div class="form-group">
+                      <label>Second Instruction</label>
+                      <textarea name="array[][inner_instruction]" class="form-control" rows="1"></textarea>
+                    </div>
+                    <div class="row">
+                      <!-- Option 1 -->
+                      <div class="col-sm-6">
+                        <div class="row border-1">
+                          <div class="">
+                            <div class="form-group">
+                              <label>Label</label>
+                              <textarea name="array[][is_equal_one][text]" class="form-control" rows="4"></textarea>
+                            </div>
+                          </div>
+                          <div class="col-sm-4">
+                            <div class="form-group">
+                              <label>Thumbnail</label><br>
+                              <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="material-icons">image</i>
+                                <img class="thumbnail-preview-img" style="display:none;">
+                                <input type="file" name="array[][is_equal_one][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Option 2 -->
+                      <div class="col-sm-6">
+                        <div class="row border-1">
+                          <div class="">
+                            <div class="form-group">
+                              <label>Label</label>
+                              <textarea name="array[][is_equal_two][text]" class="form-control" rows="4"></textarea>
+                            </div>
+                          </div>
+                          <div class="col-sm-4">
+                            <div class="form-group">
+                              <label>Thumbnail</label><br>
+                              <div class="thumbnail-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="material-icons">image</i>
+                                <img class="thumbnail-preview-img" style="display:none;">
+                                <input type="file" name="array[][is_equal_two][thumbnail]" class="thumbnail-input" accept="image/*" style="display:none;" onchange="previewThumbnail(this)">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Add/Delete Icons -->
+                  <div class="col-sm-1 d-flex flex-column justify-content-between align-items-center" style="height: 100%;">
+                    <i class="material-icons delete-icon delte" style="cursor: pointer;">delete</i>
+                    <div style="flex-grow: 1;"></div>
+                    <i class="material-icons add-icon add" style="cursor: pointer;">add</i>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+<!--  drag and drop the following  -->
+
+<script type="text/template" id="dragquestionCardTemplate">
+  <div class="card question-card mt-3">
+    <div class="card-body">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label>Question</label>
+                  <textarea name="array[0][question][text]" class="form-control" rows="4"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <!-- Option A -->
+              <div class="col-sm-6">
+                <div class="row border-1 p-2 drag">
+                  <div class="">
+                    <div class="form-group">
+                      <label for="option_a">Option A</label>
+                      <input class="form-control" type="text" id="option_a_text_0" name="array[0][options][option_a][text]" />
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="form-group mt-4">
+                      <label for="thumbnail-upload-a" class="custom-file-label">📷 Choose Images</label>
+                      <input
+                        type="file"
+                        id="thumbnail-upload-a"
+                        name="array[0][options][option_a][images][]"
+                        class="thumbnail-input"
+                        multiple
+                        accept="image/*"
+                        onchange="previewThumbnail1(this, 'preview-container_option-a')"
+                        style="display: none;">
+                      <!-- Preview container -->
+                      <div id="preview-container_option-a" class="d-flex flex-wrap mt-2"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Option B -->
+              <div class="col-sm-6">
+                <div class="row border-2 p-2 drag">
+                  <div class="">
+                    <div class="form-group">
+                      <label for="option_b">Option B</label>
+                      <input class="form-control" type="text" id="option_b_text_0" name="array[0][options][option_b][text]" />
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="form-group mt-4">
+                      <label for="thumbnail-upload-b" class="custom-file-label">📷 Choose Images</label>
+                      <input
+                        type="file"
+                        id="thumbnail-upload-b"
+                        name="array[0][options][option_b][images][]"
+                        class="thumbnail-input"
+                        multiple
+                        accept="image/*"
+                        onchange="previewThumbnail1(this, 'preview-container_option-b')"
+                        style="display: none;">
+                      <div id="preview-container_option-b" class="d-flex flex-wrap mt-2"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div><!-- /.row -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<!--  labelling the parts  -->
+
+<script type="text/template" id="labelquestionCardTemplate">
+      <div class="card question-card mt-3">
+        <div class="card-body">
+          <div class="container">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label>Question</label>
+                      <textarea name="array[0][question][text]" onkeyup="appendEditorText(this.value)" class="form-control" rows="1"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                      <div class="toolbar">
+      <div class="toolbar-header">Tools</div>
+      <a href="javascript:void(0);" class="tool-btn" id="imgBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          Image
+      </a>
+      <input type="file" id="imgInput" accept="image/*" style="display:none;" />
+      <a class="tool-btn" id="dropzoneBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <path d="M8 12h8"></path>
+          </svg>
+          Drop Zone
+      </a>
+      <a class="tool-btn" id="lineBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="19" x2="19" y2="5"></line>
+          </svg>
+          Line
+      </a>
+      <div style="flex:1"></div>
+      <a class="tool-btn" id="exportBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Export
+      </a>
+  </div>
+
+  <!-- MIDDLE TEMPLATE AREA -->
+  <div class="canvas-wrapper">
+      <div class="canvas">
+          <div class="question-space">
+              <input type="text" id="editor_questionText" placeholder="Enter your question here..." readonly/>
+          </div>
+
+          <div class="content-row">
+              <div class="image-box" id="imageBox">
+                  <img id="previewImg" src=""
+                      style="width:100%; height:100%; object-fit:contain; border-radius:20px; display:none;" />
+              </div>
+              <div class="answer-box" id="answerBox"></div>
+          </div>
+
+      </div>
+  </div>
+
+  <!-- RIGHT PROPERTIES PANEL -->
+  <div class="properties">
+      <div class="prop-section">
+          <div class="prop-title">Design</div>
+          <div class="prop-field">
+              <label>Width</label>
+              <input type="number" id="styleWidth" placeholder="Auto" />
+          </div>
+          <div class="prop-field">
+              <label>Height</label>
+              <input type="number" id="styleHeight" placeholder="Auto" />
+          </div>
+          <div class="prop-field">
+              <label>Fill</label>
+              <div style="display:flex; align-items:center; gap:8px;">
+                  <input type="color" id="styleColor"
+                      style="width:24px; height:24px; border:none; padding:0; background:none;" />
+                  <span style="font-size:11px; color:#888;">Hex</span>
+              </div>
+          </div>
+          <div class="prop-field" id="borderField">
+              <label>Border</label>
+              <div style="display:flex; align-items:center; gap:8px;">
+                  <input type="color" id="styleBorder"
+                      style="width:24px; height:24px; border:none; padding:0; background:none;" />
+              </div>
+          </div>
+          <div class="prop-field" id="thicknessField" style="display:none;">
+              <label>Thickness</label>
+              <input type="number" id="styleThickness" placeholder="2px" />
+          </div>
+      </div>
+
+      <!-- DROPZONE SPECIFIC FIELDS -->
+      <div class="prop-section hidden-fields" id="dropzoneFields">
+          <div class="prop-title">Data</div>
+          <div class="prop-field">
+              <label>ID (Unique)</label>
+              <input type="text" id="dropzoneName" placeholder="e.g., ear" />
+              <div class="error-message" id="nameError"></div>
+          </div>
+      </div>
+
+      <div class="prop-section hidden-fields" id="valueFields">
+          <div class="prop-field">
+              <label>Label Text</label>
+              <input type="text" id="dropzoneValue" placeholder="e.g., Ear" />
+          </div>
+      </div>
+
+      <div class="prop-section">
+          <a class="tool-btn delete-btn" id="deleteBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              Delete
+          </a>
+      </div>
+  </div>
+                </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+</script>

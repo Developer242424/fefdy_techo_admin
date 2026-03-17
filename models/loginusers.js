@@ -26,7 +26,6 @@ LoginUsers.init(
     section: { type: DataTypes.STRING, allowNull: true },
     profile_image: { type: DataTypes.STRING, allowNull: true },
     subject: { type: DataTypes.JSON, allowNull: true },
-    level: { type: DataTypes.INTEGER, allowNull: true },
     type: { type: DataTypes.STRING, allowNull: true },
     web_token: { type: DataTypes.TEXT, allowNull: true },
     app_token: { type: DataTypes.TEXT, allowNull: true },

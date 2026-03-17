@@ -1,6 +1,8 @@
 $(function () {
   LoadTableData();
 
+  $(".summernote").summernote();
+
   new SlimSelect({
     select: "#type",
   });
@@ -173,6 +175,8 @@ function OpenEditModal(id) {
         let data = res.data;
         $("#edit_id").val(data.id);
         $("#edit_title").val(data.title);
+        // $("#edit_description").val(data.description);
+        $("#edit_description").summernote("code", data.description);
         $("#edit_type").val(data.type);
         new SlimSelect({
           select: "#edit_type",

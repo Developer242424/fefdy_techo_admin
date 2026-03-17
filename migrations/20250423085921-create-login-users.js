@@ -56,10 +56,6 @@ module.exports = {
         type: Sequelize.JSON,
         allowNull: true,
       },
-      level: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
       type: {
         type: Sequelize.STRING,
         allowNull: true,

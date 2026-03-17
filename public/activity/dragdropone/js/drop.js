@@ -509,7 +509,7 @@ function restartGame() {
     qid,
     ust,
   };
-  window.location.href = `/admin/drag-drop/home?sid=${sid}&tid=${tid}&lid=${lid}&stid=${stid}&qid=${qid}&ust=${ust}`;
+  window.location.href = `/admin/drag-drop?sid=${sid}&tid=${tid}&lid=${lid}&stid=${stid}&qid=${qid}&ust=${ust}`;
 }
 
 

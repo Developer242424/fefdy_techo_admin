@@ -104,13 +104,7 @@
                     <div class="col-sm-3">
                         <div class="form-group">
                             <label>Level</label>
-                            <select name="edit_org_details[0][level]" class="form-control edit_level-dropdown">
-                                <option value="">Select Level</option>
-                                <% for (let i=1; i <=lvlftopic.levels; i++) { %>
-                                    <option value="<%= i %>">
-                                        <%= i %>
-                                    </option>
-                                    <% } %>
+                            <select name="edit_org_details[0][level][]" class="form-control edit_level-dropdown" multiple>
                             </select>
                             <p class="validate_error text-danger"></p>
                         </div>

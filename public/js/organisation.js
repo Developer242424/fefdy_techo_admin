@@ -6,11 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
   container.addEventListener("click", function (e) {
     // Add button logic
     if (e.target.matches("[data-add-btn]")) {
-      const levels = window.LEVEL_COUNT || 0;
-      let levelOptions = "";
-      for (let i = 1; i <= levels; i++) {
-        levelOptions += `<option value="${i}">${i}</option>`;
-      }
 
       const tempDiv = document.createElement("div");
       tempDiv.innerHTML = `<div class="row form-row">
@@ -58,9 +53,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     <label>Level</label>
                     <select name="org_details[${
                       orgIndex + 1
-                    }][level]" class="form-control level-dropdown">
+                    }][level][]" class="form-control level-dropdown" multiple>
                         <option value="">Select Level</option>
-                        ${levelOptions}
                     </select>
                     <p class="validate_error text-danger"></p>
                 </div>
@@ -91,9 +85,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const sectionSelect = newRow.querySelector(".section-dropdown");
       const levelSelect = newRow.querySelector(".level-dropdown");
       getSubjectForDropByClass(subjectSelect);
+      getLevelForDropByClass(levelSelect);
       getStandardsForDrop(standardSelect);
       new SlimSelect({ select: sectionSelect });
-      new SlimSelect({ select: levelSelect });
     }
 
     // Remove button logic
@@ -114,11 +108,6 @@ document.addEventListener("DOMContentLoaded", function () {
   container.addEventListener("click", function (e) {
     // Add button logic
     if (e.target.matches("[data-add-btn]")) {
-      const levels = window.LEVEL_COUNT || 0;
-      let levelOptions = "";
-      for (let i = 1; i <= levels; i++) {
-        levelOptions += `<option value="${i}">${i}</option>`;
-      }
 
       const tempDiv = document.createElement("div");
       tempDiv.innerHTML = `<div class="row form-row">
@@ -158,9 +147,8 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="col-sm-3">
                 <div class="form-group">
                     <label>Level</label>
-                    <select name="edit_org_details[${editOrgIndex}][level]" class="form-control level-dropdown">
+                    <select name="edit_org_details[${editOrgIndex}][level][]" class="form-control level-dropdown" multiple>
                         <option value="">Select Level</option>
-                        ${levelOptions}
                     </select>
                     <p class="validate_error text-danger"></p>
                 </div>
@@ -189,9 +177,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const sectionSelect = newRow.querySelector(".section-dropdown");
       const levelSelect = newRow.querySelector(".level-dropdown");
       getSubjectForDropByClass(subjectSelect);
+      getLevelForDropByClass(levelSelect);
       getStandardsForDrop(standardSelect);
       new SlimSelect({ select: sectionSelect });
-      new SlimSelect({ select: levelSelect });
     }
 
     // Remove button logic
@@ -218,8 +206,11 @@ $(function () {
   if (firstSubject) {
     getSubjectForDropByClass(firstSubject);
   }
+  const firstLevel = document.querySelector(".level-dropdown");
+  if (firstLevel) {
+    getLevelForDropByClass(firstLevel);
+  }
   new SlimSelect({ select: ".section-dropdown" });
-  new SlimSelect({ select: ".level-dropdown" });
 
   const firstStandard1 = document.querySelector(".edit_standard-dropdown");
   if (firstStandard1) {
@@ -229,8 +220,11 @@ $(function () {
   if (firstSubject1) {
     getSubjectForDropByClass(firstSubject1);
   }
+  const firstLevel1 = document.querySelector(".edit_level-dropdown");
+  if (firstLevel1) {
+    getLevelForDropByClass(firstLevel1);
+  }
   new SlimSelect({ select: ".edit_section-dropdown" });
-  new SlimSelect({ select: ".edit_level-dropdown" });
 
   $("#organisation_create_form").submit(function (e) {
     e.preventDefault();
@@ -385,11 +379,6 @@ async function OpenEditModal(id) {
             $("#organisation_edit").html("");
           }
 
-          const levels = window.LEVEL_COUNT || 0;
-          let levelOptions = "";
-          for (let i = 1; i <= levels; i++) {
-            levelOptions += `<option value="${i}">${i}</option>`;
-          }
           for (const value of data1) {
             html = `<div class="row form-row">
                     <div class="col-sm-3">
@@ -426,9 +415,8 @@ async function OpenEditModal(id) {
                     <div class="col-sm-3">
                         <div class="form-group">
                             <label>Level</label>
-                            <select name="edit_org_details[${editOrgIndex}][level]" class="form-control edit_level-dropdown">
+                            <select name="edit_org_details[${editOrgIndex}][level][]" class="form-control edit_level-dropdown" multiple>
                                 <option value="">Select Level</option>
-                                ${levelOptions}
                             </select>
                         </div>
                     </div>
@@ -463,9 +451,17 @@ async function OpenEditModal(id) {
             }
 
             const levelSelect = newRow.find(".edit_level-dropdown")[0];
-            const levelSlim = new SlimSelect({ select: levelSelect });
+            const levelSlim = getLevelForDropByClass(
+              levelSelect,
+              Array.isArray(value.level) ? value.level : JSON.parse(value.level)
+            );
             if (value.levels) {
-              levelSlim.setSelected([String(value.levels)]);
+              getLevelForDropByClass(
+                levelSelect,
+                Array.isArray(value.level)
+                  ? value.level
+                  : JSON.parse(value.level)
+              );
             }
             editOrgIndex++;
           }

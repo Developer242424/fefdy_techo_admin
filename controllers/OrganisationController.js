@@ -4,7 +4,6 @@ const multer = require("multer");
 const User = require("../models/user");
 const Subjects = require("../models/subjects");
 const Topics = require("../models/topics");
-const Level = require("../models/level");
 const Subtopic = require("../models/subtopic");
 const CategoryData = require("../models/categorydata");
 const Organisation = require("../models/organisation");
@@ -30,26 +29,12 @@ const sequelize = require("../config/database");
 class OrganisationController {
   constructor() {
     this.index = asyncHandler(async (req, res) => {
-      const query =
-        "SELECT * FROM topics WHERE levels = (SELECT MAX(levels) FROM topics)";
-      let lvlftopic = null;
-
-      try {
-        const result = await sequelize.query(query, {
-          type: sequelize.QueryTypes.SELECT,
-        });
-        lvlftopic = result[0] || { levels: 0 };
-      } catch (err) {
-        console.error("Query error:", err);
-      }
-
       return res.render("admin/layout", {
         title: "Organisation",
         content: "../admin/organisation/index",
         url: req.originalUrl,
         baseurl: "/admin",
         homeurl: "/admin/dashboard",
-        lvlftopic,
       });
     });
 
@@ -113,6 +98,7 @@ class OrganisationController {
               subject: value.subject,
               standard: value.standard,
               section: value.section,
+              user_type: "organisation",
             },
           });
 
@@ -127,8 +113,9 @@ class OrganisationController {
               subject: value.subject,
               standard: value.standard,
               section: value.section,
-              levels: parseInt(value.level),
+              level: value.level,
               stu_count: value.student_count,
+              user_type: "organisation",
             });
           }
         }
@@ -189,6 +176,7 @@ class OrganisationController {
           where: {
             org_id: id,
             is_deleted: null,
+            user_type: "organisation",
           },
         });
         return res.status(200).json({ status: 200, data, data1 });
@@ -250,19 +238,19 @@ class OrganisationController {
               .json({ status: 404, message: "Organisations not found" });
           }
 
-          if (file && organisation.thumbnail) {
+          if (file && organisation.profile_image) {
             // console.log(organisation.thumbnail);
             const oldPath = path.join(
               __dirname,
               "../public/",
-              organisation.thumbnail
+              organisation.profile_image
             );
             fs.unlink(oldPath, (err) => {
               if (err) {
                 console.warn(`Old file delete warning: ${err.message}`);
               }
             });
-            organisation.thumbnail = `uploads/org_profile/${file.filename}`;
+            organisation.profile_image = `uploads/org_profile/${file.filename}`;
           }
           const uniqueSubjects = [
             ...new Set(edit_org_details.map((item) => item.subject)),
@@ -276,10 +264,10 @@ class OrganisationController {
           await OrgDetails.update(
             { is_deleted: new Date() },
             {
-              where: { org_id: organisation.id },
+              where: { org_id: organisation.id, user_type: "organisation" },
             }
           );
-          console.log(edit_org_details.length);
+          // console.log(edit_org_details.length);
           for (const value of edit_org_details) {
             if (value) {
               const check = await OrgDetails.findOne({
@@ -288,6 +276,7 @@ class OrganisationController {
                   subject: value.subject,
                   standard: value.standard,
                   section: value.section,
+                  user_type: "organisation",
                   is_deleted: null,
                 },
               });
@@ -298,14 +287,15 @@ class OrganisationController {
                   subject: value.subject,
                   standard: value.standard,
                   section: value.section,
-                  levels: parseInt(value.level),
+                  level: value.level,
                   stu_count: value.student_count,
+                  user_type: "organisation",
                 });
                 if (createOrgDet) {
                   LoginUsers.update(
                     {
                       subject: JSON.stringify(uniqueSubjects),
-                      level: parseInt(value.level),
+                      level: value.level,
                     },
                     {
                       where: {
@@ -355,7 +345,7 @@ class OrganisationController {
         // await OrgDetails.destroy({ where: { org_id: id } });
         await OrgDetails.update(
           { is_deleted: new Date() },
-          { where: { org_id: id } }
+          { where: { org_id: id, user_type: "organisation" } }
         );
         return res.status(200).json({
           status: 200,

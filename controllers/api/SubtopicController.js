@@ -4,8 +4,8 @@ const multer = require("multer");
 const User = require("../../models/user");
 const Subjects = require("../../models/subjects");
 const Topics = require("../../models/topics");
-const Level = require("../../models/level");
 const Subtopic = require("../../models/subtopic");
+const Level = require("../../models/level");
 const CategoryData = require("../../models/categorydata");
 const Category = require("../../models/category");
 const WatchHistory = require("../../models/watchhistory");
@@ -33,49 +33,90 @@ class SubtopicController {
     this.data = asyncHandler(async (req, res) => {
       try {
         const user = req.session.user;
-        const { level } = req.body;
+        const { topic } = req.body;
 
-        if (!level) {
+        if (!topic) {
           return res.status(200).json({
             status: 400,
-            message: "Level ID is required",
+            message: "Topic is required",
           });
         }
 
         const subtopics = await Subtopic.findAll({
-          where: { level_id: level, is_deleted: null },
+          where: { topic, is_deleted: null },
           order: [["sort_order", "ASC"]],
         });
-
-        const ques_type = await QuestionType.findAll({
-          where: {
-            is_deleted: null,
-          },
-        });
-        const ques_ids = ques_type.map((q) => q.id);
 
         const data = await Promise.all(
           subtopics.map(async (value, index) => {
             const catDataIds = JSON.parse(value.cat_data_ids || "[]");
             const categories = JSON.parse(value.category || "[]");
 
+            // const level = await Level.findOne({
+            //   where: {
+            //     id: value.level,
+            //     is_deleted: null,
+            //   },
+            // });
+            // let templates = level.game_templates;
+
+            const ques_type_ids = await Questions.findAll({
+              where: {
+                is_deleted: null,
+                sub_topic: value.id,
+              },
+              attributes: ["question_type"],
+            });
+            let templates = ques_type_ids
+              .map((d) => d.question_type)
+              .filter((v, i, arr) => arr.indexOf(v) === i);
+            // console.log("templates", templates);
+
+            if (!templates) {
+              templates = [];
+            }
+
+            if (typeof templates === "string") {
+              try {
+                templates = JSON.parse(templates);
+              } catch {
+                templates = [];
+              }
+            }
+
+            if (!Array.isArray(templates)) {
+              templates = [];
+            }
+
+            templates = templates.filter((x) => x !== null && x !== undefined);
+            templates = templates.map(Number);
+            const ques_type = await QuestionType.findAll({
+              where: {
+                id: {
+                  [Op.in]: templates,
+                },
+                is_deleted: null,
+              },
+            });
+            const ques_ids = ques_type.map((q) => q.id);
+
             const history = await sequelize.query(
               `
-          SELECT *
-          FROM (
-            SELECT *,
-                   ROW_NUMBER() OVER (PARTITION BY category ORDER BY id DESC) AS row_num
-            FROM watch_history
-            WHERE org_id = :org_id
-              AND user_id = :user_id
-              AND subtopic = :subtopic_id
-              AND subtopic_data IN (:subtopicData)
-              AND category IN (:category)
-              AND is_deleted IS NULL
-              AND status = '1'
-          ) AS t
-          WHERE row_num = 1
-          `,
+            SELECT *
+            FROM (
+              SELECT *,
+                     ROW_NUMBER() OVER (PARTITION BY category ORDER BY id DESC) AS row_num
+              FROM watch_history
+              WHERE org_id = :org_id
+                AND user_id = :user_id
+                AND subtopic = :subtopic_id
+                AND subtopic_data IN (:subtopicData)
+                AND category IN (:category)
+                AND is_deleted IS NULL
+                AND status = '1'
+            ) AS t
+            WHERE row_num = 1
+            `,
               {
                 replacements: {
                   org_id: user.org_id,
@@ -90,7 +131,7 @@ class SubtopicController {
             // console.log("index:" + index);
             // console.log("history length" + history.length);
             // console.log("cat length" + JSON.parse(value.category).length);
-            // console.log(ques_type.length);
+            // console.log("ques_type.length ", ques_type.length);
             // console.log("User id ", user.id);
             // console.log("subtopic id ", value.id);
             // console.log("question ids ", ques_ids);
@@ -114,35 +155,35 @@ class SubtopicController {
                 ? true
                 : false;
 
-            let ttl_mark = 0;
-            let got_mark = 0;
-            await Promise.all(
-              ques_ids.map(async (value1, index1) => {
-                const testHistory = await TestHistory.findOne({
-                  where: {
-                    is_deleted: null,
-                    user_id: user.id,
-                    sub_topic: value.id,
-                    question_type: value1,
-                  },
-                  order: [["id", "Desc"]],
-                  limit: 1,
-                });
-                // console.log("user_id", user.id);
-                // console.log("sub_topic", value.id);
-                // console.log("question_type", value1);
-                // console.log("testhistory", testHistory);
+            // let ttl_mark = 0;
+            // let got_mark = 0;
+            // await Promise.all(
+            //   ques_ids.map(async (value1, index1) => {
+            //     const testHistory = await TestHistory.findOne({
+            //       where: {
+            //         is_deleted: null,
+            //         user_id: user.id,
+            //         sub_topic: value.id,
+            //         question_type: value1,
+            //       },
+            //       order: [["id", "Desc"]],
+            //       limit: 1,
+            //     });
+            //     // console.log("user_id", user.id);
+            //     // console.log("sub_topic", value.id);
+            //     // console.log("question_type", value1);
+            //     // console.log("testhistory", testHistory);
 
-                if (testHistory) {
-                  console.log("Correct answer", testHistory.correct_ans);
-                  console.log("Wrong answer", testHistory.wrong_ans);
-                  ttl_mark +=
-                    (testHistory.correct_ans || 0) +
-                    (testHistory.wrong_ans || 0);
-                  got_mark += testHistory.correct_ans || 0;
-                }
-              })
-            );
+            //     if (testHistory) {
+            //       console.log("Correct answer", testHistory.correct_ans);
+            //       console.log("Wrong answer", testHistory.wrong_ans);
+            //       ttl_mark +=
+            //         (testHistory.correct_ans || 0) +
+            //         (testHistory.wrong_ans || 0);
+            //       got_mark += testHistory.correct_ans || 0;
+            //     }
+            //   })
+            // );
             // console.log("total mark", ttl_mark);
             // console.log("got marks", got_mark);
 
@@ -154,10 +195,10 @@ class SubtopicController {
               title: value.title,
               description: value.description,
               thumbnail: value.thumbnail,
-              cat_data_ids: value.cat_data_ids,
+              // cat_data_ids: value.cat_data_ids,
               is_completed: is_completed ? 1 : 0,
-              ttl_mark: ttl_mark,
-              got_mark: got_mark,
+              // ttl_mark: ttl_mark,
+              // got_mark: got_mark,
             };
           })
         );
@@ -182,6 +223,12 @@ class SubtopicController {
             id: subtopic,
           },
         });
+        const topic = await Topics.findOne({
+          where: {
+            id: get.topic,
+          },
+        });
+        const audioMessages = topic.audio_messages;
         const category = JSON.parse(get.category);
         const cat_data_ids = JSON.parse(get.cat_data_ids);
         const cat_get = await Category.findAll({
@@ -191,7 +238,7 @@ class SubtopicController {
             },
           },
         });
-        const data = await Promise.all(
+        const category_data = await Promise.all(
           cat_get.map(async (value) => {
             const cat_data = await CategoryData.findOne({
               where: {
@@ -201,25 +248,123 @@ class SubtopicController {
               },
               attributes: ["id", "source", "type"],
             });
+            const audio_message_file = audioMessages?.categories?.find(
+              (item) => item.id.toString() === value.id.toString()
+            );
+            // console.log("audioMessages", audioMessages);
+            // console.log("audio_message_file", audio_message_file);
+
             const watch_history = await WatchHistory.findOne({
               where: {
                 user_id: user.id,
                 subtopic: subtopic,
                 category: value.id,
-                status: "1",
+                // status: "1",
                 is_deleted: null,
               },
             });
             return {
               id: value.id,
               title: value.title,
+              description: value.description,
               type: value.type,
               thumbnail: value.thumbnail,
-              is_completed: watch_history ? 1 : 0,
-              cat_data: cat_data,
+              is_completed: watch_history?.status === "1" ? 1 : 0,
+              source_id: cat_data.id,
+              source: cat_data.source,
+              subtopic_id: subtopic,
+              ttl_time: watch_history ? watch_history.ttl_time : "00:00",
+              seen_time: watch_history ? watch_history.seen_time : "00:00",
+              intro_audio: audio_message_file?.intro_audio || null,
+              completion_audio: audio_message_file?.completion_audio || null,
             };
           })
         );
+        // const level = await Level.findOne({
+        //   where: {
+        //     id: get.level,
+        //     is_deleted: null,
+        //   },
+        // });
+        // console.log("level", level);
+        // console.log("level.game_templates =", level.game_templates);
+        // console.log("Type:", typeof level.game_templates);
+        const ques_type_ids = await Questions.findAll({
+          where: {
+            is_deleted: null,
+            sub_topic: subtopic,
+          },
+          attributes: ["question_type"],
+        });
+        let templates = ques_type_ids
+          .map((d) => d.question_type)
+          .filter((v, i, arr) => arr.indexOf(v) === i);
+        // console.log("templates", templates);
+        // let templates = level.game_templates;
+
+        if (!templates) {
+          templates = [];
+        }
+
+        if (typeof templates === "string") {
+          try {
+            templates = JSON.parse(templates);
+          } catch {
+            templates = [];
+          }
+        }
+
+        if (!Array.isArray(templates)) {
+          templates = [];
+        }
+
+        templates = templates.filter((x) => x !== null && x !== undefined);
+        templates = templates.map(Number);
+
+        // console.log("Final parsed templates =", templates);
+        const question_types = await QuestionType.findAll({
+          where: {
+            id: {
+              [Op.in]: templates,
+            },
+            is_deleted: null,
+          },
+        });
+        const ques_data = await Promise.all(
+          question_types.map(async (value, index) => {
+            const audio_message_file1 = audioMessages?.question_type?.find(
+              (item) => item.id.toString() === value.id.toString()
+            );
+            const test_history = await TestHistory.findAll({
+              where: {
+                user_id: user.id,
+                sub_topic: subtopic,
+                correct_ans: {
+                  [Op.gt]: 0,
+                },
+                question_type: value.id,
+                is_deleted: null,
+              },
+            });
+            // console.log("test_history", test_history);
+            return {
+              id: value.id,
+              title: value.title,
+              description: value.description,
+              type: "game",
+              thumbnail: value.thumbnail,
+              is_completed: test_history?.length > 0 ? 1 : 0,
+              source_id: 0,
+              source: value.template,
+              subtopic_id: subtopic,
+              ttl_time: "00:00",
+              seen_time: "00:00",
+              intro_audio: audio_message_file1?.intro_audio || null,
+              completion_audio: audio_message_file1?.completion_audio || null,
+            };
+          })
+        );
+        const data = [...category_data, ...ques_data];
         return res.status(200).json({ status: 200, data });
       } catch (error) {
         console.error("Get error:", error);

@@ -1,26 +1,16 @@
 const asyncHandler = require("express-async-handler");
 const { check, validationResult } = require("express-validator");
-const multer = require("multer");
-const User = require("../models/user");
 const Subjects = require("../models/subjects");
 const Topics = require("../models/topics");
-const Level = require("../models/level");
 const Subtopic = require("../models/subtopic");
+const Category = require("../models/category");
 const CategoryData = require("../models/categorydata");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { where, Sequelize, DATE, Op } = require("sequelize");
-const { render } = require("ejs");
+const Level = require("../models/level");
+const { where, Sequelize, Op } = require("sequelize");
 require("dotenv").config();
-const session = require("express-session");
 const getDynamicUploader = require("../middleware/upload");
-const moment = require("moment");
-const { fn } = require("sequelize");
 const path = require("path");
 const fs = require("fs");
-const { title } = require("process");
-const Category = require("../models/category");
-const { connect } = require("http2");
 
 class SubtopicController {
   constructor() {
@@ -57,13 +47,13 @@ class SubtopicController {
         .bail()
         .isNumeric()
         .withMessage("Subject is need to be numeric"),
-      check("topic").notEmpty().withMessage("Topic is required"),
       check("level")
         .notEmpty()
         .withMessage("Level is required")
         .bail()
         .isNumeric()
         .withMessage("Level is need to be numeric"),
+      check("topic").notEmpty().withMessage("Topic is required"),
       check("title")
         .notEmpty()
         .withMessage("Title is required")
@@ -92,13 +82,14 @@ class SubtopicController {
         try {
           const {
             subject,
-            topic,
             level,
+            topic,
             title,
             category_data,
             description,
             category,
             sort_order,
+            learning_outcomes,
           } = req.body;
           const parsedCategoryData =
             typeof category_data === "string"
@@ -117,14 +108,15 @@ class SubtopicController {
 
           const subtopic = await Subtopic.create({
             subject: subject,
+            level: level,
             topic: topic,
-            level_id: level,
             category: JSON.stringify(category),
             title,
             description,
             thumbnail: `uploads/subtopics/${
               thumbnail ? thumbnail.filename : null
             }`,
+            learning_outcomes: learning_outcomes,
             sort_order: sort_order,
           });
 
@@ -204,14 +196,14 @@ class SubtopicController {
               attributes: ["title"],
             });
             const level = await Level.findOne({
-              where: { id: value.level_id },
-              attributes: ["title"],
+              where: { id: value.level },
+              attributes: ["level"],
             });
             return {
               id: value.id,
               subject_name: subject.subject,
               topic_name: topic.title,
-              level_name: level.title,
+              level_name: level.level,
               title: value.title,
               description: value.description,
               thumbnail: `<img src="../${value.thumbnail}" alt="Thumbnail" style="width: 50px;">`,
@@ -270,25 +262,20 @@ class SubtopicController {
         .bail()
         .isNumeric()
         .withMessage("Subject must be numeric"),
-
-      check("edit_topic").notEmpty().withMessage("Topic is required"),
-
       check("edit_level")
         .notEmpty()
         .withMessage("Level is required")
         .bail()
         .isNumeric()
         .withMessage("Level must be numeric"),
-
+      check("edit_topic").notEmpty().withMessage("Topic is required"),
       check("edit_title")
         .notEmpty()
         .withMessage("Title is required")
         .bail()
         .isLength({ min: 3 })
         .withMessage("Title must be at least 3 characters long"),
-
       check("edit_category").notEmpty().withMessage("Category is required"),
-
       check("edit_description")
         .notEmpty()
         .withMessage("Description is required")
@@ -311,14 +298,15 @@ class SubtopicController {
         try {
           const {
             edit_subject,
-            edit_topic,
             edit_level,
+            edit_topic,
             edit_title,
             edit_category_data,
             edit_description,
             edit_category,
             edit_id,
             edit_sort_order,
+            edit_learning_outcomes,
           } = req.body;
 
           const existingSubtopic = await Subtopic.findOne({
@@ -355,12 +343,13 @@ class SubtopicController {
           await Subtopic.update(
             {
               subject: edit_subject,
+              level: edit_level,
               topic: edit_topic,
-              level_id: edit_level,
               category: JSON.stringify(edit_category),
               title: edit_title,
               description: edit_description,
               thumbnail: existingSubtopic.thumbnail || null,
+              learning_outcomes: edit_learning_outcomes,
               sort_order: edit_sort_order,
             },
             { where: { id: edit_id } }

@@ -5,7 +5,6 @@ const User = require("../models/user");
 const LoginUsers = require("../models/loginusers");
 const Subjects = require("../models/subjects");
 const Topics = require("../models/topics");
-const Level = require("../models/level");
 const Category = require("../models/category");
 const QuestionType = require("../models/questiontype");
 const Questions = require("../models/questions");
@@ -35,8 +34,8 @@ class ActivityController {
         const questionsData = await Questions.findAll({
           where: {
             subject: sid,
+            level: lid,
             topic: tid,
-            level_id: lid,
             sub_topic: stid,
             question_type: qid,
             is_deleted: null,
@@ -62,7 +61,8 @@ class ActivityController {
             if (!opt) return;
 
             options.push({
-              text: opt.text || "",
+              primary_text: opt.primary_text || "",
+              secondary_text: opt.secondary_text || "",
               image: opt.thumbnail || "",
             });
 
@@ -114,8 +114,8 @@ class ActivityController {
         const obj = {
           user_id: user.id,
           subject: sid,
+          level: lid,
           topic: tid,
-          level_id: lid,
           sub_topic: stid,
           question_type: qid,
           question_ids: questionIds,
@@ -144,8 +144,8 @@ class ActivityController {
         const questionsData = await Questions.findAll({
           where: {
             subject: sid,
+            level: lid,
             topic: tid,
-            level_id: lid,
             sub_topic: stid,
             question_type: qid,
             is_deleted: null,
@@ -209,8 +209,8 @@ class ActivityController {
         const questionsData = await Questions.findOne({
           where: {
             subject: sid,
+            level: lid,
             topic: tid,
-            level_id: lid,
             sub_topic: stid,
             question_type: qid,
             is_deleted: null,
@@ -250,9 +250,239 @@ class ActivityController {
       }
     });
 
+    this.getQuestionsConditionalMatchup = asyncHandler(async (req, res) => {
+      try {
+        // console.log("Body....", req.body);
+        const { sid, tid, lid, stid, qid, ust } = req.body;
+        const questionsData = await Questions.findAll({
+          where: {
+            subject: sid,
+            level: lid,
+            topic: tid,
+            sub_topic: stid,
+            question_type: qid,
+            is_deleted: null,
+            id: {
+              [Op.notIn]: Array.from(previouslyServedIds),
+            },
+          },
+          order: [Sequelize.literal("RAND()")],
+          limit: 1,
+          raw: true,
+        });
+
+        // console.log("Questions match  up", questionsData)
+        // console.log("Questions match  up onedata only", questionsData[0].data)
+        const rawGameData = questionsData[0].data;
+
+        const transformedGameData = rawGameData.map((item, index) => {
+          if (index === 0 && item.question) {
+            return {
+              questionid: [questionsData[0].id],
+              question: item.question,
+            };
+          }
+
+          const left = item.is_equal_one || {};
+          const right = item.is_equal_two || {};
+
+          const leftText = left.text || "";
+          const leftThumbnail = left.thumbnail || "";
+
+          const rightText = right.text || "";
+          const rightThumbnail = right.thumbnail || "";
+
+          return {
+            instruction: item.instruction,
+            inner_instruction: item.inner_instruction,
+            is_equal_one: {
+              text: leftText,
+              thumbnail: leftThumbnail,
+            },
+            is_equal_two: {
+              text: rightText,
+              thumbnail: rightThumbnail,
+            },
+          };
+        });
+
+        return res.json(transformedGameData);
+      } catch (error) {
+        console.error("Error fetching random questions:", error);
+        return res.status(500).json({
+          message: "Internal server error",
+          error,
+        });
+      }
+    });
+
+    this.getQuestionsPartsDragDropOne = asyncHandler(async (req, res) => {
+      try {
+        // console.log("Body....", req.body);
+        const { sid, tid, lid, stid, qid, ust } = req.body;
+        const questionsData = await Questions.findAll({
+          where: {
+            subject: sid,
+            level: lid,
+            topic: tid,
+            sub_topic: stid,
+            question_type: qid,
+            is_deleted: null,
+            id: {
+              [Op.notIn]: Array.from(previouslyServedIds),
+            },
+          },
+          order: [Sequelize.literal("RAND()")],
+          limit: 1,
+          raw: true,
+        });
+        // console.log("questionsData", questionsData);
+
+        const rawGameData = questionsData[0].data;
+        // console.log("rawGameData", rawGameData);
+
+        const transformedGameData = [];
+
+        rawGameData.forEach((item, index) => {
+          if (item.question) {
+            transformedGameData.push({
+              questionid: [questionsData[0].id],
+              question: item.question,
+            });
+          }
+
+          if (item.html) {
+            transformedGameData.push({
+              html: item.html,
+            });
+          }
+        });
+
+        return res.json(transformedGameData);
+      } catch (error) {
+        console.error("Error fetching random questions:", error);
+        return res.status(500).json({
+          message: "Internal server error",
+          error,
+        });
+      }
+    });
+
+    this.getQuestionsForIdentify = asyncHandler(async (req, res) => {
+      try {
+        // console.log("Body....", req.body);
+        const { sid, tid, lid, stid, qid, ust } = req.body;
+        const questionType = await QuestionType.findOne({
+          where: {
+            id: qid,
+          },
+          raw: true,
+        });
+        // console.log("questionType", questionType);
+        const questionsData = await Questions.findAll({
+          where: {
+            subject: sid,
+            level: lid,
+            topic: tid,
+            sub_topic: stid,
+            question_type: qid,
+            is_deleted: null,
+            id: {
+              [Op.notIn]: Array.from(previouslyServedIds),
+            },
+          },
+          order: [Sequelize.literal("RAND()")],
+          limit: questionType?.question_limit || 1,
+          raw: true,
+        });
+        // console.log("questionsData", questionsData);
+
+        let formattedQuestions = [];
+        questionsData.forEach((qItem) => {
+          const rawGameData = qItem.data;
+          // console.log("rawGameData", rawGameData);
+          const transformedGameData = [];
+
+          rawGameData.forEach((item, index) => {
+            if (item.question) {
+              transformedGameData.push({
+                questionid: qItem.id,
+                question: item.question.text,
+                html: item?.html?.data || "<p>no data</p>",
+              });
+            }
+          });
+          // console.log("transformedGameData", transformedGameData);
+          // formattedQuestions.push();
+          formattedQuestions = formattedQuestions.concat(transformedGameData);
+        });
+        // console.log("formattedQuestions", formattedQuestions);
+
+        return res.json(formattedQuestions);
+      } catch (error) {
+        console.error("Error fetching random questions:", error);
+        return res.status(500).json({
+          message: "Internal server error",
+          error,
+        });
+      }
+    });
+
+    this.getQuestionsForDragndrop = asyncHandler(async (req, res) => {
+      try {
+        // console.log("Body....", req.body);
+        const { sid, tid, lid, stid, qid, ust } = req.body;
+        const questionsData = await Questions.findAll({
+          where: {
+            subject: sid,
+            level: lid,
+            topic: tid,
+            sub_topic: stid,
+            question_type: qid,
+            is_deleted: null,
+            id: {
+              [Op.notIn]: Array.from(previouslyServedIds),
+            },
+          },
+          order: [Sequelize.literal("RAND()")],
+          limit: 1,
+          raw: true,
+        });
+        // console.log("questionsData", questionsData);
+
+        const rawGameData = questionsData[0].data;
+        // console.log("rawGameData", rawGameData);
+
+        const transformedGameData = [];
+
+        rawGameData.forEach((item, index) => {
+          if (item.question) {
+            transformedGameData.push({
+              questionid: [questionsData[0].id],
+              question: item.question,
+            });
+          }
+
+          if (item.html) {
+            transformedGameData.push({
+              html: item.html,
+            });
+          }
+        });
+
+        return res.json(transformedGameData);
+      } catch (error) {
+        console.error("Error fetching random questions:", error);
+        return res.status(500).json({
+          message: "Internal server error",
+          error,
+        });
+      }
+    });
+
     this.storeSeparateEntries = asyncHandler(async (req, res) => {
       try {
-        const { question, comp_time, is_correct, ust } = req.body;
+        const { question, comp_time, is_correct, ques_id, ust } = req.body;
         // console.log(question, comp_time, is_correct, ust);
         const user = await LoginUsers.findOne({
           where: {
@@ -262,6 +492,7 @@ class ActivityController {
         // console.log(user);
         const obj = {
           user_id: user.id,
+          question_id: ques_id,
           question,
           comp_time,
           is_correct,

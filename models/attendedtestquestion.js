@@ -15,6 +15,7 @@ class AttendedTestQuestion extends Model {
 AttendedTestQuestion.init(
   {
     user_id: { type: DataTypes.INTEGER, allowNull: true },
+    question_id: { type: DataTypes.INTEGER, allowNull: true },  
     question: { type: DataTypes.TEXT, allowNull: true },
     comp_time: { type: DataTypes.INTEGER, allowNull: true },
     is_correct: { type: DataTypes.INTEGER, allowNull: true },

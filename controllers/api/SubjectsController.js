@@ -35,20 +35,12 @@ class SubjectsController {
 
       const data = await Promise.all(
         subjects.map(async (value) => {
-          const topics = await Topics.findAll({
-            where: {
-              subject: value.id,
-              is_deleted: null,
-            },
-            attributes: ["id", "title"],
-          });
           return {
             id: value.id,
             subject: value.subject,
             thumbnail: value.thumbnail,
             background: value.background,
             is_purchased: sub_ids.includes(String(value.id)) ? 1 : 0,
-            topics: topics,
           };
         })
       );
