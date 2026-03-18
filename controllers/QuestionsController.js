@@ -462,6 +462,27 @@ class QuestionsController {
           }
 
           newData = newArray;
+        } else if (question_type === 7 || question_type === "7") {
+          let array = [];
+          try {
+            array =
+              typeof req.body.array === "string"
+                ? JSON.parse(req.body.array)
+                : req.body.array;
+          } catch (err) {
+            return res
+              .status(200)
+              .json({ status: 400, message: "Invalid array format" });
+          }
+          if(array[0].html.data == "" || array[0].html.data == null){
+            return;
+          }
+          // console.log("requests", req.body);
+          // console.log("array", array);
+          // console.log("array[0].html.data", typeof array[0].html.data);
+          // console.log("array[0].html.data", array[0].html.data);
+          // console.log("array", JSON.stringify(array));
+          newData = array;
         } else {
           return res.status(200).json({
             status: 400,

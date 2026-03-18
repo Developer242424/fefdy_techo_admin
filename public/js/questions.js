@@ -355,6 +355,42 @@ $(function () {
       },
     });
   });
+  
+  $("#question_template_edit_form").on("submit", function (e) {
+    alert("edit")
+    e.preventDefault();
+    LoadStart();
+
+    const formData = new FormData(this);
+
+    $.ajax({
+      url: "/admin/questions-list/update",
+      method: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function (res) {
+        LoadStop();
+        if (res.status === 200) {
+          ToastAlert("success", res.message);
+          LoadTableData();
+          $("#question_template_edit_form")[0].reset();
+          $("#question_list_template_edit_modal .close").click();
+        } else if (res.status === 401) {
+          res.errors.forEach((error) => {
+            $("#" + error.path + "_error").text(error.msg);
+          });
+        } else {
+          ToastAlert("warning", res.message);
+        }
+      },
+      error: function (xhr) {
+        LoadStop();
+        const errorMessage = xhr.responseJSON?.message || "An error occurred.";
+        ToastAlert("warning", errorMessage);
+      },
+    });
+  });
 });
 
 function LoadTableData() {
@@ -445,6 +481,15 @@ function OpenEditModal(id, type) {
             );
             $(".questions_container").html(ques_html_mat);
             OpenModal("question_list_edit_modal");
+          } else if (type === 7 || type === "7") {
+            let ques_html_mat = makeHTMLforDragDrop3(id, type, data.data);
+            $(".questions_template_container").html(ques_html_mat);
+            OpenModal("question_list_template_edit_modal");
+            // console.log("data", data.data[0])
+            setTimeout(() => {
+                renderScriptForDrafDrop3(document.querySelector('.gge-editor-root'), data.data[0]);
+                // dragAndDropEditorTemplate(document.querySelector('.gge-editor-root'));
+            }, 200);
           } else {
             return false;
           }
@@ -2547,7 +2592,7 @@ function dragAndDropEditorTemplate(container) {
     };
   }
 
-  document.getElementById("bg-upload").addEventListener("change", (e) => {
+  $(document).on("change", "#bg-upload", function (e) {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -2555,24 +2600,28 @@ function dragAndDropEditorTemplate(container) {
     formData.append("editor_image", file);
 
     $.ajax({
-      url: "/admin/image-upload",
-      type: "POST",
-      data: formData,
-      processData: false,
-      contentType: false,
-      success: function (res) {
-        console.log("BG Uploaded:", res.filename);
-        bgImageUrl = assetURL + res.filename;
-        canvas.style.backgroundImage = `url('${bgImageUrl}')`;
-        canvas.style.backgroundSize = "cover";
-        canvas.style.backgroundPosition = "center";
-        e.target.value = "";
-      },
-      error: function () {
-        console.error("BG Upload failed");
-      },
+        url: "/admin/image-upload",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (res) {
+            console.log("BG Uploaded:", res.filename);
+
+            const bgImageUrl = assetURL + res.filename;
+
+            const canvas = document.getElementById("editor-canvas"); // ⚠️ ensure exists
+            canvas.style.backgroundImage = `url('${bgImageUrl}')`;
+            canvas.style.backgroundSize = "cover";
+            canvas.style.backgroundPosition = "center";
+
+            e.target.value = "";
+        },
+        error: function () {
+            console.error("BG Upload failed");
+        },
     });
-  });
+});
 
   document.getElementById("dropzone-upload").addEventListener("change", (e) => {
     const file = e.target.files[0];
@@ -3272,3 +3321,1001 @@ ${itemsHTML}
 </div>`;
   }
 }
+
+function makeHTMLforDragDrop3(id, type, data){
+  // console.log("data", data)
+  let html = `<div class="card question-card mt-3">
+    <div class="card-body">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label>Question</label>
+                  <textarea name="array[0][question][text]" onkeyup="appendDragDropText(this.value)" class="form-control" rows="1">${data[0].question.text}</textarea>
+                  <input type="hidden" name="array[0][html][data]" id="dragdrop_editor_html_val">
+                </div>
+                <div class="row">
+    <div class="gge-editor-root">
+        <div class="gge-workspace-layout">
+            <div class="gge-left-panel">
+                <div class="gge-panel-section">
+                    <h3>Tools</h3>
+
+                    <label class="gge-tool-btn">
+                        Set Background
+                        <input type="file" id="bg-upload" accept="image/*">
+                    </label>
+
+                    <label class="gge-tool-btn">
+                        Add Drop Zone
+                        <input type="file" id="dropzone-upload" accept="image/*">
+                    </label>
+
+                    <label class="gge-tool-btn">
+                        Add Item
+                        <input type="file" id="item-upload" accept="image/*">
+                    </label>
+
+                    <a class="gge-tool-btn" id="delete-btn" style="background: #991b1b; border-color: #991b1b;">
+                        Delete Selected
+                    </a>
+
+                    <a class="gge-btn-base gge-btn-success" id="export-btn">Export HTML</a>
+                </div>
+            </div>
+
+            <div class="gge-canvas-area">
+              <div class="dd-question-space-id">
+                                    <input type="text" id="dd-editor_questionText-id" placeholder="Enter your question here..." readonly/>
+                                </div>
+                <div class="gge-canvas" id="editor-canvas">
+                    <div class="gge-overlay-modal" id="answer-spot-overlay">
+                        <div class="gge-modal-content">
+                            <h3 style="margin-bottom: 12px; font-size: 16px;">Set Answer Spot</h3>
+                            <p style="margin-bottom: 0; font-size: 13px;" id="answer-spot-message">Drag and resize the
+                                item, then click Lock when ready</p>
+                        </div>
+                        <div class="gge-modal-controls">
+                            <a class="gge-btn-base gge-btn-primary" id="answer-spot-lock" style="display: block;">Lock
+                                Position</a>
+                            <a class="gge-btn-base gge-btn-success" id="answer-spot-done"
+                                style="display: none;">Done</a>
+                            <a class="gge-btn-base gge-btn-danger" id="answer-spot-cancel">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gge-right-panel">
+                <div id="properties-panel" class="gge-props-panel">
+                    <h3>Properties</h3>
+                    <div id="property-fields" style="color: #94a3b8; font-size: 13px;">
+                        Select an element to view properties
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+                    <!-- content end -->
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  html += `<input type="hidden" name="id" value="${id}">`;
+  html += `<input type="hidden" name="question_type" value="${type}">`;
+
+  return html;
+}
+
+  function renderScriptForDrafDrop3(container, old_data) {
+            const canvas = document.getElementById("editor-canvas");
+            const propertiesPanel = document.getElementById("properties-panel");
+            const propertyFields = document.getElementById("property-fields");
+
+            // console.log("canvas", canvas)
+
+            let selectedElement = null;
+            let elements = [];
+            let bgImage = "";
+            let bgImageUrl = "";
+            let isDragging = false;
+            let isResizing = false;
+            let dragStartPos = { x: 0, y: 0 };
+            let elementStartPos = { x: 0, y: 0 };
+            let answerSpotMode = false;
+
+            const assetURL = "http://localhost:5001/uploads/editor-img/";
+
+            function getCanvasCoords(clientX, clientY) {
+                const canvasRect = canvas.getBoundingClientRect();
+                return {
+                    x: clientX - canvasRect.left,
+                    y: clientY - canvasRect.top,
+                };
+            }
+
+            //  LOAD FROM JSON
+            function loadFromJSON(jsonData) {
+                if (jsonData.question && jsonData.question.text) {
+                    document.getElementById("dd-editor_questionText-id").value = jsonData.question.text;
+                }
+
+                if (!jsonData.html || !jsonData.html.data) return;
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(jsonData.html.data, "text/html");
+                const gameContainer = doc.querySelector(".game-container");
+                if (!gameContainer) return;
+
+                // Background
+                const bgMatch = gameContainer.style.backgroundImage.match(/url\(['"]?(.+?)['"]?\)/);
+                if (bgMatch) {
+                    bgImageUrl = bgMatch[1];
+                    canvas.style.backgroundImage = `url('${bgImageUrl}')`;
+                    canvas.style.backgroundSize = "cover";
+                    canvas.style.backgroundPosition = "center";
+                }
+
+                // Dropzones
+                const dropzoneEls = doc.querySelectorAll(".dropzone");
+                dropzoneEls.forEach((dz) => {
+                    const group = dz.getAttribute("data-group");
+                    const title = dz.getAttribute("data-title") || "";
+                    const style = dz.style;
+
+                    const x = parseInt(style.left) || 0;
+                    const y = parseInt(style.top) || 0;
+                    const width = parseInt(style.width) || 150;
+                    const height = parseInt(style.height) || 150;
+
+                    const imgSrc = dz.querySelector("img") ? dz.querySelector("img").src : "";
+
+                    let titleX = x;
+                    let titleY = y + height + 10;
+                    let titleFontSize = 24;
+
+                    const allTitles = doc.querySelectorAll(".dropzone-title");
+                    allTitles.forEach((dt) => {
+                        if (dt.textContent.trim() === title) {
+                            titleX = parseInt(dt.style.left) || titleX;
+                            titleY = parseInt(dt.style.top) || titleY;
+                            titleFontSize = parseFloat(dt.style.fontSize) || 24;
+                        }
+                    });
+
+                    const el = {
+                        id: "el-" + Date.now() + "-" + Math.random().toString(36).substr(2, 5),
+                        type: "dropzone",
+                        imgSrc,
+                        group,
+                        x,
+                        y,
+                        width,
+                        height,
+                        answerSpot: null,
+                        title,
+                        titleX,
+                        titleY,
+                        titleFontSize,
+                        itemName: "",
+                    };
+
+                    elements.push(el);
+                    renderElement(el);
+                });
+
+                const itemEls = doc.querySelectorAll(".item");
+                itemEls.forEach((item) => {
+                    const group = item.getAttribute("data-group");
+                    const itemName = item.getAttribute("data-name") || "";
+                    const style = item.style;
+
+                    const x = parseInt(style.left) || 0;
+                    const y = parseInt(style.top) || 0;
+                    const width = parseInt(style.width) || 100;
+                    const height = parseInt(style.height) || 100;
+
+                    const imgSrc = item.querySelector("img") ? item.querySelector("img").src : "";
+
+                    const answerX = item.getAttribute("data-answer-x");
+                    const answerY = item.getAttribute("data-answer-y");
+                    const answerW = item.getAttribute("data-answer-width");
+                    const answerH = item.getAttribute("data-answer-height");
+
+                    const answerSpot = (answerX !== null)
+                        ? { x: parseFloat(answerX), y: parseFloat(answerY), width: parseFloat(answerW), height: parseFloat(answerH) }
+                        : null;
+
+                    const el = {
+                        id: "el-" + Date.now() + "-" + Math.random().toString(36).substr(2, 5),
+                        type: "item",
+                        imgSrc,
+                        group,
+                        x,
+                        y,
+                        width,
+                        height,
+                        answerSpot,
+                        title: "",
+                        titleX: 0,
+                        titleY: 0,
+                        titleFontSize: 0,
+                        itemName,
+                    };
+
+                    elements.push(el);
+                    renderElement(el);
+                });
+            }
+            // const preloadData = {
+            //     "html": {
+            //         "data": "<div class=\"game-container\" style=\"position: relative; width: 1024px; height: 576px; background: #252d3d; background-image: url('https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773738964859-682977958.jpg'); background-size: cover; background-position: center; border: 1px solid #2d3748; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); border-radius: 4px;\">\r\n\r\n    <div class=\"dropzone\" data-group=\"A\" data-title=\"Healthy Foods\" style=\"position: absolute; left: 0px; top: 223px; width: 360px; height: 353px; border: 2px solid transparent;\">\r\n        <img src=\"https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773739019700-528114010.png\" alt=\"Drop Zone A\" style=\"width: 100%; height: 100%; pointer-events: none; user-select: none;\">\r\n    </div>\r\n    <div class=\"dropzone-title\" style=\"position: absolute; left: 106px; top: 522px; font-size: 12px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 10px 10px; border-radius: 50px; font-weight: 900; box-shadow: 0 8px 0 #d63d52, 0 10px 25px rgba(245, 87, 108, 0.4); border: 5px solid #fff; z-index: 100; font-family: 'Comic Sans MS', 'Chalkboard SE', cursive; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);\">Healthy Foods</div>\r\n    <div class=\"dropzone\" data-group=\"B\" data-title=\"Junk Foods\" style=\"position: absolute; left: 483px; top: 218px; width: 351px; height: 358px; border: 2px solid transparent;\">\r\n        <img src=\"https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773739056611-166487088.png\" alt=\"Drop Zone B\" style=\"width: 100%; height: 100%; pointer-events: none; user-select: none;\">\r\n    </div>\r\n    <div class=\"dropzone-title\" style=\"position: absolute; left: 577px; top: 518px; font-size: 14.5px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 10px 10px; border-radius: 50px; font-weight: 900; box-shadow: 0 8px 0 #d63d52, 0 10px 25px rgba(245, 87, 108, 0.4); border: 5px solid #fff; z-index: 100; font-family: 'Comic Sans MS', 'Chalkboard SE', cursive; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);\">Junk Foods</div>\r\n\r\n<div class=\"item\" data-group=\"A\" data-name=\"apple\" data-answer-x=\"26\" data-answer-y=\"325\" data-answer-width=\"97\" data-answer-height=\"95\" style=\"position: absolute; left: 699px; top: 34px; width: 97px; height: 95px; cursor: move; user-select: none; z-index: 10;\">\r\n    <img src=\"https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773738457951-929399191.png\" alt=\"apple\" style=\"width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none;\">\r\n</div>\r\n<div class=\"item\" data-group=\"A\" data-name=\"egg\" data-answer-x=\"195\" data-answer-y=\"434\" data-answer-width=\"112\" data-answer-height=\"93\" style=\"position: absolute; left: 347px; top: 79px; width: 112px; height: 93px; cursor: move; user-select: none; z-index: 10;\">\r\n    <img src=\"https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773738466471-546989949.png\" alt=\"egg\" style=\"width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none;\">\r\n</div>\r\n<div class=\"item\" data-group=\"A\" data-name=\"banana\" data-answer-x=\"74\" data-answer-y=\"425\" data-answer-width=\"114\" data-answer-height=\"90\" style=\"position: absolute; left: 528px; top: 50px; width: 114px; height: 90px; cursor: move; user-select: none; z-index: 10;\">\r\n    <img src=\"https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773738484626-296102663.png\" alt=\"banana\" style=\"width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none;\">\r\n</div>\r\n<div class=\"item\" data-group=\"A\" data-name=\"milk\" data-answer-x=\"127\" data-answer-y=\"243\" data-answer-width=\"98\" data-answer-height=\"101\" style=\"position: absolute; left: 455px; top: 155px; width: 98px; height: 101px; cursor: move; user-select: none; z-index: 10;\">\r\n    <img src=\"https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773738506446-242368099.png\" alt=\"milk\" style=\"width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none;\">\r\n</div>\r\n<div class=\"item\" data-group=\"B\" data-name=\"pizza\" data-answer-x=\"680\" data-answer-y=\"287\" data-answer-width=\"105\" data-answer-height=\"90\" style=\"position: absolute; left: 22px; top: 16px; width: 105px; height: 90px; cursor: move; user-select: none; z-index: 10;\">\r\n    <img src=\"https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773738546478-974410599.png\" alt=\"pizza\" style=\"width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none;\">\r\n</div>\r\n<div class=\"item\" data-group=\"B\" data-name=\"burgur\" data-answer-x=\"663\" data-answer-y=\"428\" data-answer-width=\"116\" data-answer-height=\"89\" style=\"position: absolute; left: 190px; top: 33px; width: 116px; height: 89px; cursor: move; user-select: none; z-index: 10;\">\r\n    <img src=\"https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773738561358-634821105.png\" alt=\"burgur\" style=\"width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none;\">\r\n</div>\r\n<div class=\"item\" data-group=\"B\" data-name=\"french fries\" data-answer-x=\"507\" data-answer-y=\"292\" data-answer-width=\"106\" data-answer-height=\"113\" style=\"position: absolute; left: 21px; top: 135px; width: 106px; height: 113px; cursor: move; user-select: none; z-index: 10;\">\r\n    <img src=\"https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773738578644-867501917.png\" alt=\"french fries\" style=\"width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none;\">\r\n</div>\r\n<div class=\"item\" data-group=\"B\" data-name=\"ice cream\" data-answer-x=\"538\" data-answer-y=\"420\" data-answer-width=\"113\" data-answer-height=\"98\" style=\"position: absolute; left: 215px; top: 138px; width: 113px; height: 98px; cursor: move; user-select: none; z-index: 10;\">\r\n    <img src=\"https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773738613714-751895635.png\" alt=\"ice cream\" style=\"width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none;\">\r\n</div>\r\n<div class=\"item\" data-group=\"B\" data-name=\"soft drink\" data-answer-x=\"614\" data-answer-y=\"237\" data-answer-width=\"91\" data-answer-height=\"105\" style=\"position: absolute; left: 374px; top: 274px; width: 91px; height: 105px; cursor: move; user-select: none; z-index: 10;\">\r\n    <img src=\"https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773738631382-242864862.png\" alt=\"soft drink\" style=\"width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none;\">\r\n</div>\r\n<div class=\"item\" data-group=\"A\" data-name=\"avacado\" data-answer-x=\"199\" data-answer-y=\"313\" data-answer-width=\"126\" data-answer-height=\"87\" style=\"position: absolute; left: 682px; top: 160px; width: 126px; height: 87px; cursor: move; user-select: none; z-index: 10;\">\r\n    <img src=\"https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773738741894-377348875.png\" alt=\"avacado\" style=\"width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none;\">\r\n</div>\r\n</div>"
+            //     },
+            //     "question": {
+            //         "text": "Drag the foods and drop them into the correct plates"
+            //     }
+            // };
+            const preloadData = old_data;
+
+            setTimeout(() => loadFromJSON(preloadData), 0);
+
+            document.getElementById("bg-upload").addEventListener("change", (e) => {
+              const file = e.target.files[0];
+              if (!file) return;
+
+              const formData = new FormData();
+              formData.append("editor_image", file);
+
+              $.ajax({
+                url: "/admin/image-upload",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                  console.log("BG Uploaded:", res.filename);
+                  bgImageUrl = assetURL + res.filename;
+                  canvas.style.backgroundImage = `url('${bgImageUrl}')`;
+                  canvas.style.backgroundSize = "cover";
+                  canvas.style.backgroundPosition = "center";
+                  e.target.value = "";
+                },
+                error: function () {
+                  console.error("BG Upload failed");
+                },
+              });
+            });
+
+            document.getElementById("dropzone-upload").addEventListener("change", (e) => {
+              const file = e.target.files[0];
+              if (!file) return;
+
+              const groupCount = elements.filter((el) => el.type === "dropzone").length;
+              if (groupCount >= 2) {
+                alert("Only 2 drop zones allowed (Group A & B)");
+                e.target.value = "";
+                return;
+              }
+
+              const group = groupCount === 0 ? "A" : "B";
+
+              const formData = new FormData();
+              formData.append("editor_image", file);
+
+              $.ajax({
+                url: "/admin/image-upload",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                  console.log("Dropzone Uploaded:", res.filename);
+                  const imageUrl = assetURL + res.filename;
+                  addElement("dropzone", imageUrl, group);
+                  e.target.value = "";
+                },
+                error: function () {
+                  console.error("Dropzone Upload failed");
+                },
+              });
+            });
+
+            document.getElementById("item-upload").addEventListener("change", (e) => {
+              const file = e.target.files[0];
+              if (!file) return;
+
+              const formData = new FormData();
+              formData.append("editor_image", file);
+
+              $.ajax({
+                url: "/admin/image-upload",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                  console.log("Item Uploaded:", res.filename);
+                  const imageUrl = assetURL + res.filename;
+                  addElement("item", imageUrl, "A");
+                  e.target.value = "";
+                },
+                error: function () {
+                  console.error("Item Upload failed");
+                },
+              });
+            });
+
+            // document.getElementById("bg-upload").addEventListener("change", (e) => {
+            //     const file = e.target.files[0];
+            //     if (!file) return;
+            //     bgImageUrl = URL.createObjectURL(file);
+            //     canvas.style.backgroundImage = `url('${bgImageUrl}')`;
+            //     canvas.style.backgroundSize = "cover";
+            //     canvas.style.backgroundPosition = "center";
+            //     e.target.value = "";
+            // });
+
+            // document.getElementById("dropzone-upload").addEventListener("change", (e) => {
+            //     const file = e.target.files[0];
+            //     if (!file) return;
+            //     const groupCount = elements.filter((el) => el.type === "dropzone").length;
+            //     if (groupCount >= 2) {
+            //         alert("Only 2 drop zones allowed (Group A & B)");
+            //         e.target.value = "";
+            //         return;
+            //     }
+            //     const group = groupCount === 0 ? "A" : "B";
+            //     const imageUrl = URL.createObjectURL(file);
+            //     addElement("dropzone", imageUrl, group);
+            //     e.target.value = "";
+            // });
+
+            // document.getElementById("item-upload").addEventListener("change", (e) => {
+            //     const file = e.target.files[0];
+            //     if (!file) return;
+            //     const imageUrl = URL.createObjectURL(file);
+            //     addElement("item", imageUrl, "A");
+            //     e.target.value = "";
+            // });
+
+            function addElement(type, imgSrc, group) {
+                const id = "el-" + Date.now();
+                let title = "";
+                if (type === "dropzone") {
+                    title =
+                        prompt(`Enter title for Drop Zone ${group}:`) || `Drop Zone ${group}`;
+                }
+                let itemName = "";
+                if (type === "item") {
+                    itemName =
+                        prompt("Enter name for this item:") ||
+                        "Item " + (elements.filter((e) => e.type === "item").length + 1);
+                }
+
+                const el = {
+                    id,
+                    type,
+                    imgSrc,
+                    group,
+                    x: 50,
+                    y: 50,
+                    width: 150,
+                    height: 150,
+                    answerSpot: null,
+                    title: title,
+                    titleX: type === "dropzone" ? 50 : 0,
+                    titleY: type === "dropzone" ? 200 : 0,
+                    titleFontSize: type === "dropzone" ? 24 : 0,
+                    itemName: itemName,
+                };
+
+                elements.push(el);
+                renderElement(el);
+            }
+
+            function renderElement(el) {
+                const existing = document.getElementById(el.id);
+                if (existing) {
+                    existing.remove();
+                }
+
+                const div = document.createElement("div");
+                div.className = "gge-canvas-item";
+                div.id = el.id;
+                div.style.left = el.x + "px";
+                div.style.top = el.y + "px";
+                div.style.width = el.width + "px";
+                div.style.height = el.height + "px";
+
+                const img = document.createElement("img");
+                img.src = el.imgSrc;
+                img.draggable = false;
+                div.appendChild(img);
+
+                const label = document.createElement("div");
+                label.className = "gge-item-label";
+                label.textContent =
+                    el.type === "dropzone"
+                        ? `Drop Zone ${el.group}`
+                        : `Item (Group ${el.group})`;
+                div.appendChild(label);
+
+                const handle = document.createElement("div");
+                handle.className = "gge-resize-grip";
+                div.appendChild(handle);
+
+                if (el.type === "dropzone" && el.title) {
+                    const existingTitle = document.getElementById(el.id + "-title");
+                    if (existingTitle) {
+                        existingTitle.remove();
+                    }
+
+                    const titleDiv = document.createElement("div");
+                    titleDiv.className = "gge-zone-title";
+                    titleDiv.id = el.id + "-title";
+                    titleDiv.textContent = el.title;
+                    titleDiv.style.left = el.titleX + "px";
+                    titleDiv.style.top = el.titleY + "px";
+                    titleDiv.style.fontSize = (el.titleFontSize || 24) + "px";
+
+                    const titleResizeHandle = document.createElement("div");
+                    titleResizeHandle.className = "gge-title-resize-grip";
+                    titleDiv.appendChild(titleResizeHandle);
+
+                    titleDiv.addEventListener("mousedown", (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        selectElement(el);
+
+                        if (e.target.className === "gge-title-resize-grip") {
+                            isResizing = true;
+                            isDragging = false;
+
+                            const coords = getCanvasCoords(e.clientX, e.clientY);
+                            elementStartPos.fontSize = el.titleFontSize || 24;
+                            dragStartPos.x = coords.x;
+                            dragStartPos.y = coords.y;
+                            dragStartPos.isTitleResize = true;
+                        } else {
+                            isDragging = true;
+                            isResizing = false;
+
+                            const coords = getCanvasCoords(e.clientX, e.clientY);
+                            elementStartPos.x = el.titleX;
+                            elementStartPos.y = el.titleY;
+                            dragStartPos.x = coords.x;
+                            dragStartPos.y = coords.y;
+                            dragStartPos.isTitle = true;
+                        }
+                    });
+
+                    canvas.appendChild(titleDiv);
+                }
+
+                div.addEventListener("mousedown", (e) => {
+                    e.preventDefault();
+
+                    if (e.target.className === "gge-resize-grip") {
+                        isResizing = true;
+                        isDragging = false;
+                        selectedElement = el;
+                        selectElement(el);
+
+                        const coords = getCanvasCoords(e.clientX, e.clientY);
+                        elementStartPos.x = el.width;
+                        elementStartPos.y = el.height;
+                        dragStartPos.x = coords.x;
+                        dragStartPos.y = coords.y;
+
+                        e.stopPropagation();
+                        return;
+                    }
+
+                    selectElement(el);
+                    isDragging = true;
+                    isResizing = false;
+
+                    const coords = getCanvasCoords(e.clientX, e.clientY);
+                    elementStartPos.x = el.x;
+                    elementStartPos.y = el.y;
+                    dragStartPos.x = coords.x;
+                    dragStartPos.y = coords.y;
+                });
+
+                canvas.appendChild(div);
+
+                if (selectedElement && selectedElement.id === el.id) {
+                    div.classList.add("gge-selected");
+                }
+
+                if (el.type === "item" && el.answerSpot) {
+                    div.classList.add("gge-has-answer");
+                }
+            }
+
+            function selectElement(el) {
+                document
+                    .querySelectorAll(".gge-canvas-item")
+                    .forEach((e) => e.classList.remove("gge-selected"));
+                document
+                    .querySelectorAll(".gge-zone-title")
+                    .forEach((t) => t.classList.remove("gge-selected"));
+
+                document.getElementById(el.id).classList.add("gge-selected");
+
+                const titleDiv = document.getElementById(el.id + "-title");
+                if (titleDiv) {
+                    titleDiv.classList.add("gge-selected");
+                }
+
+                selectedElement = el;
+                showProperties(el);
+            }
+
+            function showProperties(el) {
+                const propertyFields = document.getElementById("property-fields");
+
+                let answerSpotHTML = "";
+                if (el.type === "item") {
+                    if (el.answerSpot) {
+                        answerSpotHTML = `
+          <label class="gge-props-label">Answer Spot Set ✓</label>
+          <div style="background: #1a1f2e; padding: 8px 12px; border-radius: 6px; margin-bottom: 16px; font-size: 12px; color: #10b981;">
+              X: ${Math.round(el.answerSpot.x)}, Y: ${Math.round(el.answerSpot.y)}
+          </div>
+          <div class="gge-btn-base gge-btn-primary gge-btn-compact" id="update-answer-spot" style="width: 100%; margin-bottom: 8px;">Update Answer Spot</div>
+          <div class="gge-btn-base gge-btn-danger gge-btn-compact" id="clear-answer-spot" style="width: 100%; margin-bottom: 16px;">Clear Answer Spot</div>
+      `;
+                    } else {
+                        answerSpotHTML = `
+          <div class="gge-btn-base gge-btn-primary gge-btn-compact" id="set-answer-spot" style="width: 100%; margin-bottom: 16px;">Set Answer Spot</div>
+      `;
+                    }
+                }
+
+                propertyFields.innerHTML = `
+  <label class="gge-props-label">Type</label>
+  <input type="text" class="gge-props-text" value="${el.type === "dropzone" ? "Drop Zone" : "Draggable Item"
+                    }" disabled>
+  ${el.type === "item"
+                        ? `
+  <label class="gge-props-label">Item Name</label>
+  <input type="text" id="prop-item-name" class="gge-props-text" value="${el.itemName || ""
+                        }" style="font-weight: 600;">
+  `
+                        : ""
+                    }
+  <label class="gge-props-label">Group</label>
+  ${el.type === "dropzone"
+                        ? `
+  <label class="gge-props-label">Title Text</label>
+  <input type="text" id="prop-title" class="gge-props-text" value="${el.title || ""
+                        }" style="font-weight: 600;">
+
+  <label class="gge-props-label">Title X Position</label>
+  <input type="number" id="prop-title-x" class="gge-props-number" value="${Math.round(
+                            el.titleX
+                        )}">
+
+  <label class="gge-props-label">Title Y Position</label>
+  <input type="number" id="prop-title-y" class="gge-props-number" value="${Math.round(
+                            el.titleY
+                        )}">
+  `
+                        : ""
+                    }
+  <label class="gge-props-label">Title Font Size</label>
+  <input type="number" id="prop-title-fontsize" class="gge-props-number" value="${Math.round(
+                        el.titleFontSize || 24
+                    )}" min="12" max="72">
+  <select id="prop-group" class="gge-props-select">
+    <option value="A" ${el.group === "A" ? "selected" : ""}>Group A</option>
+    <option value="B" ${el.group === "B" ? "selected" : ""}>Group B</option>
+  </select>
+
+  ${answerSpotHTML}
+
+  <label class="gge-props-label">X Position</label>
+  <input type="number" id="prop-x" class="gge-props-number" value="${Math.round(
+                        el.x
+                    )}">
+
+  <label class="gge-props-label">Y Position</label>
+  <input type="number" id="prop-y" class="gge-props-number" value="${Math.round(
+                        el.y
+                    )}">
+
+  <label class="gge-props-label">Width</label>
+  <input type="number" id="prop-width" class="gge-props-number" value="${Math.round(
+                        el.width
+                    )}">
+
+  <label class="gge-props-label">Height</label>
+  <input type="number" id="prop-height" class="gge-props-number" value="${Math.round(
+                        el.height
+                    )}">
+  `;
+
+                if (el.type === "item") {
+                    document
+                        .getElementById("prop-item-name")
+                        .addEventListener("input", (e) => {
+                            el.itemName = e.target.value;
+                        });
+                }
+
+                if (el.type === "dropzone") {
+                    document.getElementById("prop-title").addEventListener("input", (e) => {
+                        el.title = e.target.value;
+                        const titleDiv = document.getElementById(el.id + "-title");
+                        if (titleDiv) {
+                            titleDiv.textContent = el.title;
+                        }
+                    });
+
+                    document.getElementById("prop-title-x").addEventListener("input", (e) => {
+                        el.titleX = parseInt(e.target.value) || 0;
+                        const titleDiv = document.getElementById(el.id + "-title");
+                        if (titleDiv) {
+                            titleDiv.style.left = el.titleX + "px";
+                        }
+                    });
+
+                    document.getElementById("prop-title-y").addEventListener("input", (e) => {
+                        el.titleY = parseInt(e.target.value) || 0;
+                        const titleDiv = document.getElementById(el.id + "-title");
+                        if (titleDiv) {
+                            titleDiv.style.top = el.titleY + "px";
+                        }
+                    });
+
+                    document
+                        .getElementById("prop-title-fontsize")
+                        .addEventListener("input", (e) => {
+                            el.titleFontSize = parseInt(e.target.value) || 24;
+                            const titleDiv = document.getElementById(el.id + "-title");
+                            if (titleDiv) {
+                                titleDiv.style.fontSize = el.titleFontSize + "px";
+                            }
+                        });
+                }
+                document.getElementById("prop-group").addEventListener("change", (e) => {
+                    el.group = e.target.value;
+                    renderElement(el);
+                });
+                ["x", "y", "width", "height"].forEach((prop) => {
+                    document.getElementById(`prop-${prop}`).addEventListener("input", (e) => {
+                        const value = parseInt(e.target.value) || 0;
+                        el[prop] = value;
+                        updateElementPosition(el);
+                    });
+                });
+
+                if (el.type === "item") {
+                    const setBtn = document.getElementById("set-answer-spot");
+                    const updateBtn = document.getElementById("update-answer-spot");
+                    const clearBtn = document.getElementById("clear-answer-spot");
+
+                    if (setBtn) {
+                        setBtn.onclick = () => {
+                            enterAnswerSpotMode(el);
+                        };
+                    }
+                    if (updateBtn) {
+                        updateBtn.onclick = () => {
+                            enterAnswerSpotMode(el);
+                        };
+                    }
+                    if (clearBtn) {
+                        clearBtn.onclick = () => {
+                            el.answerSpot = null;
+                            renderElement(el);
+                            showProperties(el);
+                        };
+                    }
+                }
+            }
+
+            function updateElementPosition(el) {
+                const div = document.getElementById(el.id);
+                div.style.left = el.x + "px";
+                div.style.top = el.y + "px";
+                div.style.width = el.width + "px";
+                div.style.height = el.height + "px";
+            }
+
+            document.addEventListener("mousemove", (e) => {
+                if (answerSpotMode && selectedElement && isDragging) {
+                    const coords = getCanvasCoords(e.clientX, e.clientY);
+                    const deltaX = coords.x - dragStartPos.x;
+                    const deltaY = coords.y - dragStartPos.y;
+
+                    selectedElement.x = Math.max(
+                        0,
+                        Math.min(1024 - selectedElement.width, elementStartPos.x + deltaX)
+                    );
+                    selectedElement.y = Math.max(
+                        0,
+                        Math.min(576 - selectedElement.height, elementStartPos.y + deltaY)
+                    );
+
+                    updateElementPosition(selectedElement);
+                    return;
+                }
+
+                if (!selectedElement || (!isDragging && !isResizing)) return;
+
+                const coords = getCanvasCoords(e.clientX, e.clientY);
+                if (isResizing && dragStartPos.isTitleResize) {
+                    const deltaX = coords.x - dragStartPos.x;
+
+                    selectedElement.titleFontSize = Math.max(
+                        12,
+                        Math.min(72, elementStartPos.fontSize + deltaX / 2)
+                    );
+
+                    const titleDiv = document.getElementById(selectedElement.id + "-title");
+                    if (titleDiv) {
+                        titleDiv.style.fontSize = selectedElement.titleFontSize + "px";
+                    }
+                    const fontSizeInput = document.getElementById("prop-title-fontsize");
+                    if (fontSizeInput) {
+                        fontSizeInput.value = Math.round(selectedElement.titleFontSize);
+                    }
+                    return;
+                }
+                if (isDragging && dragStartPos.isTitle) {
+                    const deltaX = coords.x - dragStartPos.x;
+                    const deltaY = coords.y - dragStartPos.y;
+
+                    selectedElement.titleX = elementStartPos.x + deltaX;
+                    selectedElement.titleY = elementStartPos.y + deltaY;
+
+                    const titleDiv = document.getElementById(selectedElement.id + "-title");
+                    if (titleDiv) {
+                        titleDiv.style.left = selectedElement.titleX + "px";
+                        titleDiv.style.top = selectedElement.titleY + "px";
+                    }
+                    return;
+                }
+                if (isResizing) {
+                    const deltaX = coords.x - dragStartPos.x;
+                    const deltaY = coords.y - dragStartPos.y;
+
+                    selectedElement.width = Math.max(50, elementStartPos.x + deltaX);
+                    selectedElement.height = Math.max(50, elementStartPos.y + deltaY);
+
+                    updateElementPosition(selectedElement);
+
+                    document.getElementById("prop-width").value = Math.round(
+                        selectedElement.width
+                    );
+                    document.getElementById("prop-height").value = Math.round(
+                        selectedElement.height
+                    );
+                } else if (isDragging) {
+                    const deltaX = coords.x - dragStartPos.x;
+                    const deltaY = coords.y - dragStartPos.y;
+
+                    selectedElement.x = Math.max(
+                        0,
+                        Math.min(1024 - selectedElement.width, elementStartPos.x + deltaX)
+                    );
+                    selectedElement.y = Math.max(
+                        0,
+                        Math.min(576 - selectedElement.height, elementStartPos.y + deltaY)
+                    );
+
+                    updateElementPosition(selectedElement);
+
+                    document.getElementById("prop-x").value = Math.round(selectedElement.x);
+                    document.getElementById("prop-y").value = Math.round(selectedElement.y);
+                }
+            });
+
+            document.addEventListener("mouseup", () => {
+                isDragging = false;
+                if (dragStartPos.isTitle) {
+                    dragStartPos.isTitle = false;
+                }
+                if (dragStartPos.isTitleResize) {
+                    dragStartPos.isTitleResize = false;
+                }
+                isResizing = false;
+            });
+
+            document.getElementById("delete-btn").addEventListener("click", () => {
+                if (!selectedElement) {
+                    alert("No element selected");
+                    return;
+                }
+
+                if (selectedElement.type === "dropzone") {
+                    const titleDiv = document.getElementById(selectedElement.id + "-title");
+                    if (titleDiv) {
+                        titleDiv.remove();
+                    }
+                }
+
+                const elementDiv = document.getElementById(selectedElement.id);
+                if (elementDiv) {
+                    elementDiv.remove();
+                }
+
+                elements = elements.filter((el) => el.id !== selectedElement.id);
+                selectedElement = null;
+                document.getElementById("property-fields").innerHTML =
+                    '<div style="color: #94a3b8; font-size: 13px;">Select an element to view properties</div>';
+            });
+
+            document.getElementById("export-btn").addEventListener("click", () => {
+                const dropzones = elements.filter((el) => el.type === "dropzone");
+                const items = elements.filter((el) => el.type === "item");
+
+                if (dropzones.length !== 2) {
+                    alert("Please add exactly 2 drop zones (Group A & B)");
+                    return;
+                }
+
+                if (items.length === 0) {
+                    alert("Please add at least one draggable item");
+                    return;
+                }
+
+                const divHTML = generateDivHTML();
+                $("#dragdrop_editor_html_val").val(divHTML);
+                $("#questionCardContainer .form-submit-button").attr("disabled", false);
+                console.log(divHTML);
+                alert("Div HTML logged to console. Press F12 to view.");
+            });
+
+            // Answer Spot Mode Functions
+            function enterAnswerSpotMode(el) {
+                answerSpotMode = true;
+                const overlay = document.getElementById("answer-spot-overlay");
+                overlay.classList.add("gge-active");
+
+                const originalPos = {
+                    x: el.x,
+                    y: el.y,
+                    width: el.width,
+                    height: el.height,
+                };
+
+                if (el.answerSpot) {
+                    el.x = el.answerSpot.x;
+                    el.y = el.answerSpot.y;
+                    el.width = el.answerSpot.width;
+                    el.height = el.answerSpot.height;
+                    updateElementPosition(el);
+                    showProperties(el);
+                }
+
+                const div = document.getElementById(el.id);
+                div.classList.add("gge-answer-mode");
+
+                const lockBtn = document.getElementById("answer-spot-lock");
+                const doneBtn = document.getElementById("answer-spot-done");
+                const cancelBtn = document.getElementById("answer-spot-cancel");
+                const message = document.getElementById("answer-spot-message");
+
+                lockBtn.style.display = "block";
+                doneBtn.style.display = "none";
+                message.textContent =
+                    "Drag and resize the item, then click Lock when ready";
+
+                let lockedPosition = null;
+
+                lockBtn.onclick = () => {
+                    lockedPosition = {
+                        x: el.x,
+                        y: el.y,
+                        width: el.width,
+                        height: el.height,
+                    };
+
+                    lockBtn.style.display = "none";
+                    doneBtn.style.display = "block";
+                    message.textContent =
+                        "Position locked! Click Done to save or Cancel to adjust";
+
+                    div.style.borderStyle = "solid";
+                    div.style.borderColor = "#10b981";
+                };
+
+                doneBtn.onclick = () => {
+                    if (lockedPosition) {
+                        el.answerSpot = {
+                            x: lockedPosition.x,
+                            y: lockedPosition.y,
+                            width: lockedPosition.width,
+                            height: lockedPosition.height,
+                        };
+
+                        el.x = originalPos.x;
+                        el.y = originalPos.y;
+                        el.width = originalPos.width;
+                        el.height = originalPos.height;
+                        updateElementPosition(el);
+
+                        exitAnswerSpotMode(el);
+                        renderElement(el);
+                        showProperties(el);
+                    }
+                };
+
+                cancelBtn.onclick = () => {
+                    el.x = originalPos.x;
+                    el.y = originalPos.y;
+                    el.width = originalPos.width;
+                    el.height = originalPos.height;
+                    updateElementPosition(el);
+                    showProperties(el);
+                    exitAnswerSpotMode(el);
+                };
+            }
+
+            function exitAnswerSpotMode(el) {
+                answerSpotMode = false;
+                isDragging = false;
+                isResizing = false;
+
+                const overlay = document.getElementById("answer-spot-overlay");
+                overlay.classList.remove("gge-active");
+
+                const div = document.getElementById(el.id);
+                div.classList.remove("gge-answer-mode");
+                div.style.borderStyle = "";
+                div.style.borderColor = "";
+            }
+
+            function generateDivHTML() {
+                const dropzones = elements.filter((el) => el.type === "dropzone");
+                const items = elements.filter((el) => el.type === "item");
+
+                let dropzoneHTML = "";
+                dropzones.forEach((dz, index) => {
+                    const titleHTML = dz.title
+                        ? `
+      <div class="dropzone-title" style="position: absolute; left: ${dz.titleX}px; top: ${dz.titleY}px; font-size: ${dz.titleFontSize}px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 10px 10px; border-radius: 50px; font-weight: 900; box-shadow: 0 8px 0 #d63d52, 0 10px 25px rgba(245, 87, 108, 0.4); border: 5px solid #fff; z-index: 100; font-family: 'Comic Sans MS', 'Chalkboard SE', cursive; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">${dz.title}</div>`
+                        : "";
+
+                    dropzoneHTML += `
+      <div class="dropzone" data-group="${dz.group}" data-title="${dz.title || ""
+                        }" style="position: absolute; left: ${dz.x}px; top: ${dz.y}px; width: ${dz.width
+                        }px; height: ${dz.height}px; border: 2px solid transparent;">
+          <img src="${dz.imgSrc}" alt="Drop Zone ${dz.group
+                        }" style="width: 100%; height: 100%; pointer-events: none; user-select: none;">
+      </div>${titleHTML}`;
+                });
+
+                let itemsHTML = "";
+                items.forEach((item, index) => {
+                    const answerAttrs = item.answerSpot
+                        ? `data-answer-x="${item.answerSpot.x}" data-answer-y="${item.answerSpot.y}" data-answer-width="${item.answerSpot.width}" data-answer-height="${item.answerSpot.height}"`
+                        : "";
+
+                    itemsHTML += `
+  <div class="item" data-group="${item.group}" data-name="${item.itemName || "Item " + (index + 1)
+                        }" ${answerAttrs} style="position: absolute; left: ${item.x}px; top: ${item.y
+                        }px; width: ${item.width}px; height: ${item.height
+                        }px; cursor: move; user-select: none; z-index: 10;">
+      <img src="${item.imgSrc}" alt="${item.itemName || "Item"
+                        }" style="width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none;">
+  </div>`;
+                });
+
+                return `<div class="game-container" style="position: relative; width: 1024px; height: 576px; background: #252d3d; ${bgImageUrl ? `background-image: url('${bgImageUrl}');` : ""
+                    } background-size: cover; background-position: center; border: 1px solid #2d3748; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); border-radius: 4px;">
+  ${dropzoneHTML}
+  ${itemsHTML}
+  </div>`;
+            }
+        }

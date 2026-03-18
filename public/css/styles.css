@@ -142,7 +142,7 @@ button.close {
 }
 
 .modal-body {
-  max-height: 500px !important;
+  max-height: 500px;
   overflow-y: overlay !important;
   scrollbar-width: thin !important;
   scrollbar-color: #7a58f4 #00000000 !important;
@@ -150,7 +150,9 @@ button.close {
 
 .modal-footer {
   display: block !important;
-  padding: calc(var(--bs-modal-padding) - var(--bs-modal-footer-gap) * 2.5) !important;
+  padding: calc(
+    var(--bs-modal-padding) - var(--bs-modal-footer-gap) * 2.5
+  ) !important;
 }
 
 .modal-large {
@@ -161,6 +163,17 @@ button.close {
 .modal-extra-large {
   width: 100% !important;
   max-width: 1500px !important;
+}
+
+.modal-full-large {
+  width: 100% !important;
+  /* max-width: 1500px !important; */
+  max-width: fit-content !important;
+  max-height: 100% !important;
+}
+
+.modal-full-large.show.modal-body {
+  max-height: fit-content !important;
 }
 
 .modal.show {
@@ -184,7 +197,7 @@ button.close {
   margin: 30px 0 !important;
 }
 
-.modal .score>input {
+.modal .score > input {
   display: none !important;
 }
 
@@ -203,11 +216,11 @@ button.close {
   cursor: pointer !important;
 }
 
-.modal .score>input:checked+label {
+.modal .score > input:checked + label {
   background-color: var(--light-purple) !important;
 }
 
-.modal .score>input:not(:checked)+label:hover {
+.modal .score > input:not(:checked) + label:hover {
   background-color: var(--light-purple) !important;
 }
 
@@ -217,7 +230,7 @@ button.close {
   margin: 30px 0 0 !important;
 }
 
-.modal .options>button {
+.modal .options > button {
   width: 120px !important;
   padding: 10px 0 !important;
   border-radius: 5px !important;
@@ -294,8 +307,10 @@ button.close {
   height: 100%;
   background: radial-gradient(rgba(20, 20, 20, 0.8), rgba(0, 0, 0, 0.8));
 
-  background: -webkit-radial-gradient(rgba(20, 20, 20, 0.8),
-      rgba(0, 0, 0, 0.8));
+  background: -webkit-radial-gradient(
+    rgba(20, 20, 20, 0.8),
+    rgba(0, 0, 0, 0.8)
+  );
 }
 
 /* :not(:required) hides these rules from IE9 and below */
@@ -331,7 +346,8 @@ button.close {
   -o-animation: spinner 150ms infinite linear;
   animation: spinner 150ms infinite linear;
   border-radius: 0.5em;
-  -webkit-box-shadow: rgba(255, 255, 255, 0.75) 1.5em 0 0 0,
+  -webkit-box-shadow:
+    rgba(255, 255, 255, 0.75) 1.5em 0 0 0,
     rgba(255, 255, 255, 0.75) 1.1em 1.1em 0 0,
     rgba(255, 255, 255, 0.75) 0 1.5em 0 0,
     rgba(255, 255, 255, 0.75) -1.1em 1.1em 0 0,
@@ -339,7 +355,8 @@ button.close {
     rgba(255, 255, 255, 0.75) -1.1em -1.1em 0 0,
     rgba(255, 255, 255, 0.75) 0 -1.5em 0 0,
     rgba(255, 255, 255, 0.75) 1.1em -1.1em 0 0;
-  box-shadow: rgba(255, 255, 255, 0.75) 1.5em 0 0 0,
+  box-shadow:
+    rgba(255, 255, 255, 0.75) 1.5em 0 0 0,
     rgba(255, 255, 255, 0.75) 1.1em 1.1em 0 0,
     rgba(255, 255, 255, 0.75) 0 1.5em 0 0,
     rgba(255, 255, 255, 0.75) -1.1em 1.1em 0 0,
@@ -500,7 +517,9 @@ button.close {
   text-decoration: none;
   color: #333;
   border-radius: 50%;
-  transition: background 0.3s, color 0.3s;
+  transition:
+    background 0.3s,
+    color 0.3s;
 }
 
 /* Hover day */
@@ -623,11 +642,6 @@ div#preview-container_option-b {
   background: #f5f5f5;
 }
 
-
-
-
-
-
 /* option card */
 .option-card {
   border: 2px solid #ddd;
@@ -688,72 +702,70 @@ div#preview-container_option-b {
   margin-right: 0 !important;
 }
 
+.option-box {
+  border: 2px solid #e0e0e0;
+  border-radius: 15px;
+  padding: 15px;
+  background: #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+}
 
+.option-box:hover {
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+}
 
- .option-box {
-    border: 2px solid #e0e0e0;
-    border-radius: 15px;
-    padding: 15px;
-    background: #fff;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    margin-bottom: 15px;
-  }
+.option-box label {
+  font-weight: 600;
+  color: #333;
+  display: block;
+  margin-bottom: 5px;
+}
 
-  .option-box:hover {
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-    transform: translateY(-3px);
-  }
+.option-box input[type="checkbox"] {
+  margin-right: 8px;
+  transform: scale(1.2);
+}
 
-  .option-box label {
-    font-weight: 600;
-    color: #333;
-    display: block;
-    margin-bottom: 5px;
-  }
+.option-box .form-control {
+  width: 100%;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
 
-  .option-box input[type="checkbox"] {
-    margin-right: 8px;
-    transform: scale(1.2);
-  }
+.option-box .form-control:focus {
+  border-color: #007bff;
+  outline: none;
+}
 
-  .option-box .form-control {
-    width: 100%;
-    border-radius: 8px;
-    border: 1.5px solid #ccc;
-    padding: 8px 10px;
-    margin-bottom: 10px;
-    font-size: 14px;
-    transition: border-color 0.2s ease;
-  }
+.thumbnail-box {
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  text-align: center;
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
 
-  .option-box .form-control:focus {
-    border-color: #007bff;
-    outline: none;
-  }
+.thumbnail-box:hover {
+  border-color: #007bff;
+}
 
-  .thumbnail-box {
-    border: 2px dashed #ccc;
-    border-radius: 10px;
-    text-align: center;
-    padding: 20px;
-    cursor: pointer;
-    transition: border-color 0.2s ease;
-  }
+.thumbnail-box i.material-icons {
+  font-size: 36px;
+  color: #aaa;
+}
 
-  .thumbnail-box:hover {
-    border-color: #007bff;
-  }
-
-  .thumbnail-box i.material-icons {
-    font-size: 36px;
-    color: #aaa;
-  }
-
-  .thumbnail-preview-img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin-top: 10px;
-  }
+.thumbnail-preview-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-top: 10px;
+}
