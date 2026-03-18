@@ -32,7 +32,7 @@ class QuestionCategoryController {
                     title: value.title,
                     action: `
                         <button class='btn btn-primary btn-sm' onclick="OpenEditModal(${value.id})">Edit</button>
-                        <button class='btn btn-danger btn-sm' onclick="DeleteData(${value.id})">Delete</button>
+                        ${value.id > 7 ? `<button class='btn btn-danger btn-sm' onclick="DeleteData(${value.id})">Delete</button>` : ``}
                         `,
                 };
             });
