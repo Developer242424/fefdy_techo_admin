@@ -357,7 +357,7 @@ $(function () {
   });
   
   $("#question_template_edit_form").on("submit", function (e) {
-    alert("edit")
+    // alert("edit")
     e.preventDefault();
     LoadStart();
 
@@ -2592,7 +2592,7 @@ function dragAndDropEditorTemplate(container) {
     };
   }
 
-  $(document).on("change", "#bg-upload", function (e) {
+  document.getElementById("bg-upload").addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -2600,28 +2600,24 @@ function dragAndDropEditorTemplate(container) {
     formData.append("editor_image", file);
 
     $.ajax({
-        url: "/admin/image-upload",
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function (res) {
-            console.log("BG Uploaded:", res.filename);
-
-            const bgImageUrl = assetURL + res.filename;
-
-            const canvas = document.getElementById("editor-canvas"); // ⚠️ ensure exists
-            canvas.style.backgroundImage = `url('${bgImageUrl}')`;
-            canvas.style.backgroundSize = "cover";
-            canvas.style.backgroundPosition = "center";
-
-            e.target.value = "";
-        },
-        error: function () {
-            console.error("BG Upload failed");
-        },
+      url: "/admin/image-upload",
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (res) {
+        console.log("BG Uploaded:", res.filename);
+        bgImageUrl = assetURL + res.filename;
+        canvas.style.backgroundImage = `url('${bgImageUrl}')`;
+        canvas.style.backgroundSize = "cover";
+        canvas.style.backgroundPosition = "center";
+        e.target.value = "";
+      },
+      error: function () {
+        console.error("BG Upload failed");
+      },
     });
-});
+  });
 
   document.getElementById("dropzone-upload").addEventListener("change", (e) => {
     const file = e.target.files[0];
