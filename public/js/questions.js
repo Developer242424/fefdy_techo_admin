@@ -481,6 +481,15 @@ function OpenEditModal(id, type) {
             );
             $(".questions_container").html(ques_html_mat);
             OpenModal("question_list_edit_modal");
+          } else if (type === 6 || type === "6") {
+            let ques_html_mat = makeHTMLforIdentify(id, type, data.data);
+            $(".questions_template_container").html(ques_html_mat);
+            OpenModal("question_list_template_edit_modal");
+            // console.log("data", data.data[0])
+            setTimeout(() => {
+                renderScriptForIdentify(document.querySelector('.identify-container'), data.data);
+                // dragAndDropEditorTemplate(document.querySelector('.gge-editor-root'));
+            }, 200);
           } else if (type === 7 || type === "7") {
             let ques_html_mat = makeHTMLforDragDrop3(id, type, data.data);
             $(".questions_template_container").html(ques_html_mat);
@@ -490,7 +499,7 @@ function OpenEditModal(id, type) {
                 renderScriptForDrafDrop3(document.querySelector('.gge-editor-root'), data.data[0]);
                 // dragAndDropEditorTemplate(document.querySelector('.gge-editor-root'));
             }, 200);
-          } else {
+          }else {
             return false;
           }
         } else if (res.status === 401) {
@@ -4315,3 +4324,1170 @@ function makeHTMLforDragDrop3(id, type, data){
   </div>`;
             }
         }
+
+function makeHTMLforIdentify(id, type, data){
+  let html = `<div class="card question-card mt-3">
+        <div class="card-body">
+            <div class="container identify-container">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label>Question</label>
+                                    <textarea name="array[0][question][text]"
+                                        onkeyup="appendIdentifyEditorText(this.value)" class="form-control"
+                                        rows="1">${data[0].question.text}</textarea>
+                                    <input type="hidden" name="array[0][html][data]" id="identify_editor_html_val">
+                                </div>
+                                <div class="row">
+                                    <div class="app-container">
+                                        <aside class="sidebar-left">
+                                            <div class="sidebar-section">
+                                                <span class="sidebar-section-title">Tools</span>
+                                                <div class="toolbar">
+                                                    <div id="addTextBtn">Text</div>
+                                                    <div id="addImageBtn">Image</div>
+                                                    <div id="deleteBtn" class="delete-link">Delete</div>
+                                                    <div id="setCanvasBgBtn" class="bg-button">Background</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="sidebar-section">
+                                                <span class="sidebar-section-title">Canvas</span>
+                                                <div class="properties-grid">
+                                                    <div class="property-input-group">
+                                                        <label>BG Color</label>
+                                                        <input type="color" id="canvasBgColor" value="#ffffff" />
+                                                    </div>
+                                                </div>
+                                                <div id="clearBgBtn" class="action-link">Clear BG Image</div>
+                                            </div>
+
+                                            <div class="sidebar-section">
+                                                <span class="sidebar-section-title">Selected Object</span>
+                                                <div id="noSelection" class="no-selection">Click an object to edit</div>
+                                                <div id="propertiesPanel" style="display:none;">
+                                                    <div class="properties-grid">
+                                                        <div class="property-input-group">
+                                                            <label>X</label>
+                                                            <input type="number" id="propX" />
+                                                        </div>
+                                                        <div class="property-input-group">
+                                                            <label>Y</label>
+                                                            <input type="number" id="propY" />
+                                                        </div>
+                                                        <div class="property-input-group">
+                                                            <label>Width</label>
+                                                            <input type="number" id="propWidth" />
+                                                        </div>
+                                                        <div class="property-input-group">
+                                                            <label>Height</label>
+                                                            <input type="number" id="propHeight" />
+                                                        </div>
+                                                        <div class="property-input-group">
+                                                            <label>Rotation</label>
+                                                            <input type="number" id="propRotation" value="0" />
+                                                        </div>
+                                                        <div class="property-input-group">
+                                                            <label>Font Size</label>
+                                                            <input type="number" id="propFontSize" value="24" />
+                                                        </div>
+                                                        <div class="property-input-group">
+                                                            <label>Fill</label>
+                                                            <input type="color" id="propBgColor" value="#fbbf24" />
+                                                        </div>
+                                                        <div class="property-input-group">
+                                                            <label>Text Color</label>
+                                                            <input type="color" id="propTextColor" value="#111827" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="checkbox-row">
+                                                        <input type="checkbox" id="propIsAnswer" />
+                                                        <label for="propIsAnswer">Is answer</label>
+                                                    </div>
+                                                    <div class="forward-back-grid">
+                                                        <div id="bringForwardBtn" class="action-link">↑ Forward</div>
+                                                        <div id="sendBackBtn" class="action-link">↓ Back</div>
+                                                    </div>
+                                                </div>
+                                                <div id="exportHtmlBtn" class="action-link">Export</div>
+                                            </div>
+                                        </aside>
+
+                                        <main class="main-area">
+                                            <div class="canvas-wrapper-id">
+                                                <div class="question-space-id">
+                                                    <input type="text" id="editor_questionText-id"
+                                                        placeholder="Enter your question here..." readonly />
+                                                </div>
+                                                <div id="canvas-id"></div>
+                                            </div>
+                                        </main>
+                                    </div>
+
+                                    <!-- Original hidden file inputs -->
+                                    <input type="file" id="imageFileInput" accept="image/*" style="display:none;" />
+                                    <input type="file" id="canvasBgFileInput" accept="image/*" style="display:none;" />
+
+                                    <!-- New hidden file inputs for bg-upload, dropzone-upload, item-upload -->
+                                    <input type="file" id="bg-upload" accept="image/*" style="display:none;" />
+                                    <input type="file" id="dropzone-upload" accept="image/*" style="display:none;" />
+                                    <input type="file" id="item-upload" accept="image/*" style="display:none;" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>`;
+
+  html += `<input type="hidden" name="id" value="${id}">`;
+  html += `<input type="hidden" name="question_type" value="${type}">`;
+
+  return html;
+}
+
+function renderScriptForIdentify(container, old_data) {
+        let nextId = 1;
+        let selectedId = null;
+        let selectedIds = new Set();
+        const objects = new Map();
+
+        // Track dropzone elements for the 2-group limit
+        let elements = [];
+
+        const canvas = container.querySelector("#canvas-id");
+        const addTextBtn = container.querySelector("#addTextBtn");
+        const addImageBtn = container.querySelector("#addImageBtn");
+        const imageFileInput = container.querySelector("#imageFileInput");
+        const canvasBgColor = container.querySelector("#canvasBgColor");
+        const propertiesPanel = container.querySelector("#propertiesPanel");
+        const noSelection = container.querySelector("#noSelection");
+        const questionText = container.querySelector("#editor_questionText-id");
+
+        const propX = container.querySelector("#propX");
+        const propY = container.querySelector("#propY");
+        const propWidth = container.querySelector("#propWidth");
+        const propHeight = container.querySelector("#propHeight");
+        const propRotation = container.querySelector("#propRotation");
+        const propFontSize = container.querySelector("#propFontSize");
+        const propBgColor = container.querySelector("#propBgColor");
+        const propTextColor = container.querySelector("#propTextColor");
+        const propIsAnswer = container.querySelector("#propIsAnswer");
+
+        const exportHtmlBtn = container.querySelector("#exportHtmlBtn");
+        const setCanvasBgBtn = container.querySelector("#setCanvasBgBtn");
+        const canvasBgFileInput = container.querySelector("#canvasBgFileInput");
+        const clearBgBtn = container.querySelector("#clearBgBtn");
+        const bringForwardBtn = container.querySelector("#bringForwardBtn");
+        const sendBackBtn = container.querySelector("#sendBackBtn");
+        const deleteBtn = container.querySelector("#deleteBtn");
+
+        const groupBtn = document.createElement("div");
+        groupBtn.id = "groupBtn";
+        groupBtn.className = "action-link";
+        groupBtn.textContent = "Group";
+        groupBtn.style.display = "none";
+
+        const ungroupBtn = document.createElement("div");
+        ungroupBtn.id = "ungroupBtn";
+        ungroupBtn.className = "action-link";
+        ungroupBtn.textContent = "Ungroup";
+        ungroupBtn.style.display = "none";
+
+        const selectionInfo = document.createElement("div");
+        selectionInfo.id = "selectionInfo";
+        selectionInfo.style.marginBottom = "10px";
+        selectionInfo.style.padding = "8px";
+        selectionInfo.style.backgroundColor = "#f0f0f0";
+        selectionInfo.style.borderRadius = "4px";
+        selectionInfo.style.fontSize = "12px";
+        selectionInfo.style.display = "none";
+
+        propertiesPanel.parentNode.insertBefore(groupBtn, propertiesPanel);
+        propertiesPanel.parentNode.insertBefore(ungroupBtn, propertiesPanel);
+        propertiesPanel.parentNode.insertBefore(selectionInfo, propertiesPanel);
+
+        function createId() {
+          return "obj_" + nextId++;
+        }
+
+        function setSelected(id, multiSelect = false) {
+          if (!multiSelect) {
+            selectedIds.clear();
+          }
+
+          if (selectedIds.has(id)) {
+            selectedIds.delete(id);
+          } else {
+            selectedIds.add(id);
+          }
+
+          if (selectedIds.size === 1) {
+            selectedId = Array.from(selectedIds)[0];
+          } else {
+            selectedId = null;
+          }
+
+          updateSelectionStyles();
+          updatePropertiesPanel();
+        }
+
+        function updateSelectionStyles() {
+          const items = canvas.querySelectorAll(".canvas-item");
+          items.forEach((item) => {
+            if (selectedIds.has(item.dataset.id)) {
+              item.classList.add("selected");
+            } else {
+              item.classList.remove("selected");
+            }
+          });
+        }
+
+        function showProperties(show) {
+          propertiesPanel.style.display = show ? "block" : "none";
+          noSelection.style.display = show ? "none" : "block";
+        }
+
+        function updateGroupButtons() {
+          const isGroup =
+            selectedId && objects.get(selectedId)?.type === "group";
+          const hasMultiSelect = selectedIds.size > 1;
+
+          groupBtn.style.display =
+            hasMultiSelect && !isGroup ? "block" : "none";
+          ungroupBtn.style.display = isGroup ? "block" : "none";
+        }
+
+        function updatePropertiesPanel() {
+          updateGroupButtons();
+
+          if (
+            selectedIds.size !== 1 ||
+            !selectedId ||
+            !objects.has(selectedId)
+          ) {
+            showProperties(false);
+            return;
+          }
+
+          showProperties(true);
+          const obj = objects.get(selectedId);
+          propX.value = obj.x;
+          propY.value = obj.y;
+          propWidth.value = obj.width;
+          propHeight.value = obj.height;
+          propRotation.value = obj.rotation || 0;
+          propFontSize.value = obj.fontSize || 24;
+          propBgColor.value = obj.bgColor || "#ffffff";
+          propTextColor.value = obj.textColor || "#000000";
+          propIsAnswer.checked = !!obj.isAnswer;
+        }
+
+        function applyObjectStyles(id) {
+          const obj = objects.get(id);
+          const element = canvas.querySelector(`.canvas-item[data-id="${id}"]`);
+          if (!element || !obj) return;
+
+          element.style.left = obj.x + "px";
+          element.style.top = obj.y + "px";
+          element.style.width = obj.width + "px";
+          element.style.height = obj.height + "px";
+          element.style.transform = `rotate(${obj.rotation || 0}deg)`;
+
+          if (obj.isAnswer) {
+            element.dataset.answer = "true";
+          } else {
+            delete element.dataset.answer;
+          }
+
+          if (obj.type === "group") {
+            element.style.backgroundColor = "transparent";
+            return;
+          }
+
+          const content = element.querySelector(".content");
+          if (obj.type === "text") {
+            content.style.fontSize = (obj.fontSize || 24) + "px";
+            content.style.color = obj.textColor || "#111827";
+            element.style.backgroundColor = "transparent";
+          } else if (obj.type === "rect" || obj.type === "circle") {
+            element.style.backgroundColor = obj.bgColor || "#fbbf24";
+            content.style.color = obj.textColor || "#111827";
+          } else if (obj.type === "image") {
+            element.style.backgroundColor = "transparent";
+          }
+        }
+
+        function createCanvasItem(objData) {
+          const item = document.createElement("div");
+          item.className = "canvas-item";
+          item.dataset.id = objData.id;
+          item.style.position = "absolute";
+          item.style.zIndex = "10";
+          item.style.left = objData.x + "px";
+          item.style.top = objData.y + "px";
+          item.style.width = objData.width + "px";
+          item.style.height = objData.height + "px";
+
+          const content = document.createElement("div");
+          content.className = "content";
+
+          if (objData.type === "group") {
+            content.style.position = "relative";
+            content.style.width = "100%";
+            content.style.height = "100%";
+          } else if (objData.type === "text") {
+            content.classList.add("text");
+            content.contentEditable = "true";
+            content.innerText = objData.text || "Text";
+            content.addEventListener("input", () => {
+              const obj = objects.get(objData.id);
+              if (obj) obj.text = content.innerText;
+            });
+          } else if (objData.type === "circle") {
+            item.style.borderRadius = "999px";
+          } else if (objData.type === "image") {
+            const img = document.createElement("img");
+            img.src = objData.src;
+            content.appendChild(img);
+          }
+
+          item.appendChild(content);
+
+          const handle = document.createElement("div");
+          handle.className = "resize-handle";
+          item.appendChild(handle);
+
+          item.addEventListener("mousedown", (e) => {
+            if (
+              e.target === handle ||
+              e.target.classList.contains("resize-handle")
+            )
+              return;
+            const isCtrlClick = e.ctrlKey || e.metaKey;
+            setSelected(objData.id, isCtrlClick);
+          });
+
+          setupDrag(item, objData.id);
+          setupResize(handle, objData.id);
+
+          canvas.appendChild(item);
+          applyObjectStyles(objData.id);
+          return item;
+        }
+
+        function setupDrag(item, id) {
+          let isDragging = false;
+          let startX, startY, startLeft, startTop;
+
+          item.addEventListener("mousedown", (e) => {
+            if (e.target.classList.contains("resize-handle")) return;
+            if (e.button !== 0) return;
+            isDragging = true;
+            document.body.classList.add("dragging");
+            startX = e.clientX;
+            startY = e.clientY;
+            const rect = item.getBoundingClientRect();
+            const canvasRect = canvas.getBoundingClientRect();
+            startLeft = rect.left - canvasRect.left;
+            startTop = rect.top - canvasRect.top;
+
+            const onMove = (eMove) => {
+              if (!isDragging) return;
+              const dx = eMove.clientX - startX;
+              const dy = eMove.clientY - startY;
+              const newX = Math.max(0, startLeft + dx);
+              const newY = Math.max(0, startTop + dy);
+
+              item.style.left = newX + "px";
+              item.style.top = newY + "px";
+
+              const obj = objects.get(id);
+              obj.x = newX;
+              obj.y = newY;
+              updatePropertiesPanel();
+            };
+
+            const onUp = () => {
+              isDragging = false;
+              document.body.classList.remove("dragging");
+              document.removeEventListener("mousemove", onMove);
+              document.removeEventListener("mouseup", onUp);
+            };
+
+            document.addEventListener("mousemove", onMove);
+            document.addEventListener("mouseup", onUp);
+          });
+        }
+
+        function setupResize(handle, id) {
+          let isResizing = false;
+          let startX, startY, startWidth, startHeight;
+
+          handle.addEventListener("mousedown", (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            isResizing = true;
+            document.body.classList.add("dragging");
+            startX = e.clientX;
+            startY = e.clientY;
+
+            const item = canvas.querySelector(`.canvas-item[data-id="${id}"]`);
+            const rect = item.getBoundingClientRect();
+            startWidth = rect.width;
+            startHeight = rect.height;
+
+            const onMove = (eMove) => {
+              if (!isResizing) return;
+              const dx = eMove.clientX - startX;
+              const dy = eMove.clientY - startY;
+
+              const newWidth = Math.max(30, startWidth + dx);
+              const newHeight = Math.max(30, startHeight + dy);
+
+              item.style.width = newWidth + "px";
+              item.style.height = newHeight + "px";
+
+              const obj = objects.get(id);
+              obj.width = newWidth;
+              obj.height = newHeight;
+              updatePropertiesPanel();
+            };
+
+            const onUp = () => {
+              isResizing = false;
+              document.body.classList.remove("dragging");
+              document.removeEventListener("mousemove", onMove);
+              document.removeEventListener("mouseup", onUp);
+            };
+
+            document.addEventListener("mousemove", onMove);
+            document.addEventListener("mouseup", onUp);
+          });
+        }
+
+        function addText() {
+          const id = createId();
+          const obj = {
+            id,
+            type: "text",
+            x: 80,
+            y: 80,
+            width: 160,
+            height: 60,
+            rotation: 0,
+            fontSize: 24,
+            textColor: "#111827",
+            bgColor: "#ffffff",
+            text: "New text",
+            isAnswer: false,
+          };
+          objects.set(id, obj);
+          createCanvasItem(obj);
+          setSelected(id);
+        }
+
+        // ── addElement: used by dropzone-upload and item-upload handlers ────
+        function addElement(type, imageUrl, group) {
+          const id = createId();
+          const isDropzone = type === "dropzone";
+          const obj = {
+            id,
+            type: "image",
+            x: isDropzone ? (group === "A" ? 60 : 500) : 200,
+            y: isDropzone ? 160 : 300,
+            width: isDropzone ? 220 : 150,
+            height: isDropzone ? 180 : 120,
+            rotation: 0,
+            src: imageUrl,
+            isAnswer: false,
+            elementType: type, // "dropzone" | "item"
+            group: group,
+          };
+          objects.set(id, obj);
+          elements.push(obj); // keep elements array in sync for group-count checks
+          createCanvasItem(obj);
+          setSelected(id);
+        }
+
+                 const assetURL = "http://localhost:5001/uploads/editor-img/";
+
+          let uploadedImageName = "";
+
+          // IMAGE UPLOAD
+          addImageBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            imageFileInput.value = "";
+            imageFileInput.click();
+          });
+
+          imageFileInput.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append("editor_image", file);
+
+            $.ajax({
+              url: "/admin/image-upload",
+              type: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function (res) {
+                console.log("Uploaded:", res.filename);
+                uploadedImageName = res.filename;
+
+                const finalImageUrl = assetURL + uploadedImageName;
+
+                const id = createId();
+                const obj = {
+                  id,
+                  type: "image",
+                  x: 200,
+                  y: 120,
+                  width: 200,
+                  height: 150,
+                  rotation: 0,
+                  src: finalImageUrl,
+                  isAnswer: false,
+                };
+                objects.set(id, obj);
+                createCanvasItem(obj);
+                setSelected(id);
+              },
+              error: function () {
+                console.error("Upload failed");
+              },
+            });
+          });
+
+          // CANVAS BACKGROUND IMAGE UPLOAD
+          setCanvasBgBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            canvasBgFileInput.value = "";
+            canvasBgFileInput.click();
+          });
+
+          canvasBgFileInput.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append("editor_image", file);
+
+            $.ajax({
+              url: "/admin/image-upload",
+              type: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function (res) {
+                console.log("Canvas BG Uploaded:", res.filename);
+
+                const finalImageUrl = assetURL + res.filename;
+
+                canvas.style.backgroundImage = `url('${finalImageUrl}')`;
+                canvas.style.backgroundSize = "cover";
+                canvas.style.backgroundPosition = "center";
+                canvas.style.backgroundRepeat = "no-repeat";
+              },
+              error: function () {
+                console.error("Canvas BG Upload failed");
+              },
+            });
+          });
+
+        // const assetURL = "http://localhost:5001/uploads/editor-img/";
+
+        // let uploadedImageName = "";
+
+        // // ── Original addImageBtn (server upload) ────────────────────────────
+        // addImageBtn.addEventListener("click", (e) => {
+        //   e.preventDefault();
+        //   imageFileInput.value = "";
+        //   imageFileInput.click();
+        // });
+
+        // imageFileInput.addEventListener("change", (e) => {
+        //   const file = e.target.files[0];
+        //   if (!file) return;
+        //   const imageUrl = URL.createObjectURL(file);
+        //   const id = createId();
+        //   const obj = {
+        //     id,
+        //     type: "image",
+        //     x: 200,
+        //     y: 120,
+        //     width: 200,
+        //     height: 150,
+        //     rotation: 0,
+        //     src: imageUrl,
+        //     isAnswer: false,
+        //   };
+        //   objects.set(id, obj);
+        //   createCanvasItem(obj);
+        //   setSelected(id);
+        //   e.target.value = "";
+        // });
+
+        // // ── Original setCanvasBgBtn (server upload) ─────────────────────────
+        // setCanvasBgBtn.addEventListener("click", (e) => {
+        //   e.preventDefault();
+        //   canvasBgFileInput.value = "";
+        //   canvasBgFileInput.click();
+        // });
+
+        // canvasBgFileInput.addEventListener("change", (e) => {
+        //   const file = e.target.files[0];
+        //   if (!file) return;
+        //   const bgImageUrl = URL.createObjectURL(file);
+        //   canvas.style.backgroundImage = `url('${bgImageUrl}')`;
+        //   canvas.style.backgroundSize = "cover";
+        //   canvas.style.backgroundPosition = "center";
+        //   canvas.style.backgroundRepeat = "no-repeat";
+        //   e.target.value = "";
+        // });
+
+        // // ── bg-upload: local object URL (preview only, no server call) ──────
+        // document.getElementById("bg-upload").addEventListener("change", (e) => {
+        //   const file = e.target.files[0];
+        //   if (!file) return;
+        //   const bgImageUrl = URL.createObjectURL(file);
+        //   canvas.style.backgroundImage = `url('${bgImageUrl}')`;
+        //   canvas.style.backgroundSize = "cover";
+        //   canvas.style.backgroundPosition = "center";
+        //   e.target.value = "";
+        // });
+
+        // ── dropzone-upload: max 2 drop zones (Group A & B) ─────────────────
+        document
+          .getElementById("dropzone-upload")
+          .addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const groupCount = elements.filter(
+              (el) => el.elementType === "dropzone",
+            ).length;
+            if (groupCount >= 2) {
+              alert("Only 2 drop zones allowed (Group A & B)");
+              e.target.value = "";
+              return;
+            }
+            const group = groupCount === 0 ? "A" : "B";
+            const imageUrl = URL.createObjectURL(file);
+            addElement("dropzone", imageUrl, group);
+            e.target.value = "";
+          });
+
+        // ── item-upload: add a draggable item element ────────────────────────
+        document
+          .getElementById("item-upload")
+          .addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const imageUrl = URL.createObjectURL(file);
+            addElement("item", imageUrl, "A");
+            e.target.value = "";
+          });
+
+        addTextBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          addText();
+        });
+
+        groupBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          groupSelectedItems();
+        });
+
+        ungroupBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          ungroupSelectedItems();
+        });
+
+        canvasBgColor.addEventListener("input", () => {
+          canvas.style.backgroundColor = canvasBgColor.value;
+        });
+
+        clearBgBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          canvas.style.backgroundImage = "none";
+          canvas.style.backgroundColor = canvasBgColor.value;
+        });
+
+        canvas.addEventListener("mousedown", (e) => {
+          if (e.target === canvas) {
+            selectedIds.clear();
+            selectedId = null;
+            updateSelectionStyles();
+            updatePropertiesPanel();
+          }
+        });
+
+        function syncPropertyChange() {
+          if (!selectedId || !objects.has(selectedId)) return;
+          const obj = objects.get(selectedId);
+
+          const x = parseFloat(propX.value);
+          const y = parseFloat(propY.value);
+          const w = parseFloat(propWidth.value);
+          const h = parseFloat(propHeight.value);
+          const rot = parseFloat(propRotation.value);
+          const fontSize = parseFloat(propFontSize.value);
+
+          if (!isNaN(x)) obj.x = x;
+          if (!isNaN(y)) obj.y = y;
+          if (!isNaN(w)) obj.width = Math.max(30, w);
+          if (!isNaN(h)) obj.height = Math.max(30, h);
+          if (!isNaN(rot)) obj.rotation = rot;
+          if (!isNaN(fontSize)) obj.fontSize = fontSize;
+
+          obj.bgColor = propBgColor.value;
+          obj.textColor = propTextColor.value;
+          obj.isAnswer = propIsAnswer.checked;
+
+          objects.forEach((o, key) => applyObjectStyles(key));
+          updatePropertiesPanel();
+        }
+
+        [
+          propX,
+          propY,
+          propWidth,
+          propHeight,
+          propRotation,
+          propFontSize,
+          propBgColor,
+          propTextColor,
+        ].forEach((input) => {
+          input.addEventListener("input", syncPropertyChange);
+        });
+        propIsAnswer.addEventListener("change", syncPropertyChange);
+
+        const questionTextarea = container.querySelector(
+          "textarea[name='array[0][question][text]']",
+        );
+        if (questionTextarea) {
+          questionTextarea.addEventListener("input", (e) => {
+            appendIdentifyEditorText(e.target.value);
+          });
+        }
+
+        function exportHTML() {
+          const canvasWrapper = document.querySelector(".canvas-wrapper-id");
+          const clonedWrapper = canvasWrapper.cloneNode(true);
+
+          clonedWrapper
+            .querySelectorAll(".resize-handle")
+            .forEach((h) => h.remove());
+
+          clonedWrapper.querySelectorAll(".canvas-item").forEach((item) => {
+            item.classList.remove("selected");
+            const content = item.querySelector(":scope > .content");
+            if (content) {
+              content.contentEditable = "false";
+
+              const childDivs = content.querySelectorAll(":scope > div");
+              childDivs.forEach((childDiv) => {
+                const innerContent = childDiv.querySelector(".content");
+                if (innerContent) {
+                  while (innerContent.firstChild) {
+                    childDiv.appendChild(innerContent.firstChild);
+                  }
+                  innerContent.remove();
+                }
+              });
+            }
+          });
+
+          const clonedCanvas = clonedWrapper.querySelector("#canvas-id");
+
+          const computedStyle = getComputedStyle(canvas);
+          const canvasStyles = {
+            width: computedStyle.width,
+            height: computedStyle.height,
+            backgroundColor: computedStyle.backgroundColor,
+            backgroundImage: computedStyle.backgroundImage,
+            backgroundSize: computedStyle.backgroundSize,
+            backgroundPosition: computedStyle.backgroundPosition,
+            backgroundRepeat: computedStyle.backgroundRepeat,
+            borderRadius: computedStyle.borderRadius,
+            boxShadow: computedStyle.boxShadow,
+          };
+
+          const questionInput = container.querySelector(
+            "#editor_questionText-id",
+          );
+          const questionTextVal = questionInput
+            ? questionInput.value
+            : "Question";
+
+          const htmlString = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Export</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Jersey+25&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px;
+        }
+
+        .wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .canvas-wrapper-id {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            padding: 40px;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+        }
+
+         .question-space-id {
+            font-family: 'Jersey 25', sans-serif;
+            padding: 16px 40px;
+            background: transparent;
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            position: absolute;
+            flex-shrink: 0;
+            z-index: 2;
+            bottom: 34pc;
+          }
+
+          input#editor_questionText-id {
+            font-family: 'Jersey 25', sans-serif;
+            border: none;
+            font-size: 26px;
+            background: #fff;
+            color: #C60055;
+            border-radius: 12px;
+            text-align: center;
+            padding:10px;
+          }
+
+        #canvas-id {
+            width: ${canvasStyles.width};
+            height: ${canvasStyles.height};
+            background: ${canvasStyles.backgroundColor};
+            ${
+              canvasStyles.backgroundImage !== "none"
+                ? `background-image: ${canvasStyles.backgroundImage};`
+                : ""
+            }
+            background-size: ${canvasStyles.backgroundSize};
+            background-position: ${canvasStyles.backgroundPosition};
+            background-repeat: ${canvasStyles.backgroundRepeat};
+            border-radius: ${canvasStyles.borderRadius};
+            box-shadow: ${canvasStyles.boxShadow};
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-item {
+            position: absolute !important;
+            border-radius: 4px;
+            box-shadow: none;
+            z-index: 10 !important;
+            cursor: pointer;
+        }
+
+        .canvas-item .content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 4px;
+            text-align: center;
+            user-select: none;
+        }
+
+        .canvas-item .content.text {
+            cursor: default;
+            user-select: none;
+        }
+
+        .canvas-item .content img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            pointer-events: none;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Alata&display=swap');
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        ${clonedWrapper.outerHTML}
+    </div>`;
+
+          const hiddenInput = container.querySelector(
+            "input[name='array[0][html][data]']",
+          );
+          if (hiddenInput) {
+            hiddenInput.value = htmlString;
+          }
+          console.log(htmlString);
+        }
+
+        exportHtmlBtn.addEventListener("click", (e) => {
+          exportHTML();
+        });
+
+        deleteBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (selectedIds.size === 0) return;
+
+          selectedIds.forEach((id) => {
+            const element = canvas.querySelector(
+              `.canvas-item[data-id="${id}"]`,
+            );
+            if (element) element.remove();
+            // Also remove from elements array if present
+            const obj = objects.get(id);
+            if (obj) {
+              const idx = elements.findIndex((el) => el.id === id);
+              if (idx !== -1) elements.splice(idx, 1);
+            }
+            objects.delete(id);
+          });
+
+          selectedIds.clear();
+          selectedId = null;
+          updateSelectionStyles();
+          updatePropertiesPanel();
+        });
+
+        bringForwardBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (!selectedId) return;
+          const element = canvas.querySelector(
+            `.canvas-item[data-id="${selectedId}"]`,
+          );
+          if (element && element.nextElementSibling) {
+            element.parentNode.insertBefore(
+              element.nextElementSibling,
+              element,
+            );
+          }
+        });
+
+        sendBackBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (!selectedId) return;
+          const element = canvas.querySelector(
+            `.canvas-item[data-id="${selectedId}"]`,
+          );
+          if (element && element.previousElementSibling) {
+            element.parentNode.insertBefore(
+              element,
+              element.previousElementSibling,
+            );
+          }
+        });
+
+        canvas.style.backgroundColor = canvasBgColor.value;
+
+        // ── LOAD FROM JSON ──────────────────────────────────────────────────
+        function loadFromJSON(jsonData) {
+          const record = Array.isArray(jsonData) ? jsonData[0] : jsonData;
+          if (!record) return;
+
+          if (record.question && record.question.text) {
+            const qText = record.question.text;
+            questionText.value = qText;
+            const textarea = container.querySelector(
+              "textarea[name='array[0][question][text]']",
+            );
+            if (textarea) textarea.value = qText;
+          }
+
+          if (!record.html || !record.html.data) return;
+
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(record.html.data, "text/html");
+          const canvasEl = doc.querySelector("#canvas-id");
+          if (!canvasEl) return;
+
+          const bgImage = canvasEl.style.backgroundImage;
+          if (bgImage && bgImage !== "none") {
+            canvas.style.backgroundImage = bgImage;
+            canvas.style.backgroundSize =
+              canvasEl.style.backgroundSize || "cover";
+            canvas.style.backgroundPosition =
+              canvasEl.style.backgroundPosition || "center";
+            canvas.style.backgroundRepeat =
+              canvasEl.style.backgroundRepeat || "no-repeat";
+          }
+
+          if (canvasEl.style.backgroundColor) {
+            canvas.style.backgroundColor = canvasEl.style.backgroundColor;
+            canvasBgColor.value =
+              rgbToHex(canvasEl.style.backgroundColor) || "#ffffff";
+          }
+
+          const items = canvasEl.querySelectorAll(".canvas-item");
+          items.forEach((item) => {
+            const id = createId();
+
+            const x = parseFloat(item.style.left) || 0;
+            const y = parseFloat(item.style.top) || 0;
+            const width = parseFloat(item.style.width) || 100;
+            const height = parseFloat(item.style.height) || 100;
+            const rotation = (() => {
+              const t = item.style.transform || "";
+              const m = t.match(/rotate\(([-\d.]+)deg\)/);
+              return m ? parseFloat(m[1]) : 0;
+            })();
+            const isAnswer = item.dataset.answer === "true";
+            const bgColor = item.style.backgroundColor || "transparent";
+
+            const contentEl = item.querySelector(".content");
+            const imgEl = contentEl && contentEl.querySelector("img");
+            const isImage = !!imgEl;
+
+            let obj;
+
+            if (isImage) {
+              obj = {
+                id,
+                type: "image",
+                x,
+                y,
+                width,
+                height,
+                rotation,
+                src: imgEl.src,
+                isAnswer,
+                bgColor: "transparent",
+                textColor: "#111827",
+              };
+            } else if (contentEl) {
+              const isCircle = item.style.borderRadius === "999px";
+              if (isCircle) {
+                obj = {
+                  id,
+                  type: "circle",
+                  x,
+                  y,
+                  width,
+                  height,
+                  rotation,
+                  bgColor:
+                    bgColor !== "transparent"
+                      ? rgbToHex(bgColor) || bgColor
+                      : "#60a5fa",
+                  textColor: contentEl.style.color
+                    ? rgbToHex(contentEl.style.color) || "#111827"
+                    : "#111827",
+                  isAnswer,
+                };
+              } else if (
+                contentEl.classList.contains("text") ||
+                contentEl.contentEditable === "true" ||
+                contentEl.contentEditable === ""
+              ) {
+                obj = {
+                  id,
+                  type: "text",
+                  x,
+                  y,
+                  width,
+                  height,
+                  rotation,
+                  fontSize: parseFloat(contentEl.style.fontSize) || 24,
+                  textColor: contentEl.style.color
+                    ? rgbToHex(contentEl.style.color) || "#111827"
+                    : "#111827",
+                  bgColor:
+                    bgColor !== "transparent"
+                      ? rgbToHex(bgColor) || bgColor
+                      : "#ffffff",
+                  text: contentEl.innerText || contentEl.textContent || "Text",
+                  isAnswer,
+                };
+              } else {
+                obj = {
+                  id,
+                  type: "rect",
+                  x,
+                  y,
+                  width,
+                  height,
+                  rotation,
+                  bgColor:
+                    bgColor !== "transparent"
+                      ? rgbToHex(bgColor) || bgColor
+                      : "#fbbf24",
+                  textColor: contentEl.style.color
+                    ? rgbToHex(contentEl.style.color) || "#111827"
+                    : "#111827",
+                  isAnswer,
+                };
+              }
+            } else {
+              return;
+            }
+
+            objects.set(id, obj);
+            elements.push(obj); // keep elements in sync
+            createCanvasItem(obj);
+          });
+        }
+
+        function rgbToHex(rgb) {
+          if (!rgb || rgb === "transparent") return null;
+          if (rgb.startsWith("#")) return rgb;
+          const m = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+          if (!m) return null;
+          return (
+            "#" +
+            [m[1], m[2], m[3]]
+              .map((n) => parseInt(n).toString(16).padStart(2, "0"))
+              .join("")
+          );
+        }
+
+        // const preloadData = [
+        //   {
+        //     html: {
+        //       data: '<div id="canvas-id" style="background-color: rgb(255, 255, 255); background-image: url(\'https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773661987849-98555185.jpg\'); background-size: cover; background-position: center center; background-repeat: no-repeat;"><div class="canvas-item" data-id="obj_1" style="position: absolute; z-index: 10; left: 724px; top: 34px; width: 137px; height: 121px; transform: rotate(0deg); background-color: transparent;" data-answer="true"><div class="content" contenteditable="false"><img src="https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773662094983-416115029.png"></div></div><div class="canvas-item" data-id="obj_2" style="position: absolute; z-index: 10; left: 36px; top: 40px; width: 152px; height: 113px; transform: rotate(0deg); background-color: transparent;" data-answer="true"><div class="content" contenteditable="false"><img src="https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773662129612-730756257.png"></div></div><div class="canvas-item" data-id="obj_4" style="position: absolute; z-index: 10; left: 597px; top: 174px; width: 127px; height: 115px; transform: rotate(0deg); background-color: transparent;" data-answer="true"><div class="content" contenteditable="false"><img src="https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773662218932-782228850.png"></div></div><div class="canvas-item" data-id="obj_5" style="position: absolute; z-index: 10; left: 159px; top: 176px; width: 134px; height: 100px; transform: rotate(0deg); background-color: transparent;" data-answer="true"><div class="content" contenteditable="false"><img src="https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773662367917-772335566.png"></div></div><div class="canvas-item" data-id="obj_7" style="position: absolute; z-index: 10; left: 60px; top: 450px; width: 151px; height: 85px; transform: rotate(0deg); background-color: transparent;" data-answer="true"><div class="content" contenteditable="false"><img src="https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773662431380-518081594.png"></div></div><div class="canvas-item" data-id="obj_8" style="position: absolute; z-index: 10; left: 708px; top: 382px; width: 163px; height: 128px; transform: rotate(0deg); background-color: transparent;" data-answer="true"><div class="content" contenteditable="false"><img src="https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773662453162-131061615.png"></div></div><div class="canvas-item" data-id="obj_9" style="position: absolute; z-index: 10; left: 476px; top: 400px; width: 200px; height: 150px; transform: rotate(0deg); background-color: transparent;" data-answer="true"><div class="content" contenteditable="false"><img src="https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773662499253-368434546.png"></div></div><div class="canvas-item" data-id="obj_10" style="position: absolute; z-index: 10; left: 374px; top: 233px; width: 170px; height: 126px; transform: rotate(0deg); background-color: transparent;" data-answer="true"><div class="content" contenteditable="false"><img src="https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773662526280-413886200.png"></div></div><div class="canvas-item" data-id="obj_12" style="position: absolute; z-index: 10; left: 0px; top: 270px; width: 158px; height: 133px; transform: rotate(0deg); background-color: transparent;"><div class="content" contenteditable="false"><img src="https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773662663544-712585959.png"></div></div><div class="canvas-item" data-id="obj_14" style="position: absolute; z-index: 10; left: 724px; top: 187px; width: 200px; height: 150px; transform: rotate(0deg); background-color: transparent;"><div class="content" contenteditable="false"><img src="https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773662705829-549393451.png"></div></div><div class="canvas-item" data-id="obj_15" style="position: absolute; z-index: 10; left: 245px; top: 363px; width: 136px; height: 112px; transform: rotate(0deg); background-color: transparent;"><div class="content" contenteditable="false"><img src="https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773662727304-969276549.png"></div></div><div class="canvas-item" data-id="obj_16" style="position: absolute; z-index: 10; left: 371px; top: 45px; width: 157px; height: 110px; transform: rotate(0deg); background-color: transparent;"><div class="content" contenteditable="false"><img src="https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1773662764157-896694847.png"></div></div></div>',
+        //     },
+        //     question: {
+        //       text: "Identify the vegetables.",
+        //     },
+        //   },
+        // ];
+        const preloadData = old_data;
+
+        setTimeout(() => loadFromJSON(preloadData), 0);
+}
