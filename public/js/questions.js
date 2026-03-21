@@ -481,6 +481,15 @@ function OpenEditModal(id, type) {
             );
             $(".questions_container").html(ques_html_mat);
             OpenModal("question_list_edit_modal");
+          } else if (type === 5 || type === "5") {
+            let ques_html_mat = makeHTMLforLabelParts(id, type, data.data);
+            $(".questions_template_container").html(ques_html_mat);
+            OpenModal("question_list_template_edit_modal");
+            // console.log("data", data.data[0])
+            setTimeout(() => {
+                renderScriptforLabelParts($('.labelparts-container'), data.data);
+                // dragAndDropEditorTemplate(document.querySelector('.gge-editor-root'));
+            }, 200);
           } else if (type === 6 || type === "6") {
             let ques_html_mat = makeHTMLforIdentify(id, type, data.data);
             $(".questions_template_container").html(ques_html_mat);
@@ -5491,3 +5500,710 @@ function renderScriptForIdentify(container, old_data) {
 
         setTimeout(() => loadFromJSON(preloadData), 0);
 }
+
+function makeHTMLforLabelParts(id, type, data){
+  let html = `<div class="card question-card mt-3">
+        <div class="card-body">
+            <div class="container labelparts-container">
+                <div class="">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label>Question</label>
+                                    <textarea name="array[0][question][text]" onkeyup="appendEditorText(this.value)"
+                                        class="form-control" rows="1">${data[0].question.text}</textarea>
+                                    <input type="hidden" name="array[0][html][data]" id="editor_html_val">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="toolbar">
+                                <div class="toolbar-header">Tools</div>
+                                <a href="javascript:void(0);" class="tool-btn" id="imgBtn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                        <polyline points="21 15 16 10 5 21"></polyline>
+                                    </svg>
+                                    Image
+                                </a>
+                                <input type="file" id="imgInput" accept="image/*" style="display:none;" />
+                                <a class="tool-btn" id="dropzoneBtn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <path d="M8 12h8"></path>
+                                    </svg>
+                                    Drop Zone
+                                </a>
+                                <a class="tool-btn" id="lineBtn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="5" y1="19" x2="19" y2="5"></line>
+                                    </svg>
+                                    Line
+                                </a>
+                                <div style="flex:1"></div>
+                                <a class="tool-btn" id="exportBtn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                    Export
+                                </a>
+                            </div>
+
+                            <!-- MIDDLE TEMPLATE AREA -->
+                            <div class="canvas-wrapper" id="editor_html">
+                                <div class="canvas">
+                                    <div class="question-space">
+                                        <input type="text" id="editor_questionText"
+                                            placeholder="Enter your question here..." readonly />
+                                    </div>
+
+                                    <div class="content-row">
+                                        <div class="image-box" id="imageBox">
+                                            <img id="previewImg" src=""
+                                                style="width:100%; height:100%; object-fit:contain; border-radius:20px; display:none;" />
+                                        </div>
+                                        <div class="answer-box" id="answerBox"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- RIGHT PROPERTIES PANEL -->
+                            <div class="properties">
+                                <div class="prop-section">
+                                    <div class="prop-title">Design</div>
+                                    <div class="prop-field">
+                                        <label>Width</label>
+                                        <input type="number" id="styleWidth" placeholder="Auto" />
+                                    </div>
+                                    <div class="prop-field">
+                                        <label>Height</label>
+                                        <input type="number" id="styleHeight" placeholder="Auto" />
+                                    </div>
+                                    <div class="prop-field">
+                                        <label>Fill</label>
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <input type="color" id="styleColor"
+                                                style="width:24px; height:24px; border:none; padding:0; background:none;" />
+                                            <span style="font-size:11px; color:#888;">Hex</span>
+                                        </div>
+                                    </div>
+                                    <div class="prop-field" id="borderField">
+                                        <label>Border</label>
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <input type="color" id="styleBorder"
+                                                style="width:24px; height:24px; border:none; padding:0; background:none;" />
+                                        </div>
+                                    </div>
+                                    <div class="prop-field" id="thicknessField" style="display:none;">
+                                        <label>Thickness</label>
+                                        <input type="number" id="styleThickness" placeholder="2px" />
+                                    </div>
+                                </div>
+
+                                <!-- DROPZONE SPECIFIC FIELDS -->
+                                <div class="prop-section" id="dropzoneFields">
+                                    <div class="prop-title">Data</div>
+                                    <div class="prop-field">
+                                        <label>ID (Unique)</label>
+                                        <input type="text" id="dropzoneName" placeholder="e.g., ear" />
+                                        <div class="error-message" id="nameError"></div>
+                                    </div>
+                                </div>
+
+                                <div class="prop-section" id="valueFields">
+                                    <div class="prop-field">
+                                        <label>Label Text</label>
+                                        <input type="text" id="dropzoneValue" placeholder="e.g., Ear" />
+                                    </div>
+                                </div>
+
+                                <div class="prop-section">
+                                    <a class="tool-btn delete-btn" id="deleteBtn">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path
+                                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                            </path>
+                                        </svg>
+                                        Delete
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>`;
+
+  html += `<input type="hidden" name="id" value="${id}">`;
+  html += `<input type="hidden" name="question_type" value="${type}">`;
+
+  return html;
+}
+
+function renderScriptforLabelParts(container, old_data) {
+            let selectedElement = null;
+            let isDragging = false;
+            let dragOffsetX = 0;
+            let dragOffsetY = 0;
+            let dropzoneMap = {};
+
+            const imgBtn = container.find("#imgBtn");
+            const imgInput = container.find("#imgInput");
+            const previewImg = container.find("#previewImg")[0];
+            const dropzoneBtn = container.find("#dropzoneBtn");
+            const lineBtn = container.find("#lineBtn");
+            const questionText = container.find("#editor_questionText");
+            const editor_html_val = container.find("#editor_html_val");
+            const imageBox = container.find("#imageBox")[0];
+            const answerBox = container.find("#answerBox")[0];
+            const deleteBtn = container.find("#deleteBtn");
+
+            const styleWidth = container.find("#styleWidth");
+            const styleHeight = container.find("#styleHeight");
+            const styleColor = container.find("#styleColor");
+            const styleBorder = container.find("#styleBorder");
+            const styleThickness = container.find("#styleThickness");
+            const borderField = container.find("#borderField");
+            const thicknessField = container.find("#thicknessField");
+
+            const dropzoneFields = container.find("#dropzoneFields");
+            const valueFields = container.find("#valueFields");
+            const dropzoneName = container.find("#dropzoneName");
+            const dropzoneValue = container.find("#dropzoneValue");
+            const nameError = container.find("#nameError");
+
+            // const publicURL = "https://demoadmin.fefdybraingym.com/public/";
+            // const assetURL = "https://demoadmin.fefdybraingym.com/public/uploads/editor-img/";
+
+            const publicURL = "http://localhost:5001/";
+            const assetURL = "http://localhost:5001/uploads/editor-img/";
+
+            let uploadedImageName = "";
+
+            // ---------------------------------------------------------------------
+            // IMAGE UPLOAD
+            // ---------------------------------------------------------------------
+            imgBtn.on("click", () => {
+                imgInput.click();
+            });
+
+            imgInput.on("change", (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                // Local preview 
+                // previewImg.src = URL.createObjectURL(file);
+                // previewImg.style.display = "block";
+                // e.target.value = "";
+                
+                const formData = new FormData();
+                formData.append("editor_image", file);
+                $.ajax({
+                    url: "/admin/image-upload",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (res) {
+                        console.log("Uploaded:", res.filename);
+                        uploadedImageName = res.filename;
+                        previewImg.src = assetURL + uploadedImageName;
+                        previewImg.style.display = "block";
+                    },
+                    error: function () {
+                        console.error("Upload failed");
+                    },
+                });
+            });
+
+            // ---------------------------------------------------------------------
+            // CREATE DROPZONE
+            // ---------------------------------------------------------------------
+            dropzoneBtn.on("click", () => {
+                const dropzone = document.createElement("div");
+                dropzone.className = "dropzone";
+                dropzone.style.left = "80px";
+                dropzone.style.top = "50px";
+                imageBox.appendChild(dropzone);
+
+                attachElementHandlers(dropzone);
+                selectElement(dropzone);
+            });
+
+            // ---------------------------------------------------------------------
+            // CREATE LINE
+            // ---------------------------------------------------------------------
+            lineBtn.on("click", () => {
+                const line = document.createElement("div");
+                line.className = "line";
+                line.style.left = "80px";
+                line.style.top = "50px";
+                imageBox.appendChild(line);
+
+                attachElementHandlers(line);
+                selectElement(line);
+            });
+
+            // ---------------------------------------------------------------------
+            // ATTACH ELEMENT HANDLERS
+            // ---------------------------------------------------------------------
+            function attachElementHandlers(element) {
+                element.addEventListener("mousedown", (e) => {
+                    selectElement(element);
+                    startDrag(e, element);
+                });
+            }
+
+            // ---------------------------------------------------------------------
+            // SELECT ELEMENT
+            // ---------------------------------------------------------------------
+            function selectElement(element) {
+                if (selectedElement) {
+                    selectedElement.classList.remove("selected");
+                }
+
+                selectedElement = element;
+                element.classList.add("selected");
+
+                const isDropzone = element.classList.contains("dropzone");
+                const isLine = element.classList.contains("line");
+
+                styleWidth.val(parseInt(element.style.width) || (isDropzone ? 80 : 80));
+                styleHeight.val(parseInt(element.style.height) || (isDropzone ? 40 : 2));
+                styleColor.val(
+                    element.style.backgroundColor
+                        ? rgbToHex(element.style.backgroundColor)
+                        : isDropzone
+                            ? "#ffffff"
+                            : "#000000"
+                );
+
+                if (isDropzone) {
+                    borderField.show();
+                    thicknessField.hide();
+                    dropzoneFields.addClass("show");
+                    valueFields.addClass("show");
+
+                    styleBorder.val(
+                        element.style.borderColor
+                            ? rgbToHex(element.style.borderColor)
+                            : "#000000"
+                    );
+
+                    dropzoneName.val(element.dataset.zoneName || "");
+                    dropzoneValue.val(element.dataset.zoneValue || "");
+                    nameError.text("");
+                    dropzoneName.removeClass("error");
+                } else if (isLine) {
+                    borderField.hide();
+                    thicknessField.show();
+                    dropzoneFields.removeClass("show");
+                    valueFields.removeClass("show");
+                    styleThickness.val(parseInt(element.style.height) || 2);
+                } else {
+                    dropzoneFields.removeClass("show");
+                    valueFields.removeClass("show");
+                    borderField.hide();
+                    thicknessField.hide();
+                }
+            }
+
+            // ---------------------------------------------------------------------
+            // DRAG HANDLER
+            // ---------------------------------------------------------------------
+            function startDrag(e, element) {
+                isDragging = true;
+
+                const rect = element.getBoundingClientRect();
+                const parentRect = imageBox.getBoundingClientRect();
+
+                dragOffsetX = e.clientX - rect.left;
+                dragOffsetY = e.clientY - rect.top;
+
+                $(document).on("mousemove.editorDrag", (moveEvent) => {
+                    const newX = moveEvent.clientX - parentRect.left - dragOffsetX;
+                    const newY = moveEvent.clientY - parentRect.top - dragOffsetY;
+                    element.style.left = newX + "px";
+                    element.style.top = newY + "px";
+                });
+
+                $(document).on("mouseup.editorDrag", () => {
+                    isDragging = false;
+                    $(document).off(".editorDrag");
+                });
+            }
+
+            // ---------------------------------------------------------------------
+            // STYLE INPUTS
+            // ---------------------------------------------------------------------
+            styleWidth.on("input", () => {
+                if (selectedElement) selectedElement.style.width = styleWidth.val() + "px";
+            });
+
+            styleHeight.on("input", () => {
+                if (selectedElement)
+                    selectedElement.style.height = styleHeight.val() + "px";
+            });
+
+            styleColor.on("input", () => {
+                if (selectedElement)
+                    selectedElement.style.backgroundColor = styleColor.val();
+            });
+
+            styleBorder.on("input", () => {
+                if (selectedElement && selectedElement.classList.contains("dropzone")) {
+                    selectedElement.style.borderColor = styleBorder.val();
+                }
+            });
+
+            styleThickness.on("input", () => {
+                if (selectedElement && selectedElement.classList.contains("line")) {
+                    selectedElement.style.height = styleThickness.val() + "px";
+                }
+            });
+
+            // ---------------------------------------------------------------------
+            // DROPZONE NAME
+            // ---------------------------------------------------------------------
+            dropzoneName.on("input", () => {
+                if (!selectedElement || !selectedElement.classList.contains("dropzone"))
+                    return;
+
+                const newName = dropzoneName.val().trim();
+                const oldName = selectedElement.dataset.zoneName;
+
+                nameError.text("");
+                dropzoneName.removeClass("error");
+
+                if (newName && isDuplicateZoneName(newName, selectedElement)) {
+                    nameError.text("This ID already exists");
+                    dropzoneName.addClass("error");
+                    return;
+                }
+
+                selectedElement.dataset.zoneName = newName;
+
+                if (oldName && dropzoneMap[oldName]) {
+                    const answerElem = dropzoneMap[oldName];
+                    answerElem.dataset.elementId = newName;
+                    dropzoneMap[newName] = answerElem;
+                    delete dropzoneMap[oldName];
+                }
+            });
+
+            dropzoneValue.on("input", () => {
+                if (!selectedElement || !selectedElement.classList.contains("dropzone"))
+                    return;
+
+                const newValue = dropzoneValue.val().trim();
+                selectedElement.dataset.zoneValue = newValue;
+
+                if (dropzoneMap[selectedElement.dataset.zoneName]) {
+                    const answerElem = dropzoneMap[selectedElement.dataset.zoneName];
+                    answerElem.textContent = newValue;
+                }
+
+                if (selectedElement.dataset.zoneName && newValue) {
+                    if (!dropzoneMap[selectedElement.dataset.zoneName]) {
+                        createAnswerElement(selectedElement);
+                    }
+                }
+            });
+
+            function isDuplicateZoneName(name, currentZone) {
+                const zones = imageBox.querySelectorAll(".dropzone");
+                for (let z of zones) {
+                    if (z !== currentZone && z.dataset.zoneName === name) return true;
+                }
+                return false;
+            }
+
+            // ---------------------------------------------------------------------
+            // ANSWER ELEMENTS
+            // ---------------------------------------------------------------------
+            function createAnswerElement(dropzone, posLeft, posTop) {
+                const name = dropzone.dataset.zoneName;
+                const value = dropzone.dataset.zoneValue;
+
+                if (dropzoneMap[name]) return;
+
+                const el = document.createElement("div");
+                el.className = "answer-element";
+                el.textContent = value;
+                el.dataset.elementId = name;
+
+                const count = Object.keys(dropzoneMap).length;
+                el.style.left = (posLeft !== undefined ? posLeft : 50 + count * 80) + "px";
+                el.style.top  = (posTop  !== undefined ? posTop  : 50 + count * 30) + "px";
+
+                answerBox.appendChild(el);
+                dropzoneMap[name] = el;
+
+                el.addEventListener("mousedown", (e) => {
+                    selectElement(dropzone);
+                    startAnswerDrag(e, el);
+                });
+            }
+
+            function startAnswerDrag(e, element) {
+                isDragging = true;
+
+                const rect = element.getBoundingClientRect();
+                const parentRect = answerBox.getBoundingClientRect();
+
+                dragOffsetX = e.clientX - rect.left;
+                dragOffsetY = e.clientY - rect.top;
+
+                $(document).on("mousemove.answerDrag", (moveEvent) => {
+                    const newX = moveEvent.clientX - parentRect.left - dragOffsetX;
+                    const newY = moveEvent.clientY - parentRect.top - dragOffsetY;
+                    element.style.left = newX + "px";
+                    element.style.top = newY + "px";
+                });
+
+                $(document).on("mouseup.answerDrag", () => {
+                    isDragging = false;
+                    $(document).off(".answerDrag");
+                });
+            }
+
+            // ---------------------------------------------------------------------
+            // DELETE ELEMENT
+            // ---------------------------------------------------------------------
+            deleteBtn.on("click", () => {
+                if (!selectedElement) return;
+
+                const isDropzone = selectedElement.classList.contains("dropzone");
+                const name = selectedElement.dataset.zoneName;
+
+                if (isDropzone && dropzoneMap[name]) {
+                    dropzoneMap[name].remove();
+                    delete dropzoneMap[name];
+                }
+
+                selectedElement.remove();
+                selectedElement = null;
+
+                styleWidth.val("");
+                styleHeight.val("");
+                styleColor.val("#ffffff");
+                styleBorder.val("#000000");
+                styleThickness.val("");
+                dropzoneName.val("");
+                dropzoneValue.val("");
+                nameError.text("");
+                dropzoneName.removeClass("error");
+                dropzoneFields.removeClass("show");
+                valueFields.removeClass("show");
+            });
+
+            // ---------------------------------------------------------------------
+            // RGB → HEX
+            // ---------------------------------------------------------------------
+            function rgbToHex(rgb) {
+                if (!rgb || rgb === "rgba(0, 0, 0, 0)") return "#ffffff";
+                const m = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+                if (!m) return "#ffffff";
+                const toHex = (x) => parseInt(x).toString(16).padStart(2, "0");
+                return "#" + toHex(m[1]) + toHex(m[2]) + toHex(m[3]);
+            }
+
+            // ---------------------------------------------------------------------
+            // EXPORT CANVAS
+            // ---------------------------------------------------------------------
+            const exportBtn = container.find("#exportBtn");
+            const editorCSS = `https://demoadmin.fefdybraingym.com/public/css/editor.css`;
+            //   const editorCSS = `https://demoadmin.fefdybraingym.com/public/css/editor.css?v=${Date.now()}`;
+
+            function copyComputedStyles(src, dest) {
+                const styles = getComputedStyle(src);
+                const props = [
+                    "position",
+                    "top",
+                    "left",
+                    "right",
+                    "bottom",
+                    "width",
+                    "height",
+                    "min-width",
+                    "min-height",
+                    "max-width",
+                    "max-height",
+                    "display",
+                    "box-sizing",
+                    "transform",
+                    "z-index",
+                    "font-size",
+                    "font-weight",
+                    "font-family",
+                    "line-height",
+                    "letter-spacing",
+                    "padding",
+                    "margin",
+                    "color",
+                    "background-color",
+                ];
+
+                props.forEach((prop) => {
+                    dest.style[prop] = styles.getPropertyValue(prop);
+                });
+            }
+
+            exportBtn.on("click", () => {
+                const contentRow = document.querySelector("#editor_html");
+                const clone = contentRow.cloneNode(true);
+
+                const originalInputs = contentRow.querySelectorAll("input, textarea");
+                const clonedInputs = clone.querySelectorAll("input, textarea");
+                originalInputs.forEach((src, i) => {
+                    const val = src.value;
+                    clonedInputs[i].value = val;
+                    clonedInputs[i].setAttribute("value", val);
+                });
+
+                const originals = contentRow.querySelectorAll("*");
+                const copies = clone.querySelectorAll("*");
+                copyComputedStyles(contentRow, clone);
+                originals.forEach((el, i) => copyComputedStyles(el, copies[i]));
+
+                const img = clone.querySelector("img");
+                if (img && uploadedImageName) img.src = assetURL + uploadedImageName;
+
+                setTimeout(() => {
+                    const wrapper = document.createElement("div");
+                    wrapper.style.display = "flex";
+                    wrapper.style.gap = "18pc";
+
+                    const googleFonts = `
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alata&display=swap">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap">
+    `;
+                    wrapper.insertAdjacentHTML("afterbegin", googleFonts);
+
+                    const link = document.createElement("link");
+                    link.rel = "stylesheet";
+                    link.href = editorCSS;
+
+                    wrapper.appendChild(link);
+                    wrapper.appendChild(clone);
+
+                    const editor_html = wrapper.outerHTML;
+                    editor_html_val.val(editor_html);
+
+                    alert("Exported");
+                    console.log("HTML: ", editor_html);
+                    $("#questionCardContainer .form-submit-button").attr("disabled", false);
+                }, 50);
+            });
+
+            // ---------------------------------------------------------------------
+            // LOAD FROM JSON 
+            // ---------------------------------------------------------------------
+            function loadFromEntry(entry) {
+                container.find("#editor_questionText").val(entry?.question?.text || "");
+
+                const htmlData = entry?.html?.data;
+                if (!htmlData) return;
+
+                // clear
+                dropzoneMap = {};
+                $(imageBox).find(".dropzone, .line").remove();
+                $(answerBox).find(".answer-element").remove();
+                if (selectedElement) selectedElement.classList.remove("selected");
+                selectedElement = null;
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlData, "text/html");
+
+                const imgEl = doc.querySelector("#previewImg");
+                if (imgEl && imgEl.getAttribute("src")) {
+                    previewImg.src = imgEl.getAttribute("src");
+                    previewImg.style.display = "block";
+                }
+
+                function getInset(el, side) {
+                    const parts = (el.style.inset || "").split(" ").map(v => parseFloat(v));
+                    if (!parts.length || isNaN(parts[0])) return null;
+                    if (side === "top") return parts[0];
+                    if (side === "left") return parts.length === 4 ? parts[3] : parts[1] ?? parts[0];
+                    return null;
+                }
+
+                const parsedImageBox = doc.querySelector("#imageBox");
+                if (parsedImageBox) {
+                    parsedImageBox.querySelectorAll(".line").forEach(srcEl => {
+                        const line = document.createElement("div");
+                        line.className = "line";
+                        line.style.left            = (parseFloat(srcEl.style.left) || getInset(srcEl, "left") || 50) + "px";
+                        line.style.top             = (parseFloat(srcEl.style.top)  || getInset(srcEl, "top")  || 50) + "px";
+                        line.style.width           = (parseFloat(srcEl.style.width)  || 80) + "px";
+                        line.style.height          = (parseFloat(srcEl.style.height) || 2)  + "px";
+                        line.style.backgroundColor = srcEl.style.backgroundColor || "rgb(0,0,0)";
+                        imageBox.appendChild(line);
+                        attachElementHandlers(line);
+                    });
+
+                    parsedImageBox.querySelectorAll(".dropzone").forEach(srcEl => {
+                        const dropzone = document.createElement("div");
+                        dropzone.className = "dropzone";
+                        dropzone.style.left            = (parseFloat(srcEl.style.left) || getInset(srcEl, "left") || 50) + "px";
+                        dropzone.style.top             = (parseFloat(srcEl.style.top)  || getInset(srcEl, "top")  || 50) + "px";
+                        dropzone.style.width           = (parseFloat(srcEl.style.width)  || 80) + "px";
+                        dropzone.style.height          = (parseFloat(srcEl.style.height) || 40) + "px";
+                        dropzone.style.backgroundColor = srcEl.style.backgroundColor || "#ffffff";
+                        dropzone.style.borderColor     = srcEl.style.borderColor     || "#000000";
+                        dropzone.dataset.zoneName      = srcEl.getAttribute("data-zone-name")  || "";
+                        dropzone.dataset.zoneValue     = srcEl.getAttribute("data-zone-value") || "";
+                        imageBox.appendChild(dropzone);
+                        attachElementHandlers(dropzone);
+                    });
+                }
+
+                const parsedAnswerBox = doc.querySelector("#answerBox");
+                if (parsedAnswerBox) {
+                    parsedAnswerBox.querySelectorAll(".answer-element").forEach(srcEl => {
+                        const zoneId = srcEl.getAttribute("data-element-id") || "";
+                        const match  = imageBox.querySelector(`.dropzone[data-zone-name="${zoneId}"]`);
+                        if (!match) return;
+                        const left = parseFloat(srcEl.style.left) || getInset(srcEl, "left") || 50;
+                        const top  = parseFloat(srcEl.style.top)  || getInset(srcEl, "top")  || 50;
+                        createAnswerElement(match, left, top);
+                    });
+                }
+            }
+
+            // ---------------------------------------------------------------------
+            // PRELOAD DATA
+            // ---------------------------------------------------------------------
+//             const preloadData = [
+//     {
+//         "html": {
+//             "data": "<div style=\"display: flex; gap: 18pc;\">\r\n      <link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap\">\r\n      <link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Alata&amp;display=swap\">\r\n      <link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Fredoka+One&amp;display=swap\">\r\n    <link rel=\"stylesheet\" href=\"https://demoadmin.fefdybraingym.com/public/css/editor.css\"><div class=\"canvas-wrapper\" id=\"editor_html\" style=\"position: static; inset: auto; width: 973px; height: 701.469px; min-width: auto; min-height: auto; max-width: 100%; max-height: none; display: flex; box-sizing: border-box; transform: none; z-index: auto; font-size: 14px; font-weight: 400; font-family: &quot;Public Sans&quot;, sans-serif; line-height: 21px; letter-spacing: normal; padding: 0px 12px; margin: 0px; color: rgb(33, 37, 41); background-color: rgba(0, 0, 0, 0);\">\r\n      <div class=\"canvas\" style=\"position: static; inset: auto; width: 759.188px; height: 701.469px; min-width: auto; min-height: auto; max-width: none; max-height: none; display: flex; box-sizing: border-box; transform: none; z-index: auto; font-size: 14px; font-weight: 400; font-family: &quot;Public Sans&quot;, sans-serif; line-height: 21px; letter-spacing: normal; padding: 20px; margin: 0px; color: rgb(33, 37, 41); background-color: rgb(200, 255, 128);\">\r\n          <div class=\"question-space\" style=\"position: static; inset: auto; width: 719.188px; height: 80px; min-width: auto; min-height: auto; max-width: none; max-height: none; display: flex; box-sizing: border-box; transform: none; z-index: auto; font-size: 14px; font-weight: 400; font-family: &quot;Public Sans&quot;, sans-serif; line-height: 21px; letter-spacing: normal; padding: 0px 20px; margin: 0px 0px 20px; color: rgb(33, 37, 41); background-color: rgba(0, 0, 0, 0);\">\r\n              <input type=\"text\" id=\"editor_questionText\" placeholder=\"Enter your question here...\" readonly=\"\" value=\"Label the parts of the dog.\" style=\"position: static; inset: auto; width: 679.188px; height: 50px; min-width: auto; min-height: auto; max-width: none; max-height: none; display: block; box-sizing: border-box; transform: none; z-index: auto; font-size: 32px; font-weight: 400; font-family: Alata, sans-serif; line-height: 48px; letter-spacing: normal; padding: 1px 2px; margin: 0px; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);\">\r\n          </div>\r\n\r\n          <div class=\"content-row\" style=\"position: static; inset: auto; width: 719.188px; height: 561.469px; min-width: auto; min-height: auto; max-width: none; max-height: none; display: flex; box-sizing: border-box; transform: none; z-index: auto; font-size: 14px; font-weight: 400; font-family: &quot;Public Sans&quot;, sans-serif; line-height: 21px; letter-spacing: normal; padding: 0px; margin: 0px; color: rgb(33, 37, 41); background-color: rgba(0, 0, 0, 0);\">\r\n              <div class=\"image-box\" id=\"imageBox\" style=\"position: relative; inset: 0px; width: 287.672px; height: 449.172px; min-width: auto; min-height: auto; max-width: none; max-height: none; display: block; box-sizing: border-box; transform: none; z-index: auto; font-size: 14px; font-weight: 400; font-family: &quot;Public Sans&quot;, sans-serif; line-height: 21px; letter-spacing: normal; padding: 0px; margin: 0px; color: rgb(33, 37, 41); background-color: rgb(255, 255, 255);\">\r\n                  <img id=\"previewImg\" src=\"https://demoadmin.fefdybraingym.com/public/uploads/editor-img/1766998358962-297240112.png\" style=\"width: 287.672px; height: 449.172px; object-fit: contain; border-radius: 20px; display: block; position: static; inset: auto; min-width: 0px; min-height: 0px; max-width: 100%; max-height: none; box-sizing: border-box; transform: none; z-index: auto; font-size: 14px; font-weight: 400; font-family: &quot;Public Sans&quot;, sans-serif; line-height: 21px; letter-spacing: normal; padding: 0px; margin: 0px; color: rgb(33, 37, 41); background-color: rgba(0, 0, 0, 0);\">\r\n              <div class=\"dropzone\" style=\"inset: 96px -97.3281px 309.172px 305px; position: absolute; width: 80px; height: 44px; min-width: 0px; min-height: 0px; max-width: none; max-height: none; display: block; box-sizing: border-box; transform: none; z-index: auto; font-size: 14px; font-weight: 400; font-family: &quot;Public Sans&quot;, sans-serif; line-height: 21px; letter-spacing: normal; padding: 20px; margin: 0px; color: rgb(33, 37, 41); background-color: rgb(255, 255, 255);\" data-zone-name=\"ear\" data-zone-value=\"Ear\"></div><div class=\"dropzone selected\" style=\"inset: 151px -94.3281px 254.172px 302px; position: absolute; width: 80px; height: 44px; min-width: 0px; min-height: 0px; max-width: none; max-height: none; display: block; box-sizing: border-box; transform: none; z-index: auto; font-size: 14px; font-weight: 400; font-family: &quot;Public Sans&quot;, sans-serif; line-height: 21px; letter-spacing: normal; padding: 20px; margin: 0px; color: rgb(33, 37, 41); background-color: rgb(255, 255, 255);\" data-zone-name=\"eyes\" data-zone-value=\"Eyes\"></div><div class=\"dropzone\" style=\"inset: 298px -100.328px 107.172px 308px; position: absolute; width: 80px; height: 44px; min-width: 0px; min-height: 0px; max-width: none; max-height: none; display: block; box-sizing: border-box; transform: none; z-index: auto; font-size: 14px; font-weight: 400; font-family: &quot;Public Sans&quot;, sans-serif; line-height: 21px; letter-spacing: normal; padding: 20px; margin: 0px; color: rgb(33, 37, 41); background-color: rgb(255, 255, 255);\" data-zone-name=\"feet\" data-zone-value=\"Feet\"></div><div class=\"dropzone\" style=\"inset: 199px -95.3281px 206.172px 303px; position: absolute; width: 80px; height: 44px; min-width: 0px; min-height: 0px; max-width: none; max-height: none; display: block; box-sizing: border-box; transform: none; z-index: auto; font-size: 14px; font-weight: 400; font-family: &quot;Public Sans&quot;, sans-serif; line-height: 21px; letter-spacing: normal; padding: 20px; margin: 0px; color: rgb(33, 37, 41); background-color: rgb(255, 255, 255);\" data-zone-name=\"nose\" data-zone-value=\"Nose\"></div><div class=\"line\" style=\"inset: 116px -18.3281px 331.172px 226px; position: absolute; width: 80px; height: 2px; min-width: 0px; min-height: 0px; max-width: none; max-height: none; display: block; box-sizing: border-box; transform: none; z-index: auto; font-size: 14px; font-weight: 400; font-family: &quot;Public Sans&quot;, sans-serif; line-height: 21px; letter-spacing: normal; padding: 0px; margin: 0px; color: rgb(33, 37, 41); background-color: rgb(0, 0, 0);\"></div><div class=\"line\" style=\"inset: 176px -16.3281px 271.172px 209px; width: 95px; position: absolute; height: 2px; min-width: 0px; min-height: 0px; max-width: none; max-height: none; display: block; box-sizing: border-box; transform: none; z-index: auto; font-size: 14px; font-weight: 400; font-family: &quot;Public Sans&quot;, sans-serif; line-height: 21px; letter-spacing: normal; padding: 0px; margin: 0px; color: rgb(33, 37, 41); background-color: rgb(0, 0, 0);\"></div><div class=\"line\" style=\"inset: 215px -17.3281px 232.172px 192px; width: 113px; position: absolute; height: 2px; min-width: 0px; min-height: 0px; max-width: none; max-height: none; display: block; box-sizing: border-box; transform: none; z-index: auto; font-size: 14px; font-weight: 400; font-family: &quot;Public Sans&quot;, sans-serif; line-height: 21px; letter-spacing: normal; padding: 0px; margin: 0px; color: rgb(33, 37, 41); background-color: rgb(0, 0, 0);\"></div><div class=\"line\" style=\"inset: 322px -20.3281px 125.172px 266px; width: 42px; position: absolute; height: 2px; min-width: 0px; min-height: 0px; max-width: none; max-height: none; display: block; box-sizing: border-box; transform: none; z-index: auto; font-size: 14px; font-weight: 400; font-family: &quot;Public Sans&quot;, sans-serif; line-height: 21px; letter-spacing: normal; padding: 0px; margin: 0px; color: rgb(33, 37, 41); background-color: rgb(0, 0, 0);\"></div></div>\r\n              <div class=\"answer-box\" id=\"answerBox\" style=\"position: relative; inset: 0px; width: 143.516px; height: 561.469px; min-width: auto; min-height: auto; max-width: none; max-height: none; display: block; box-sizing: border-box; transform: none; z-index: auto; font-size: 14px; font-weight: 400; font-family: &quot;Public Sans&quot;, sans-serif; line-height: 21px; letter-spacing: normal; padding: 0px; margin: 0px; color: rgb(33, 37, 41); background-color: rgba(0, 0, 0, 0);\"><div class=\"answer-element\" data-element-id=\"ear\" style=\"inset: 295px 111.688px 216.469px -32px; position: absolute; width: 63.8281px; height: 50px; min-width: 0px; min-height: 0px; max-width: none; max-height: none; display: block; box-sizing: border-box; transform: none; z-index: auto; font-size: 20px; font-weight: 400; font-family: &quot;Fredoka One&quot;, sans-serif; line-height: 30px; letter-spacing: normal; padding: 10px 15px; margin: 0px; color: rgb(255, 255, 255); background-color: rgb(142, 88, 61);\">Ear</div><div class=\"answer-element\" data-element-id=\"eyes\" style=\"inset: 223px 104.031px 288.469px -35px; position: absolute; width: 74.4844px; height: 50px; min-width: 0px; min-height: 0px; max-width: none; max-height: none; display: block; box-sizing: border-box; transform: none; z-index: auto; font-size: 20px; font-weight: 400; font-family: &quot;Fredoka One&quot;, sans-serif; line-height: 30px; letter-spacing: normal; padding: 10px 15px; margin: 0px; color: rgb(255, 255, 255); background-color: rgb(142, 88, 61);\">Eyes</div><div class=\"answer-element\" data-element-id=\"nose\" style=\"inset: 90px 104.875px 421.469px -39px; position: absolute; width: 77.6406px; height: 50px; min-width: 0px; min-height: 0px; max-width: none; max-height: none; display: block; box-sizing: border-box; transform: none; z-index: auto; font-size: 20px; font-weight: 400; font-family: &quot;Fredoka One&quot;, sans-serif; line-height: 30px; letter-spacing: normal; padding: 10px 15px; margin: 0px; color: rgb(255, 255, 255); background-color: rgb(142, 88, 61);\">Nose</div><div class=\"answer-element\" data-element-id=\"feet\" style=\"inset: 156px 107.875px 355.469px -37px; position: absolute; width: 72.6406px; height: 50px; min-width: 0px; min-height: 0px; max-width: none; max-height: none; display: block; box-sizing: border-box; transform: none; z-index: auto; font-size: 20px; font-weight: 400; font-family: &quot;Fredoka One&quot;, sans-serif; line-height: 30px; letter-spacing: normal; padding: 10px 15px; margin: 0px; color: rgb(255, 255, 255); background-color: rgb(142, 88, 61);\">Feet</div></div>\r\n          </div>\r\n\r\n      </div>\r\n  </div></div>"
+//         },
+//         "question": {
+//             "text": "Label the parts of the dog."
+//         }
+//     }
+// ];
+            const preloadData = old_data;
+
+            setTimeout(() => {
+                const entry = Array.isArray(preloadData) ? preloadData[0] : preloadData;
+                if (entry) loadFromEntry(entry);
+            }, 0);
+        }
