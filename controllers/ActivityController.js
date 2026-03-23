@@ -110,6 +110,12 @@ class ActivityController {
             web_token: ust,
           },
         });
+        if (!user) {
+          return res.status(404).json({
+            message: "User not found",
+            error: "Invalid web_token",
+          });
+        }
         // console.log("user....", user);
         const obj = {
           user_id: user.id,
@@ -132,7 +138,7 @@ class ActivityController {
         console.error("Error fetching random questions:", error);
         return res.status(500).json({
           message: "Internal server error",
-          error,
+          error: error.message || String(error),
         });
       }
     });
