@@ -39,179 +39,233 @@ class OverallReportController {
       try {
         const user = req.session.user;
         const { subject } = req.body;
-        
-        // 🔥 1. FETCH ALL DATA ONCE
-        const [levels, subtopics, questions, testHistory] = await Promise.all([
-          Level.findAll({ where: { is_deleted: null } }),
-          Subtopic.findAll({
-            where: { subject, is_deleted: null },
-          }),
-          Questions.findAll({
-            where: { is_deleted: null },
-            attributes: ["id", "sub_topic", "question_type"],
-          }),
-          TestHistory.findAll({
-            where: { user_id: user.id, is_deleted: null },
-            order: [["id", "DESC"]],
-          }),
-        ]);
-        
-        // 🔥 2. MAP DATA (IN MEMORY)
-        const subtopicsByLevel = {};
-        subtopics.forEach((s) => {
-          if (!subtopicsByLevel[s.level]) subtopicsByLevel[s.level] = [];
-          subtopicsByLevel[s.level].push(s);
+        const levels = await Level.findAll({
+          where: {
+            is_deleted: null,
+          },
         });
-        
-        const subtopicsByTopic = {};
-        subtopics.forEach((s) => {
-          if (!subtopicsByTopic[s.topic]) subtopicsByTopic[s.topic] = [];
-          subtopicsByTopic[s.topic].push(s);
-        });
-        
-        const questionsBySubtopic = {};
-        questions.forEach((q) => {
-          if (!questionsBySubtopic[q.sub_topic])
-            questionsBySubtopic[q.sub_topic] = [];
-          questionsBySubtopic[q.sub_topic].push(q);
-        });
-        
-        const historyBySubtopic = {};
-        testHistory.forEach((h) => {
-          if (!historyBySubtopic[h.sub_topic])
-            historyBySubtopic[h.sub_topic] = [];
-          historyBySubtopic[h.sub_topic].push(h);
-        });
-        
-        // 🔥 3. MAIN LOGIC (NO EXTRA DB CALLS)
         const results = await Promise.all(
-          levels.map(async (level) => {
-            const levelSubtopics = subtopicsByLevel[level.id] || [];
-        
+          levels.map(async (level, idx) => {
+            const subtopics = await Subtopic.findAll({
+              where: {
+                level: level.id,
+                subject: subject,
+                is_deleted: null,
+              },
+            });
+            // console.log("subtopics", subtopics);
             let percent = 0;
-        
             const result = await Promise.all(
-              levelSubtopics.map(async (subtopic) => {
-                const qList = questionsBySubtopic[subtopic.id] || [];
-        
-                let templates = [
-                  ...new Set(qList.map((q) => q.question_type)),
-                ].filter(Boolean).map(Number);
-        
-                const historyList = (historyBySubtopic[subtopic.id] || []).filter(
-                  (h) => templates.includes(h.question_type)
+              subtopics.map(async (subtopic) => {
+                // console.log("subtopic.id", subtopic.id);
+                const ques_type_ids = await Questions.findAll({
+                  where: {
+                    is_deleted: null,
+                    sub_topic: subtopic.id,
+                  },
+                  attributes: ["question_type"],
+                });
+                let templates = ques_type_ids
+                  .map((d) => d.question_type)
+                  .filter((v, i, arr) => arr.indexOf(v) === i);
+                // console.log("templates", templates);
+
+                if (!templates) {
+                  templates = [];
+                }
+
+                if (typeof templates === "string") {
+                  try {
+                    templates = JSON.parse(templates);
+                  } catch {
+                    templates = [];
+                  }
+                }
+
+                if (!Array.isArray(templates)) {
+                  templates = [];
+                }
+
+                templates = templates.filter(
+                  (x) => x !== null && x !== undefined
                 );
-        
+                templates = templates.map(Number);
+
+                const test_history = await TestHistory.findAll({
+                  where: {
+                    user_id: user.id,
+                    sub_topic: subtopic.id,
+                    question_type: { [Op.in]: templates },
+                    is_deleted: null,
+                  },
+                  order: [["id", "DESC"]],
+                });
+                // console.log("test_history " + subtopic.title, test_history);
                 const latestByTemplate = {};
-                historyList.forEach((entry) => {
+                test_history.forEach((entry) => {
                   if (!latestByTemplate[entry.question_type]) {
-                    latestByTemplate[entry.question_type] = entry;
+                    latestByTemplate[entry.question_type] = entry; // first one is latest because sorted DESC
                   }
                 });
-        
+                // console.log("latestByTemplate", latestByTemplate);
                 let correctQ = 0;
                 let wrongQ = 0;
-        
-                Object.values(latestByTemplate).forEach((h) => {
-                  correctQ += h.correct_ans;
-                  wrongQ += h.wrong_ans;
+                Object.values(latestByTemplate).map((history) => {
+                  correctQ += history.correct_ans;
+                  wrongQ += history.wrong_ans;
                 });
-        
+                // console.log("correctQ", correctQ);
+                // console.log("wrongQ", wrongQ);
                 percent +=
                   correctQ + wrongQ <= 0
                     ? 0
                     : (correctQ / (correctQ + wrongQ)) * 100;
-        
-                // ⚠️ KEEP SAME ML CALL (no structure change)
+                // console.log("percent", percent);
                 const question_rep = await BuildJsonForSkillCalciRequest(
                   latestByTemplate
                 );
-        
+                // console.log("question_rep", question_rep);
                 let questions_request = [];
                 if (question_rep.length > 0) {
                   questions_request = await getSkillsReportByML([
                     { user_id: user.id, questions: question_rep },
                   ]);
                 }
-        
+                // console.log("questions_request", questions_request);
                 if (questions_request[0]?.overall_skill_improvements) {
+                  // console.log(
+                  //   "questions_request[0].overall_skill_improvements",
+                  //   questions_request[0].overall_skill_improvements
+                  // );
                   return questions_request[0].overall_skill_improvements;
                 }
-        
                 return null;
               })
             );
-        
-            const final_percent = percent / (levelSubtopics.length || 1);
+            // console.log("percent", percent);
+            const final_percent = percent / subtopics.length;
             const data = result.filter(Boolean);
             const averagedSkills = averageSkills(data);
+
+            // console.log("data", data);
+            // console.log("averagedSkills", averagedSkills);
             const fnl_skills = convertSkillObjectToArray(averagedSkills);
-        
-            // 🔥 TOPICS OPTIMIZED (NO DB CALLS)
             const topics = await Topics.findAll({
               where: {
                 is_deleted: null,
-                subject,
+                subject: subject,
                 level: level.id,
               },
               attributes: ["id", "title", "thumbnail", "sort_order"],
             });
-        
             const topics_data = await Promise.all(
               topics.map(async (topic) => {
-                const topicSubtopics = subtopicsByTopic[topic.id] || [];
-        
-                const subtopicPercentages = topicSubtopics.map((subtopic) => {
-                  const qList = questionsBySubtopic[subtopic.id] || [];
-        
-                  let templates = [
-                    ...new Set(qList.map((q) => q.question_type)),
-                  ].filter(Boolean).map(Number);
-        
-                  const historyList = (historyBySubtopic[subtopic.id] || []).filter(
-                    (h) => templates.includes(h.question_type)
+                const subtopics = await Subtopic.findAll({
+                  where: {
+                    topic: topic.id,
+                    is_deleted: null,
+                  },
+                });
+                // console.log("subtopics for topic " + topic.title, subtopics);
+
+                // Calculate percentages for all subtopics in parallel
+                const percentPromises = subtopics.map(async (subtopic) => {
+                  const ques_type_ids = await Questions.findAll({
+                    where: {
+                      is_deleted: null,
+                      sub_topic: subtopic.id,
+                    },
+                    attributes: ["question_type"],
+                  });
+
+                  let templates = ques_type_ids
+                    .map((d) => d.question_type)
+                    .filter((v, i, arr) => arr.indexOf(v) === i);
+
+                  if (!templates) {
+                    templates = [];
+                  }
+
+                  if (typeof templates === "string") {
+                    try {
+                      templates = JSON.parse(templates);
+                    } catch {
+                      templates = [];
+                    }
+                  }
+
+                  if (!Array.isArray(templates)) {
+                    templates = [];
+                  }
+
+                  templates = templates.filter(
+                    (x) => x !== null && x !== undefined
                   );
-        
+                  templates = templates.map(Number);
+
+                  const test_history = await TestHistory.findAll({
+                    where: {
+                      user_id: user.id,
+                      sub_topic: subtopic.id,
+                      question_type: { [Op.in]: templates },
+                      is_deleted: null,
+                    },
+                    order: [["id", "DESC"]],
+                  });
+
+                  const latestByTemplate = {};
+                  test_history.forEach((entry) => {
+                    if (!latestByTemplate[entry.question_type]) {
+                      latestByTemplate[entry.question_type] = entry;
+                    }
+                  });
+
                   let correctQ = 0;
                   let wrongQ = 0;
-        
-                  historyList.forEach((h) => {
-                    correctQ += h.correct_ans;
-                    wrongQ += h.wrong_ans;
+                  Object.values(latestByTemplate).forEach((history) => {
+                    correctQ += history.correct_ans;
+                    wrongQ += history.wrong_ans;
                   });
-        
+
                   const percent =
                     correctQ + wrongQ <= 0
                       ? 0
                       : (correctQ / (correctQ + wrongQ)) * 100;
-        
+
                   return {
                     subtopic_id: subtopic.id,
                     subtopic_name: subtopic.title,
                     percent: Math.round(percent > 100 ? 100 : percent),
                   };
                 });
-        
+
+                // Wait for all subtopic percentages to be calculated
+                const subtopicPercentages = await Promise.all(percentPromises);
+
+                // Calculate topic-wide average percentage if needed
                 const totalPercent = subtopicPercentages.reduce(
                   (sum, item) => sum + item.percent,
                   0
                 );
-        
                 const averagePercent =
                   subtopicPercentages.length > 0
                     ? Math.round(totalPercent / subtopicPercentages.length)
                     : 0;
-        
+
                 return {
                   id: topic.id,
                   name: topic.title,
                   thumbnail: topic.thumbnail,
                   sort_order: topic.sort_order,
+                  // Topic-level percentage (average of all subtopics)
                   topic_percentage: averagePercent,
+                  // Detailed subtopic percentages
+                  // subtopic_percentages: subtopicPercentages,
+                  // Or if you want just an array of percentages without subtopic details:
+                  // subtopic_percents: subtopicPercentages.map(item => item.percent),
                 };
               })
             );
-        
             return {
               id: level.id,
               name: level.level,
@@ -221,7 +275,6 @@ class OverallReportController {
             };
           })
         );
-        
         return res.status(200).json({ status: 200, data: results });
       } catch (error) {
         console.error("Login error:", error);
