@@ -186,19 +186,22 @@ class UsersListController {
 
             try {
               subjectIds = value.subject ? JSON.parse(value.subject) : [];
+
+              if (!Array.isArray(subjectIds)) {
+                subjectIds = [subjectIds];
+              }
             } catch (err) {
               subjectIds = [];
             }
-
             const subjects = subjectIds.length
               ? await Subjects.findAll({
-                  where: {
-                    id: {
-                      [Op.in]: subjectIds,
-                    },
+                where: {
+                  id: {
+                    [Op.in]: subjectIds,
                   },
-                  attributes: ["subject"],
-                })
+                },
+                attributes: ["subject"],
+              })
               : [];
 
             const subjectNames = subjects.map((sub) => sub.subject);
@@ -222,13 +225,11 @@ class UsersListController {
               type: value.type === "student" ? "Student" : "Individual",
               profile_image: `<img src="../${value.profile_image}" alt="Thumbnail" style="width: 50px;">`,
               action: `
-                <button class="btn btn-primary btn-sm" onclick="${
-                  value.type === "student"
-                    ? `OpenEditModal(${value.id})`
-                    : `IndividualOpenEditModal(${value.id})`
+                <button class="btn btn-primary btn-sm" onclick="${value.type === "student"
+                  ? `OpenEditModal(${value.id})`
+                  : `IndividualOpenEditModal(${value.id})`
                 }">Edit</button>
-                <button class='btn btn-danger btn-sm' onclick="DeleteData(${
-                  value.id
+                <button class='btn btn-danger btn-sm' onclick="DeleteData(${value.id
                 })">Delete</button>
               `,
             };

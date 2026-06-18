@@ -67,6 +67,66 @@ class OrganisationController {
           return res.status(200).json({ status: 401, errors: errors.array() });
         }
         const { org_name, name, mobile, email, org_details } = req.body;
+        if (!org_details || !Array.isArray(org_details) || org_details.length === 0) {
+          return res.status(200).json({
+            status: 400,
+            message: "At least one subject row is required"
+          });
+        }
+        for (let i = 0; i < org_details.length; i++) {
+          const row = org_details[i];
+
+          if (!row.subject) {
+            return res.status(200).json({
+              status: 400,
+              message: `Subject is required in row ${i + 1}`
+            });
+          }
+
+          if (!row.standard) {
+            return res.status(200).json({
+              status: 400,
+              message: `Standard is required in row ${i + 1}`
+            });
+          }
+
+          if (!row.section) {
+            return res.status(200).json({
+              status: 400,
+              message: `Section is required in row ${i + 1}`
+            });
+          }
+
+          if (!row.level || row.level.length === 0) {
+            return res.status(200).json({
+              status: 400,
+              message: `Level is required in row ${i + 1}`
+            });
+          }
+
+          if (!row.student_count) {
+            return res.status(200).json({
+              status: 400,
+              message: `Student count is required in row ${i + 1}`
+            });
+          }
+        }
+
+        const combinations = new Set();
+
+        for (const row of org_details) {
+          const key = `${row.subject}_${row.standard}_${row.section}`;
+
+          if (combinations.has(key)) {
+            return res.status(200).json({
+              status: 400,
+              message: "Duplicate Subject + Standard + Section found"
+            });
+          }
+
+          combinations.add(key);
+        }
+
         const file = req.file;
         if (!file) {
           return res
@@ -134,10 +194,25 @@ class OrganisationController {
       });
       const data = await Promise.all(
         data1.map(async (value) => {
+          console.log("value.subject =", value.subject);
+          console.log("parsed =", JSON.parse(value.subject));
+          console.log("isArray =", Array.isArray(JSON.parse(value.subject)));
+          let subjectIds = [];
+
+          try {
+            subjectIds = JSON.parse(value.subject || "[]");
+
+            if (!Array.isArray(subjectIds)) {
+              subjectIds = [subjectIds];
+            }
+          } catch (err) {
+            subjectIds = [];
+          }
+
           const subjects = await Subjects.findAll({
             where: {
               id: {
-                [Op.in]: JSON.parse(value.subject),
+                [Op.in]: subjectIds,
               },
             },
             attributes: ["subject"],

@@ -34,13 +34,20 @@
     </div>
 
     <div class="auth-main">
+        <div class="auth-header">
+            <a href="#"><img src="/logo/cmpny-logo1.jpg" alt="img"></a>
+        </div>
         <div class="auth-wrapper v3">
             <div class="auth-form">
-                <div class="auth-header">
-                    <a href="#"><img src="/logo/cmpny-logo1.jpg" alt="img"></a>
-                </div>
+
                 <div class="card my-5">
                     <div class="card-body">
+
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold text-primary">Fefdy BrainGym Admin</h2>
+                            <p class="text-muted mb-0">Administrator Portal</p>
+                        </div>
+                        
                         <div class="d-flex justify-content-between align-items-end mb-4">
                             <h3 class="mb-0"><b>Login</b></h3>
                             <!-- <a href="#" class="link-primary">Don't have an account?</a> -->
@@ -53,52 +60,22 @@
                             </div>
                             <div class="form-group mb-3">
                                 <label class="form-label">Password</label>
-                                <input type="password" class="form-control" name="password" id="password">
+
+                                <div class="position-relative">
+                                    <input type="password" class="form-control pe-5" name="password" id="password">
+
+                                    <span id="togglePassword"
+                                        style="position:absolute; right:15px; top:50%; transform:translateY(-50%); cursor:pointer;">
+                                        <i class="fas fa-eye"></i>
+                                    </span>
+                                </div>
+
                                 <p class="validate_error" id="password_error"></p>
                             </div>
                             <div class="d-grid mt-4">
                                 <button type="submit" class="btn btn-primary">Login</button>
                             </div>
                         </form>
-                        <!-- <div class="saprator mt-3">
-                            <span>Login with</span>
-                        </div> -->
-                        <!-- <div class="row">
-                            <div class="col-4">
-                                <div class="d-grid">
-                                    <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
-                                        <img src="#" alt="img"> <span class="d-none d-sm-inline-block"> Google</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="d-grid">
-                                    <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
-                                        <img src="#" alt="img"> <span class="d-none d-sm-inline-block"> Twitter</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="d-grid">
-                                    <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
-                                        <img src="#" alt="img"> <span class="d-none d-sm-inline-block"> Facebook</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div> -->
-                    </div>
-                </div>
-                <div class="auth-footer row">
-                    <!-- <div class=""> -->
-                    <div class="col my-1">
-                        <p class="m-0">Copyright © <a href="#">#</a> Distributed by <a href="#">#</a></p>
-                    </div>
-                    <div class="col-auto my-1">
-                        <ul class="list-inline footer-link mb-0">
-                            <li class="list-inline-item"><a href="#">Home</a></li>
-                            <li class="list-inline-item"><a href="#">Privacy Policy</a></li>
-                            <li class="list-inline-item"><a href="#">Contact us</a></li>
-                        </ul>
                     </div>
                 </div>
             </div>
@@ -115,7 +92,22 @@
     <script src="/assets/js/fonts/custom-font.js"></script>
     <script src="/assets/js/pcoded.js"></script>
     <script src="/assets/js/plugins/feather.min.js"></script>
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const password = document.getElementById('password');
+            const icon = this.querySelector('i');
 
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    </script>
 </body>
 
 </html>
